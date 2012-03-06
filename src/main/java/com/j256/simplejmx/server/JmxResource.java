@@ -1,4 +1,4 @@
-package com.j256.simplejmx;
+package com.j256.simplejmx.server;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
 public @interface JmxResource {
 
 	/**
-	 * Jmx domain name of the object.
+	 * JMX domain name of the object.
 	 */
 	public String domainName();
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
-	<!-- simplejmx tests configuration file for Maven (http://maven.apache.org/) -->
+	<!-- simplejmx pom configuration file for Maven (http://maven.apache.org/) -->
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.j256</groupId>
 	<artifactId>simpleJmx</artifactId>

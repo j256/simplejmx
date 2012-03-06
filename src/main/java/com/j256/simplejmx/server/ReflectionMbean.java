@@ -1,4 +1,4 @@
-package com.j256.simplejmx;
+package com.j256.simplejmx.server;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

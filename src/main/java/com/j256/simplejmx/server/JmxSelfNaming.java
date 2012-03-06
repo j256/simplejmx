@@ -1,4 +1,4 @@
-package com.j256.simplejmx;
+package com.j256.simplejmx.server;
 
 import javax.management.ObjectName;
 

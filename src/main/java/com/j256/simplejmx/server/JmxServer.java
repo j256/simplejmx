@@ -1,4 +1,4 @@
-package com.j256.simplejmx;
+package com.j256.simplejmx.server;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
@@ -9,6 +9,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 
+import javax.management.JMException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.management.remote.JMXConnectorServer;
@@ -40,7 +41,7 @@ public class JmxServer {
 	 * Start our JMX service. The port must have already been called either here on in the {@link #JmxServer(int)}
 	 * constructor before {@link #start()} is called.
 	 */
-	public synchronized void start() throws Exception {
+	public synchronized void start() throws JMException {
 		if (port == 0) {
 			throw new IllegalStateException("port must be already set when JmxServer is initialized");
 		}
@@ -49,14 +50,14 @@ public class JmxServer {
 	}
 
 	/**
-	 * Close the JMX server.
+	 * Stop the JMX server by closing the connector and unpublishing it from the RMI registry.
 	 */
-	public synchronized void close() throws Exception {
+	public synchronized void stop() throws JMException {
 		if (connector != null) {
 			try {
 				connector.stop();
 			} catch (IOException e) {
-				throw new Exception("Could not stop our Jmx connector server", e);
+				throw createJmException("Could not stop our Jmx connector server", e);
 			} finally {
 				connector = null;
 			}
@@ -65,7 +66,7 @@ public class JmxServer {
 			try {
 				UnicastRemoteObject.unexportObject(rmiRegistry, true);
 			} catch (NoSuchObjectException e) {
-				throw new Exception("Could not unexport our RMI registry", e);
+				throw createJmException("Could not unexport our RMI registry", e);
 			} finally {
 				rmiRegistry = null;
 			}
@@ -75,7 +76,7 @@ public class JmxServer {
 	/**
 	 * Register the object parameter for exposure with JMX.
 	 */
-	public void register(Object obj) {
+	public void register(Object obj) throws JMException {
 		ObjectName objectName = extractJmxResourceObjName(obj);
 		if (objectName == null) {
 			// skip it if it is null
@@ -84,20 +85,29 @@ public class JmxServer {
 		try {
 			mbeanServer.registerMBean(new ReflectionMbean(obj), objectName);
 		} catch (Exception e) {
-			throw new IllegalArgumentException("Registering JMX object failed", e);
+			throw createJmException("Registering JMX object " + objectName + " failed", e);
 		}
 	}
 
 	/**
-	 * Un-register the object parameter from JMX.
+	 * Un-register the object parameter from JMX. Use the {@link #unregisterThrow(Object)} if you want to see the
+	 * exceptions.
 	 */
 	public void unregister(Object obj) {
-		ObjectName objectName = extractJmxResourceObjName(obj);
 		try {
-			mbeanServer.unregisterMBean(objectName);
+			unregisterThrow(obj);
 		} catch (Exception e) {
 			// ignored
 		}
+	}
+
+	/**
+	 * Un-register the object parameter from JMX but this throws exceptions. Use the {@link #unregister(Object)} if you
+	 * want it to be silent.
+	 */
+	public void unregisterThrow(Object obj) throws JMException {
+		ObjectName objectName = extractJmxResourceObjName(obj);
+		mbeanServer.unregisterMBean(objectName);
 	}
 
 	/**
@@ -111,12 +121,12 @@ public class JmxServer {
 	/**
 	 * Start the RMI registry.
 	 */
-	private void startRmiRegistry() throws Exception {
+	private void startRmiRegistry() throws JMException {
 		if (rmiRegistry == null) {
 			try {
 				rmiRegistry = LocateRegistry.createRegistry(port);
 			} catch (IOException e) {
-				throw new Exception("Unable to create RMI registry on port " + port, e);
+				throw createJmException("Unable to create RMI registry on port " + port, e);
 			}
 		}
 	}
@@ -124,27 +134,27 @@ public class JmxServer {
 	/**
 	 * Start our JMX service.
 	 */
-	private void startJmxService() throws Exception {
+	private void startJmxService() throws JMException {
 		if (connector == null) {
 			JMXServiceURL url = null;
 			String urlString = "service:jmx:rmi://localhost:" + (port + 1) + "/jndi/rmi://:" + port + "/jmxrmi";
 			try {
 				url = new JMXServiceURL(urlString);
 			} catch (MalformedURLException e) {
-				throw new Exception("Malformed service url created " + urlString, e);
+				throw createJmException("Malformed service url created " + urlString, e);
 			}
 			try {
 				connector =
 						JMXConnectorServerFactory.newJMXConnectorServer(url, new HashMap<String, Object>(),
 								ManagementFactory.getPlatformMBeanServer());
 			} catch (IOException e) {
-				throw new Exception("Could not make our Jmx connector server", e);
+				throw createJmException("Could not make our Jmx connector server", e);
 			}
 			try {
 				connector.start();
 			} catch (IOException e) {
 				connector = null;
-				throw new Exception("Could not start our Jmx connector server", e);
+				throw createJmException("Could not start our Jmx connector server", e);
 			}
 			mbeanServer = connector.getMBeanServer();
 		}
@@ -165,6 +175,12 @@ public class JmxServer {
 
 	private ObjectName extractJmxSelfNamingObjName(String domain, JmxSelfNaming obj) {
 		return makeObjectName(obj, domain, obj.getJmxObjectName(), obj.getJmxFieldValues());
+	}
+
+	private JMException createJmException(String message, Exception e) {
+		JMException jmException = new JMException(message);
+		jmException.initCause(e);
+		return jmException;
 	}
 
 	private ObjectName makeObjectName(Object obj, String domain, String name, String[] fieldValues) {
