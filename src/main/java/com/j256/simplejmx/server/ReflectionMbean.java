@@ -2,6 +2,7 @@ package com.j256.simplejmx.server;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,7 @@ public class ReflectionMbean implements DynamicMBean {
 	private final Object obj;
 	private final Map<String, Method> fieldGetMap = new HashMap<String, Method>();
 	private final Map<String, Method> fieldSetMap = new HashMap<String, Method>();
-	private final Map<String, Method> fieldOperationMap = new HashMap<String, Method>();
+	private final Map<NameParams, Method> fieldOperationMap = new HashMap<NameParams, Method>();
 	private final MBeanInfo mbeanInfo;
 
 	public ReflectionMbean(Object obj) {
@@ -64,11 +65,12 @@ public class ReflectionMbean implements DynamicMBean {
 		return mbeanInfo;
 	}
 
-	public Object invoke(String actionName, Object[] params, String[] signature) throws MBeanException,
+	public Object invoke(String actionName, Object[] params, String[] signatureTypes) throws MBeanException,
 			ReflectionException {
-		Method method = fieldOperationMap.get(actionName);
+		Method method = fieldOperationMap.get(new NameParams(actionName, signatureTypes));
 		if (method == null) {
-			throw new MBeanException(new IllegalArgumentException("Unknown action " + actionName));
+			throw new MBeanException(new IllegalArgumentException("Unknown action '" + actionName
+					+ "' with parameter types " + Arrays.toString(signatureTypes)));
 		} else {
 			try {
 				return method.invoke(obj, params);
@@ -116,7 +118,7 @@ public class ReflectionMbean implements DynamicMBean {
 		} else {
 			desc = jmxResource.description();
 		}
-		findAttributes(obj);
+		discoverAttributes(obj);
 		List<MBeanAttributeInfo> attributes = new ArrayList<MBeanAttributeInfo>();
 		List<MBeanOperationInfo> operations = new ArrayList<MBeanOperationInfo>();
 		// we have to go back because we need to match up the getters and setters
@@ -142,11 +144,13 @@ public class ReflectionMbean implements DynamicMBean {
 					throw new IllegalArgumentException("Operation method " + method
 							+ " cannot start with get or set.  Is this an attribute?");
 				}
-				if (fieldOperationMap.containsKey(name)) {
-					throw new IllegalArgumentException("Another method " + method
-							+ " has been marked as an operation with different parameters");
+				Class<?>[] types = method.getParameterTypes();
+				String[] stringTypes = new String[types.length];
+				for (int i = 0; i < types.length; i++) {
+					stringTypes[i] = types[i].toString();
 				}
-				fieldOperationMap.put(name, method);
+				NameParams nameParams = new NameParams(name, stringTypes);
+				fieldOperationMap.put(nameParams, method);
 				operations.add(new MBeanOperationInfo(jmxOperation.description(), method));
 			}
 		}
@@ -159,7 +163,7 @@ public class ReflectionMbean implements DynamicMBean {
 	/**
 	 * Using reflection, find methods from our object that will be exposed via JMX.
 	 */
-	private void findAttributes(Object obj) {
+	private void discoverAttributes(Object obj) {
 		for (Method method : obj.getClass().getMethods()) {
 			JmxAttribute jmxAttribute = method.getAnnotation(JmxAttribute.class);
 			if (jmxAttribute == null) {
@@ -167,35 +171,30 @@ public class ReflectionMbean implements DynamicMBean {
 				continue;
 			}
 			String name = method.getName();
-			if (name.length() < 5) {
-				throw new IllegalArgumentException("Method " + method
-						+ " is marked as an attribute but its name is too short");
-			}
 			String varName = buildMethodSuffix(name);
 			Map<String, Method> fieldMap;
 			if (name.startsWith("get")) {
 				if (method.getParameterTypes().length != 0) {
-					throw new IllegalArgumentException("Method " + method
-							+ " is marked as an attribute but the get has arguments");
+					throw new IllegalArgumentException("Method '" + method + "' starts with 'get' but has arguments");
 				}
 				if (method.getReturnType() == void.class) {
-					throw new IllegalArgumentException("Method " + method
-							+ " is marked as a get attribute but does not return anything");
+					throw new IllegalArgumentException("Method '" + method
+							+ "' starts with 'get' but does not return anything");
 				}
 				fieldMap = fieldGetMap;
 			} else if (name.startsWith("set")) {
 				if (method.getParameterTypes().length != 1) {
-					throw new IllegalArgumentException("Method " + method
-							+ " is marked as an attribute but the set does not have 1 argument");
+					throw new IllegalArgumentException("Method '" + method
+							+ "' starts with 'set' but does not have 1 argument");
 				}
 				if (method.getReturnType() != void.class) {
-					throw new IllegalArgumentException("Method " + method
-							+ " is marked as a set attribute but does not return void");
+					throw new IllegalArgumentException("Method '" + method
+							+ "' starts with 'set' but does not return void");
 				}
 				fieldMap = fieldSetMap;
 			} else {
-				throw new IllegalArgumentException("Method " + method
-						+ " is marked as an attribute but is not get... or set...");
+				throw new IllegalArgumentException("Method '" + method
+						+ "' is marked as an attribute but does not start with 'get' or 'set'");
 			}
 			fieldMap.put(varName, method);
 		}
@@ -203,5 +202,31 @@ public class ReflectionMbean implements DynamicMBean {
 
 	private String buildMethodSuffix(String name) {
 		return Character.toLowerCase(name.charAt(3)) + name.substring(4);
+	}
+
+	private static class NameParams {
+		String name;
+		String[] paramTypes;
+		public NameParams(String name, String[] paramTypes) {
+			this.name = name;
+			this.paramTypes = paramTypes;
+		}
+
+		@Override
+		public int hashCode() {
+			return 31 * (31 + name.hashCode()) + Arrays.hashCode(paramTypes);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (obj == null || getClass() != obj.getClass()) {
+				return false;
+			}
+			NameParams other = (NameParams) obj;
+			if (!name.equals(other.name)) {
+				return false;
+			}
+			return Arrays.equals(paramTypes, other.paramTypes);
+		}
 	}
 }

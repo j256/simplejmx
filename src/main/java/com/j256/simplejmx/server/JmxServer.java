@@ -16,6 +16,8 @@ import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
 
+import com.j256.simplejmx.client.JmxClient;
+
 /**
  * JMX server connection which sets up a server (with or without JVM parameters) and allows classes to easily publish
  * themselves via RMI.
@@ -78,10 +80,6 @@ public class JmxServer {
 	 */
 	public void register(Object obj) throws JMException {
 		ObjectName objectName = extractJmxResourceObjName(obj);
-		if (objectName == null) {
-			// skip it if it is null
-			return;
-		}
 		try {
 			mbeanServer.registerMBean(new ReflectionMbean(obj), objectName);
 		} catch (Exception e) {
@@ -116,6 +114,24 @@ public class JmxServer {
 	 */
 	public void setPort(int port) {
 		this.port = port;
+	}
+
+	/**
+	 * Internal method used also by {@link JmxClient} to construct an object name the same in the client and the server.
+	 * 
+	 * @param domain
+	 *            This corresponds to the {@link JmxResource#domainName()} and is the top level folder name for the
+	 *            beans.
+	 * @param name
+	 *            This corresponds to the {@link JmxResource#objectName()} and is the bean name in the lowest folder
+	 *            level.
+	 * @param fieldValues
+	 *            These can be used to setup folders inside of the top folder. Each of the entries in the array are in
+	 *            "name=value" format. It is recommended that they are in alphabetic order. I often use ("00",
+	 *            "FolderName"). As far as I can tell, the name is ignored by jconsole.
+	 */
+	public static ObjectName makeObjectName(String domain, String name, JmxNamingFieldValue[] fieldValues) {
+		return makeObjectName(domain, name, fieldValues, null);
 	}
 
 	/**
@@ -167,14 +183,15 @@ public class JmxServer {
 					"Registered class must implement JmxSelfNaming or have JmxResource annotation");
 		}
 		if (obj instanceof JmxSelfNaming) {
-			return extractJmxSelfNamingObjName(jmxResource.domainName(), (JmxSelfNaming) obj);
+			return makeObjectName(jmxResource.domainName(), ((JmxSelfNaming) obj).getJmxObjectName(),
+					((JmxSelfNaming) obj).getJmxFieldValues(), null);
 		} else {
-			return makeObjectName(obj, jmxResource.domainName(), jmxResource.objectName(), jmxResource.fieldValues());
+			String objectName = jmxResource.objectName();
+			if (objectName == null || objectName.length() == 0) {
+				objectName = obj.getClass().getSimpleName();
+			}
+			return makeObjectName(jmxResource.domainName(), jmxResource.objectName(), null, jmxResource.fieldValues());
 		}
-	}
-
-	private ObjectName extractJmxSelfNamingObjName(String domain, JmxSelfNaming obj) {
-		return makeObjectName(obj, domain, obj.getJmxObjectName(), obj.getJmxFieldValues());
 	}
 
 	private JMException createJmException(String message, Exception e) {
@@ -183,14 +200,27 @@ public class JmxServer {
 		return jmException;
 	}
 
-	private ObjectName makeObjectName(Object obj, String domain, String name, String[] fieldValues) {
+	private static ObjectName makeObjectName(String domain, String name, JmxNamingFieldValue[] fieldValues,
+			String[] fieldValueStrings) {
 		// j256.backupd:00=clients,name=
 		StringBuilder sb = new StringBuilder();
 		sb.append(domain);
 		sb.append(':');
 		boolean first = true;
 		if (fieldValues != null) {
-			for (String fieldValue : fieldValues) {
+			for (JmxNamingFieldValue fieldValue : fieldValues) {
+				if (first) {
+					first = false;
+				} else {
+					sb.append(',');
+				}
+				sb.append(fieldValue.getField());
+				sb.append('=');
+				sb.append(fieldValue.getValue());
+			}
+		}
+		if (fieldValueStrings != null) {
+			for (String fieldValue : fieldValueStrings) {
 				if (first) {
 					first = false;
 				} else {
@@ -207,7 +237,7 @@ public class JmxServer {
 		try {
 			return new ObjectName(sb.toString());
 		} catch (Exception e) {
-			throw new IllegalArgumentException("Object " + obj + " generated an invalid name: " + sb.toString(), e);
+			throw new IllegalArgumentException("Invalid ObjectName generated: " + sb.toString(), e);
 		}
 	}
 }

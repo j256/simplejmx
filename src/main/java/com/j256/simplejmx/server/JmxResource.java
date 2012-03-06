@@ -20,8 +20,9 @@ public @interface JmxResource {
 	public String domainName();
 
 	/**
-	 * Name of the object for the name= part of the ObjectName. Could be replaced by
-	 * {@link JmxSelfNaming#getJmxObjectName()}.
+	 * Name of the object for the name= part of the ObjectName. If the object implements {@link JmxSelfNaming} then this
+	 * would be replaced by {@link JmxSelfNaming#getJmxObjectName()}. If the object doesn't implement
+	 * {@link JmxSelfNaming} and this is not specified then the object class name is used.
 	 */
 	public String objectName() default "";
 
