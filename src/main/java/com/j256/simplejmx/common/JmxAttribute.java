@@ -1,4 +1,4 @@
-package com.j256.simplejmx.server;
+package com.j256.simplejmx.common;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

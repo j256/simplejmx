@@ -8,6 +8,11 @@ import javax.management.JMException;
 import org.junit.Test;
 
 import com.j256.simplejmx.client.JmxClient;
+import com.j256.simplejmx.common.JmxAttribute;
+import com.j256.simplejmx.common.JmxNamingFieldValue;
+import com.j256.simplejmx.common.JmxOperation;
+import com.j256.simplejmx.common.JmxResource;
+import com.j256.simplejmx.common.ObjectNameUtil;
 
 public class JmxServerTest {
 
@@ -136,6 +141,28 @@ public class JmxServerTest {
 		}
 	}
 
+	@Test(expected = IllegalArgumentException.class)
+	public void testShortAttributeMethodName() throws Exception {
+		JmxServer server = new JmxServer(DEFAULT_PORT);
+		try {
+			server.start();
+			server.register(new ShortAttributeMethodName());
+		} finally {
+			server.stop();
+		}
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testJustGetAttributeMethodName() throws Exception {
+		JmxServer server = new JmxServer(DEFAULT_PORT);
+		try {
+			server.start();
+			server.register(new JustGet());
+		} finally {
+			server.stop();
+		}
+	}
+
 	@Test
 	public void testRegisterFolders() throws Exception {
 		JmxServer server = new JmxServer(DEFAULT_PORT);
@@ -187,6 +214,22 @@ public class JmxServerTest {
 		@JmxAttribute(description = "A value")
 		public int getFoo() {
 			return FOO_VALUE;
+		}
+	}
+
+	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	protected static class ShortAttributeMethodName {
+		@JmxAttribute(description = "A value")
+		public int x() {
+			return 0;
+		}
+	}
+
+	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	protected static class JustGet {
+		@JmxAttribute(description = "A value")
+		public int get() {
+			return 0;
 		}
 	}
 }

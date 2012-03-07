@@ -1,5 +1,11 @@
 package com.j256.simplejmx.server;
 
+import com.j256.simplejmx.common.JmxAttribute;
+import com.j256.simplejmx.common.JmxNamingFieldValue;
+import com.j256.simplejmx.common.JmxOperation;
+import com.j256.simplejmx.common.JmxResource;
+import com.j256.simplejmx.common.JmxSelfNaming;
+
 public class JmxIntegrationTest {
 
 	private static final int DEFAULT_PORT = 5256;
@@ -44,14 +50,26 @@ public class JmxIntegrationTest {
 			this.foo = foo;
 		}
 
-		@JmxOperation(description = "See Foo to be 0")
+		@JmxOperation(description = "Set Foo to be 0")
 		public void resetFoo() {
 			this.foo = 0;
 		}
 
-		@JmxOperation(description = "Set Foo to be a particular value as an operation")
+		@JmxOperation(description = "Set Foo to be a particular value as an operation", parameterNames = { "newValue" }, parameterDescriptions = { "new value to set to foo" })
 		public void resetFoo(int newValue) {
 			this.foo = newValue;
+		}
+
+		@JmxOperation(description = "Add the two params", parameterNames = { "first", "second" }, parameterDescriptions = {
+				"First one", "Second one" })
+		public String twoArguements(int first, int second) {
+			return first + " + " + second + " = " + (first + second);
+		}
+
+		// another operation without any parameter information
+		@JmxOperation(description = "Return the parameter")
+		public String anotherOperation(String someParam) {
+			return "Parameter was: " + someParam;
 		}
 
 		@JmxOperation(description = "Add another object to JMX")

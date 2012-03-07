@@ -1,4 +1,6 @@
-package com.j256.simplejmx.server;
+package com.j256.simplejmx.common;
+
+import com.j256.simplejmx.server.JmxServer;
 
 /**
  * Wrapper around a field and value pair that is used in {@link JmxResource#fieldValues()} and

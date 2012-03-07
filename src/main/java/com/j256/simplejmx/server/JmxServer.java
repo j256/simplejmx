@@ -16,6 +16,10 @@ import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
 
+import com.j256.simplejmx.common.JmxResource;
+import com.j256.simplejmx.common.JmxSelfNaming;
+import com.j256.simplejmx.common.ObjectNameUtil;
+
 /**
  * JMX server connection which sets up a server (with or without JVM parameters) and allows classes to easily publish
  * themselves via RMI.
@@ -78,8 +82,9 @@ public class JmxServer {
 	 */
 	public void register(Object obj) throws JMException {
 		ObjectName objectName = extractJmxResourceObjName(obj);
+		ReflectionMbean mbean = new ReflectionMbean(obj);
 		try {
-			mbeanServer.registerMBean(new ReflectionMbean(obj), objectName);
+			mbeanServer.registerMBean(mbean, objectName);
 		} catch (Exception e) {
 			throw createJmException("Registering JMX object " + objectName + " failed", e);
 		}

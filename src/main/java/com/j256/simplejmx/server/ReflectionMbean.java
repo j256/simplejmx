@@ -16,7 +16,12 @@ import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanException;
 import javax.management.MBeanInfo;
 import javax.management.MBeanOperationInfo;
+import javax.management.MBeanParameterInfo;
 import javax.management.ReflectionException;
+
+import com.j256.simplejmx.common.JmxAttribute;
+import com.j256.simplejmx.common.JmxOperation;
+import com.j256.simplejmx.common.JmxResource;
 
 /**
  * Wrapping of an object so we can dynamically expose its attributes and operations using annotations and reflection.
@@ -127,15 +132,19 @@ public class ReflectionMbean implements DynamicMBean {
 		// we have to go back because we need to match up the getters and setters
 		for (Method method : methods) {
 			JmxAttribute jmxAttribute = method.getAnnotation(JmxAttribute.class);
-			JmxOperation jmxOperation = method.getAnnotation(JmxOperation.class);
-			String name = method.getName();
 			if (jmxAttribute != null) {
-				String varName = buildMethodSuffix(name);
+				String methodName = method.getName();
+				if (methodName.length() < 4) {
+					// shouldn't get here but let's be careful out there
+					continue;
+				}
+				String varName = buildMethodSuffix(methodName);
 				Method getMethod = fieldGetMap.get(varName);
-				if (name.startsWith("set") && getMethod != null) {
+				if (methodName.startsWith("set") && getMethod != null) {
 					/*
-					 * We run through and lookup the get and set at the same time but we only add them to the attribute
-					 * list if it is the getter or if there is no getter. We don't want to add it twice.
+					 * We have to add the getter and the setter at the same time. So we only add them to the attribute
+					 * list if this method is the getter or this is the setter and there is no getter. We don't want to
+					 * add it twice.
 					 */
 					continue;
 				}
@@ -145,13 +154,42 @@ public class ReflectionMbean implements DynamicMBean {
 				} catch (IntrospectionException e) {
 					// ignore this attribute I guess
 				}
-			} else if (jmxOperation != null) {
-				operations.add(new MBeanOperationInfo(jmxOperation.description(), method));
+			} else {
+				JmxOperation jmxOperation = method.getAnnotation(JmxOperation.class);
+				if (jmxOperation != null) {
+					MBeanParameterInfo[] parameterInfos = buildParameterInfos(method, jmxOperation);
+					operations.add(new MBeanOperationInfo(method.getName(), jmxOperation.description(), parameterInfos,
+							method.getReturnType().getName(), jmxOperation.action()));
+				}
 			}
 		}
 
 		return new MBeanInfo(clazz.getName(), desc, attributes.toArray(new MBeanAttributeInfo[attributes.size()]),
 				null, operations.toArray(new MBeanOperationInfo[operations.size()]), null);
+	}
+
+	private MBeanParameterInfo[] buildParameterInfos(Method method, JmxOperation jmxOperation) {
+		Class<?>[] types = method.getParameterTypes();
+		MBeanParameterInfo[] parameterInfos = new MBeanParameterInfo[types.length];
+		String[] parameterNames = jmxOperation.parameterNames();
+		String[] parameterDescriptions = jmxOperation.parameterDescriptions();
+		for (int i = 0; i < types.length; i++) {
+			String name;
+			if (i >= parameterNames.length) {
+				name = "p" + i;
+			} else {
+				name = parameterNames[i];
+			}
+			String typeName = types[i].getName();
+			String description;
+			if (i >= parameterDescriptions.length) {
+				description = "parameter #" + i + " of type: " + typeName;
+			} else {
+				description = parameterDescriptions[i];
+			}
+			parameterInfos[i] = new MBeanParameterInfo(name, typeName, description);
+		}
+		return parameterInfos;
 	}
 
 	/**
@@ -165,6 +203,9 @@ public class ReflectionMbean implements DynamicMBean {
 				continue;
 			}
 			String name = method.getName();
+			if (name.length() < 4) {
+				throw new IllegalArgumentException("Method '" + method + "' has a name that is too short");
+			}
 			String varName = buildMethodSuffix(name);
 			Map<String, Method> fieldMap;
 			if (name.startsWith("get")) {

@@ -18,7 +18,7 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
-import com.j256.simplejmx.server.ObjectNameUtil;
+import com.j256.simplejmx.common.ObjectNameUtil;
 
 /**
  * JMX client connection implementation.

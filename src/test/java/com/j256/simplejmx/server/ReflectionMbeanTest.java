@@ -9,6 +9,9 @@ import javax.management.MBeanAttributeInfo;
 import org.junit.Test;
 
 import com.j256.simplejmx.client.JmxClient;
+import com.j256.simplejmx.common.JmxAttribute;
+import com.j256.simplejmx.common.JmxOperation;
+import com.j256.simplejmx.common.JmxResource;
 
 public class ReflectionMbeanTest {
 
