@@ -111,19 +111,21 @@ public class ReflectionMbean implements DynamicMBean {
 	 * Build our JMX information object by using reflection.
 	 */
 	private MBeanInfo buildMbeanInfo() {
-		JmxResource jmxResource = obj.getClass().getAnnotation(JmxResource.class);
+		Class<?> clazz = obj.getClass();
+		JmxResource jmxResource = clazz.getAnnotation(JmxResource.class);
 		String desc;
 		if (jmxResource == null || jmxResource.description() == null || jmxResource.description().length() == 0) {
-			desc = "Jmx information about " + obj.getClass();
+			desc = "Jmx information about " + clazz;
 		} else {
 			desc = jmxResource.description();
 		}
-		discoverAttributes();
-		discoverOperations();
+		Method[] methods = clazz.getMethods();
+		discoverAttributes(methods);
+		discoverOperations(methods);
 		List<MBeanAttributeInfo> attributes = new ArrayList<MBeanAttributeInfo>();
 		List<MBeanOperationInfo> operations = new ArrayList<MBeanOperationInfo>();
 		// we have to go back because we need to match up the getters and setters
-		for (Method method : obj.getClass().getMethods()) {
+		for (Method method : methods) {
 			JmxAttribute jmxAttribute = method.getAnnotation(JmxAttribute.class);
 			JmxOperation jmxOperation = method.getAnnotation(JmxOperation.class);
 			String name = method.getName();
@@ -148,16 +150,15 @@ public class ReflectionMbean implements DynamicMBean {
 			}
 		}
 
-		return new MBeanInfo(obj.getClass().getName(), desc,
-				attributes.toArray(new MBeanAttributeInfo[attributes.size()]), null,
-				operations.toArray(new MBeanOperationInfo[operations.size()]), null);
+		return new MBeanInfo(clazz.getName(), desc, attributes.toArray(new MBeanAttributeInfo[attributes.size()]),
+				null, operations.toArray(new MBeanOperationInfo[operations.size()]), null);
 	}
 
 	/**
 	 * Using reflection, find attribute methods from our object that will be exposed via JMX.
 	 */
-	private void discoverAttributes() {
-		for (Method method : obj.getClass().getMethods()) {
+	private void discoverAttributes(Method[] methods) {
+		for (Method method : methods) {
 			JmxAttribute jmxAttribute = method.getAnnotation(JmxAttribute.class);
 			if (jmxAttribute == null) {
 				// skip it if no annotation
@@ -196,8 +197,8 @@ public class ReflectionMbean implements DynamicMBean {
 	/**
 	 * Using reflection, find operation methods from our object that will be exposed via JMX.
 	 */
-	private void discoverOperations() {
-		for (Method method : obj.getClass().getMethods()) {
+	private void discoverOperations(Method[] methods) {
+		for (Method method : methods) {
 			JmxOperation jmxOperation = method.getAnnotation(JmxOperation.class);
 			if (jmxOperation == null) {
 				continue;

@@ -61,15 +61,18 @@ public class JmxClient {
 	}
 
 	public JmxClient(int localPort) throws IllegalArgumentException {
-		this(hostPortToUrl("", localPort));
+		this(generalJmxUrlForHostNamePort("", localPort));
 	}
 
-	public JmxClient(String host, int port) throws IllegalArgumentException {
-		this(hostPortToUrl(host, port));
+	public JmxClient(String hostName, int port) throws IllegalArgumentException {
+		this(generalJmxUrlForHostNamePort(hostName, port));
 	}
 
-	public static String hostPortToUrl(String host, int port) {
-		return "service:jmx:rmi:///jndi/rmi://" + host + ":" + port + "/jmxrmi";
+	/**
+	 * Returns a JMX/RMI URL for a host-name and port.
+	 */
+	public static String generalJmxUrlForHostNamePort(String hostName, int port) {
+		return "service:jmx:rmi:///jndi/rmi://" + hostName + ":" + port + "/jmxrmi";
 	}
 
 	/**

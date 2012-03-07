@@ -129,7 +129,8 @@ public class JmxServerTest {
 		JmxServer server = new JmxServer(DEFAULT_PORT);
 		try {
 			server.start();
-			server.register(new NoJmxResource());
+			// this class has no JmxResource annotation
+			server.register(this);
 		} finally {
 			server.stop();
 		}
@@ -178,9 +179,6 @@ public class JmxServerTest {
 		public void resetFoo(int newValue) {
 			this.foo = newValue;
 		}
-	}
-
-	protected static class NoJmxResource {
 	}
 
 	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME, fieldValues = { FOLDER_NAME })
