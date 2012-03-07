@@ -15,6 +15,9 @@ public class JmxServerTest {
 	private static final String DOMAIN_NAME = "j256";
 	private static final String OBJECT_NAME = "testObject";
 	private static final int FOO_VALUE = 1459243;
+	private static final String FOLDER_FIELD_NAME = "00";
+	private static final String FOLDER_VALUE_NAME = "FolderName";
+	private static final String FOLDER_NAME = FOLDER_FIELD_NAME + "=" + FOLDER_VALUE_NAME;
 
 	@Test
 	public void testJmxServer() throws Exception {
@@ -64,10 +67,9 @@ public class JmxServerTest {
 	public void testRegister() throws Exception {
 		JmxServer server = new JmxServer(DEFAULT_PORT);
 		TestObject obj = new TestObject();
-		JmxClient client;
 		try {
 			server.start();
-			client = new JmxClient(DEFAULT_PORT);
+			JmxClient client = new JmxClient(DEFAULT_PORT);
 
 			try {
 				client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo");
@@ -122,6 +124,36 @@ public class JmxServerTest {
 		}
 	}
 
+	@Test(expected = IllegalArgumentException.class)
+	public void testRegisterNoJmxResource() throws Exception {
+		JmxServer server = new JmxServer(DEFAULT_PORT);
+		try {
+			server.start();
+			server.register(new NoJmxResource());
+		} finally {
+			server.stop();
+		}
+	}
+
+	@Test
+	public void testRegisterFolders() throws Exception {
+		JmxServer server = new JmxServer(DEFAULT_PORT);
+		try {
+			server.start();
+			server.register(new TestObjectFolders());
+			JmxClient client = new JmxClient(DEFAULT_PORT);
+			assertEquals(FOO_VALUE, client.getAttribute(
+					ObjectNameUtil.makeObjectName(DOMAIN_NAME, OBJECT_NAME, new String[] { FOLDER_NAME }), "foo"));
+			assertEquals(FOO_VALUE,
+					client.getAttribute(
+							ObjectNameUtil.makeObjectName(DOMAIN_NAME, OBJECT_NAME,
+									new JmxNamingFieldValue[] { new JmxNamingFieldValue(FOLDER_FIELD_NAME,
+											FOLDER_VALUE_NAME) }), "foo"));
+		} finally {
+			server.stop();
+		}
+	}
+
 	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
 	protected static class TestObject {
 
@@ -145,6 +177,18 @@ public class JmxServerTest {
 		@JmxOperation(description = "A value")
 		public void resetFoo(int newValue) {
 			this.foo = newValue;
+		}
+	}
+
+	protected static class NoJmxResource {
+	}
+
+	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME, fieldValues = { FOLDER_NAME })
+	protected static class TestObjectFolders {
+
+		@JmxAttribute(description = "A value")
+		public int getFoo() {
+			return FOO_VALUE;
 		}
 	}
 }

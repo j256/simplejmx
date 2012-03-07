@@ -33,7 +33,7 @@ public class ReflectionMbean implements DynamicMBean {
 
 	public ReflectionMbean(Object obj) {
 		this.obj = obj;
-		this.mbeanInfo = buildMbeanInfo(obj);
+		this.mbeanInfo = buildMbeanInfo();
 	}
 
 	public Object getAttribute(String attribute) throws AttributeNotFoundException, ReflectionException {
@@ -110,7 +110,7 @@ public class ReflectionMbean implements DynamicMBean {
 	/**
 	 * Build our JMX information object by using reflection.
 	 */
-	private MBeanInfo buildMbeanInfo(Object obj) {
+	private MBeanInfo buildMbeanInfo() {
 		JmxResource jmxResource = obj.getClass().getAnnotation(JmxResource.class);
 		String desc;
 		if (jmxResource == null || jmxResource.description() == null || jmxResource.description().length() == 0) {
@@ -118,7 +118,8 @@ public class ReflectionMbean implements DynamicMBean {
 		} else {
 			desc = jmxResource.description();
 		}
-		discoverAttributes(obj);
+		discoverAttributes();
+		discoverOperations();
 		List<MBeanAttributeInfo> attributes = new ArrayList<MBeanAttributeInfo>();
 		List<MBeanOperationInfo> operations = new ArrayList<MBeanOperationInfo>();
 		// we have to go back because we need to match up the getters and setters
@@ -130,7 +131,10 @@ public class ReflectionMbean implements DynamicMBean {
 				String varName = buildMethodSuffix(name);
 				Method getMethod = fieldGetMap.get(varName);
 				if (name.startsWith("set") && getMethod != null) {
-					// don't stick in 2 of the them
+					/*
+					 * We run through and lookup the get and set at the same time but we only add them to the attribute
+					 * list if it is the getter or if there is no getter. We don't want to add it twice.
+					 */
 					continue;
 				}
 				Method setMethod = fieldSetMap.get(varName);
@@ -140,17 +144,6 @@ public class ReflectionMbean implements DynamicMBean {
 					// ignore this attribute I guess
 				}
 			} else if (jmxOperation != null) {
-				if (name.startsWith("get") || name.startsWith("set")) {
-					throw new IllegalArgumentException("Operation method " + method
-							+ " cannot start with get or set.  Is this an attribute?");
-				}
-				Class<?>[] types = method.getParameterTypes();
-				String[] stringTypes = new String[types.length];
-				for (int i = 0; i < types.length; i++) {
-					stringTypes[i] = types[i].toString();
-				}
-				NameParams nameParams = new NameParams(name, stringTypes);
-				fieldOperationMap.put(nameParams, method);
 				operations.add(new MBeanOperationInfo(jmxOperation.description(), method));
 			}
 		}
@@ -161,9 +154,9 @@ public class ReflectionMbean implements DynamicMBean {
 	}
 
 	/**
-	 * Using reflection, find methods from our object that will be exposed via JMX.
+	 * Using reflection, find attribute methods from our object that will be exposed via JMX.
 	 */
-	private void discoverAttributes(Object obj) {
+	private void discoverAttributes() {
 		for (Method method : obj.getClass().getMethods()) {
 			JmxAttribute jmxAttribute = method.getAnnotation(JmxAttribute.class);
 			if (jmxAttribute == null) {
@@ -200,10 +193,37 @@ public class ReflectionMbean implements DynamicMBean {
 		}
 	}
 
+	/**
+	 * Using reflection, find operation methods from our object that will be exposed via JMX.
+	 */
+	private void discoverOperations() {
+		for (Method method : obj.getClass().getMethods()) {
+			JmxOperation jmxOperation = method.getAnnotation(JmxOperation.class);
+			if (jmxOperation == null) {
+				continue;
+			}
+			String name = method.getName();
+			if (name.startsWith("get") || name.startsWith("set")) {
+				throw new IllegalArgumentException("Operation method " + method
+						+ " cannot start with get or set.  Is this an attribute?");
+			}
+			Class<?>[] types = method.getParameterTypes();
+			String[] stringTypes = new String[types.length];
+			for (int i = 0; i < types.length; i++) {
+				stringTypes[i] = types[i].toString();
+			}
+			NameParams nameParams = new NameParams(name, stringTypes);
+			fieldOperationMap.put(nameParams, method);
+		}
+	}
+
 	private String buildMethodSuffix(String name) {
 		return Character.toLowerCase(name.charAt(3)) + name.substring(4);
 	}
 
+	/**
+	 * Key class for our hashmap to find matching methods based on name and parameter list.
+	 */
 	private static class NameParams {
 		String name;
 		String[] paramTypes;

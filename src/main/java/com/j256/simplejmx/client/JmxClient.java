@@ -18,7 +18,7 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
-import com.j256.simplejmx.server.JmxServer;
+import com.j256.simplejmx.server.ObjectNameUtil;
 
 /**
  * JMX client connection implementation.
@@ -134,7 +134,7 @@ public class JmxClient {
 	 * Return an array of the attributes associated with the bean name.
 	 */
 	public MBeanAttributeInfo[] getAttributesInfo(String domainName, String name) throws IllegalArgumentException {
-		return getAttributesInfo(JmxServer.makeObjectName(domainName, name, null));
+		return getAttributesInfo(ObjectNameUtil.makeObjectName(domainName, name));
 	}
 
 	/**
@@ -215,7 +215,7 @@ public class JmxClient {
 	 * Return the value of a JMX attribute.
 	 */
 	public Object getAttribute(String domain, String objectName, String attributeName) throws IllegalArgumentException {
-		return getAttribute(JmxServer.makeObjectName(domain, objectName, null), attributeName);
+		return getAttribute(ObjectNameUtil.makeObjectName(domain, objectName), attributeName);
 	}
 
 	/**
@@ -238,7 +238,7 @@ public class JmxClient {
 	 */
 	public String getAttributeString(String domain, String objectName, String attributeName)
 			throws IllegalArgumentException {
-		return getAttributeString(JmxServer.makeObjectName(domain, objectName, null), attributeName);
+		return getAttributeString(ObjectNameUtil.makeObjectName(domain, objectName), attributeName);
 	}
 
 	/**
@@ -258,7 +258,7 @@ public class JmxClient {
 	 */
 	public void setAttribute(String domainName, String objectName, String attrName, String value)
 			throws IllegalArgumentException {
-		setAttribute(JmxServer.makeObjectName(domainName, objectName, null), attrName, value);
+		setAttribute(ObjectNameUtil.makeObjectName(domainName, objectName), attrName, value);
 	}
 
 	/**
@@ -274,7 +274,7 @@ public class JmxClient {
 	 */
 	public void setAttribute(String domainName, String objectName, String attrName, Object value)
 			throws IllegalArgumentException {
-		setAttribute(JmxServer.makeObjectName(domainName, objectName, null), attrName, value);
+		setAttribute(ObjectNameUtil.makeObjectName(domainName, objectName), attrName, value);
 	}
 
 	/**
@@ -300,7 +300,7 @@ public class JmxClient {
 	 */
 	public Object invokeOperation(String domain, String objectName, String operName, String... paramStrings)
 			throws IllegalArgumentException {
-		return invokeOperation(JmxServer.makeObjectName(domain, objectName, null), operName, paramStrings);
+		return invokeOperation(ObjectNameUtil.makeObjectName(domain, objectName), operName, paramStrings);
 	}
 
 	/**
@@ -340,7 +340,7 @@ public class JmxClient {
 	 */
 	public Object invokeOperation(String domain, String objectName, String operName, Object... params)
 			throws IllegalArgumentException {
-		return invokeOperation(JmxServer.makeObjectName(domain, objectName, null), operName, params);
+		return invokeOperation(ObjectNameUtil.makeObjectName(domain, objectName), operName, params);
 	}
 
 	/**
