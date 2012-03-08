@@ -73,12 +73,6 @@ public class JmxIntegrationTest {
 			return "Parameter was: " + someParam;
 		}
 
-		// another operation without any parameter information
-		@JmxOperation(description = "Return the parameter", parameterNames = { "someParam" }, parameterDescriptions = { "Parameter which will be returned" })
-		public String returnParam(Integer someParam) {
-			return "Parameter was: " + someParam;
-		}
-
 		@JmxOperation(description = "Add another object to JMX")
 		public void addAnotherObject() throws Exception {
 			jmxServer.register(new AnotherObject(jmxServer));
