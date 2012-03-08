@@ -7,7 +7,6 @@ import java.rmi.NoSuchObjectException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashMap;
 
 import javax.management.JMException;
 import javax.management.MBeanServer;
@@ -53,9 +52,22 @@ public class JmxServer {
 	}
 
 	/**
-	 * Stop the JMX server by closing the connector and unpublishing it from the RMI registry.
+	 * Stop the JMX server by closing the connector and unpublishing it from the RMI registry. This ignores any
+	 * exceptions.
 	 */
-	public synchronized void stop() throws JMException {
+	public synchronized void stop() {
+		try {
+			stopThrow();
+		} catch (JMException e) {
+			// ignored
+		}
+	}
+
+	/**
+	 * Stop the JMX server by closing the connector and unpublishing it from the RMI registry. This throws a JMException
+	 * on any issues.
+	 */
+	public synchronized void stopThrow() throws JMException {
 		if (connector != null) {
 			try {
 				connector.stop();
@@ -79,7 +91,7 @@ public class JmxServer {
 	/**
 	 * Register the object parameter for exposure with JMX.
 	 */
-	public void register(Object obj) throws JMException {
+	public synchronized void register(Object obj) throws JMException {
 		ObjectName objectName = extractJmxResourceObjName(obj);
 		ReflectionMbean mbean;
 		try {
@@ -110,7 +122,7 @@ public class JmxServer {
 	 * Un-register the object parameter from JMX but this throws exceptions. Use the {@link #unregister(Object)} if you
 	 * want it to be silent.
 	 */
-	public void unregisterThrow(Object obj) throws JMException {
+	public synchronized void unregisterThrow(Object obj) throws JMException {
 		ObjectName objectName = extractJmxResourceObjName(obj);
 		mbeanServer.unregisterMBean(objectName);
 	}
@@ -144,7 +156,7 @@ public class JmxServer {
 			}
 			try {
 				connector =
-						JMXConnectorServerFactory.newJMXConnectorServer(url, new HashMap<String, Object>(),
+						JMXConnectorServerFactory.newJMXConnectorServer(url, null,
 								ManagementFactory.getPlatformMBeanServer());
 			} catch (IOException e) {
 				throw createJmException("Could not make our Jmx connector server", e);
@@ -168,10 +180,6 @@ public class JmxServer {
 		if (obj instanceof JmxSelfNaming) {
 			return ObjectNameUtil.makeObjectName(jmxResource, (JmxSelfNaming) obj);
 		} else {
-			String objectName = jmxResource.objectName();
-			if (objectName == null || objectName.length() == 0) {
-				objectName = obj.getClass().getSimpleName();
-			}
 			return ObjectNameUtil.makeObjectName(jmxResource, obj);
 		}
 	}

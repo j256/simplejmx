@@ -3,14 +3,21 @@ package com.j256.simplejmx.server;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.lang.reflect.Field;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
+
 import javax.management.JMException;
+import javax.management.ReflectionException;
 
 import org.junit.Test;
 
 import com.j256.simplejmx.client.JmxClient;
 import com.j256.simplejmx.common.JmxAttribute;
+import com.j256.simplejmx.common.JmxFolderName;
 import com.j256.simplejmx.common.JmxOperation;
 import com.j256.simplejmx.common.JmxResource;
+import com.j256.simplejmx.common.JmxSelfNaming;
 import com.j256.simplejmx.common.ObjectNameUtil;
 
 public class JmxServerTest {
@@ -42,6 +49,46 @@ public class JmxServerTest {
 			server.start();
 		} finally {
 			server.stop();
+		}
+	}
+
+	@Test(expected = JMException.class)
+	public void testJmxServerDoubleInstance() throws Exception {
+		JmxServer server = new JmxServer(DEFAULT_PORT);
+		try {
+			server.start();
+			new JmxServer(DEFAULT_PORT).start();
+		} finally {
+			server.stop();
+		}
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testJmxServerWildPort() throws Exception {
+		JmxServer server = new JmxServer(-10);
+		try {
+			server.start();
+		} finally {
+			server.stop();
+		}
+	}
+
+	@Test(expected = JMException.class)
+	public void testDoubleClose() throws Exception {
+		JmxServer server = new JmxServer(DEFAULT_PORT);
+		try {
+			server.start();
+		} finally {
+			Field field = server.getClass().getDeclaredField("rmiRegistry");
+			field.setAccessible(true);
+			Registry rmiRegistry = (Registry) field.get(server);
+			// close the rmi registry through trickery!
+			UnicastRemoteObject.unexportObject(rmiRegistry, true);
+			try {
+				server.stopThrow();
+			} finally {
+				server.stop();
+			}
 		}
 	}
 
@@ -78,7 +125,7 @@ public class JmxServerTest {
 			try {
 				client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo");
 				fail("should not get here");
-			} catch (IllegalArgumentException e) {
+			} catch (Exception e) {
 				// ignored
 			}
 
@@ -105,7 +152,7 @@ public class JmxServerTest {
 			try {
 				client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo");
 				fail("should not get here");
-			} catch (IllegalArgumentException e) {
+			} catch (Exception e) {
 				// ignored
 			}
 		} finally {
@@ -136,6 +183,7 @@ public class JmxServerTest {
 			// this class has no JmxResource annotation
 			server.register(this);
 		} finally {
+			server.unregister(this);
 			server.stop();
 		}
 	}
@@ -143,10 +191,12 @@ public class JmxServerTest {
 	@Test(expected = JMException.class)
 	public void testShortAttributeMethodName() throws Exception {
 		JmxServer server = new JmxServer(DEFAULT_PORT);
+		ShortAttributeMethodName obj = new ShortAttributeMethodName();
 		try {
 			server.start();
-			server.register(new ShortAttributeMethodName());
+			server.register(obj);
 		} finally {
+			server.unregister(obj);
 			server.stop();
 		}
 	}
@@ -154,10 +204,12 @@ public class JmxServerTest {
 	@Test(expected = JMException.class)
 	public void testJustGetAttributeMethodName() throws Exception {
 		JmxServer server = new JmxServer(DEFAULT_PORT);
+		JustGet obj = new JustGet();
 		try {
 			server.start();
-			server.register(new JustGet());
+			server.register(obj);
 		} finally {
+			server.unregister(obj);
 			server.stop();
 		}
 	}
@@ -165,9 +217,10 @@ public class JmxServerTest {
 	@Test
 	public void testRegisterFolders() throws Exception {
 		JmxServer server = new JmxServer(DEFAULT_PORT);
+		TestObjectFolders obj = new TestObjectFolders();
 		try {
 			server.start();
-			server.register(new TestObjectFolders());
+			server.register(obj);
 			JmxClient client = new JmxClient(DEFAULT_PORT);
 			assertEquals(FOO_VALUE, client.getAttribute(
 					ObjectNameUtil.makeObjectName(DOMAIN_NAME, OBJECT_NAME, new String[] { FOLDER_NAME }), "foo"));
@@ -177,57 +230,248 @@ public class JmxServerTest {
 							ObjectNameUtil.makeObjectName(DOMAIN_NAME, OBJECT_NAME, new String[] { FOLDER_FIELD_NAME
 									+ "=" + FOLDER_VALUE_NAME }), "foo"));
 		} finally {
+			server.unregister(obj);
 			server.stop();
 		}
 	}
-	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+
+	@Test
+	public void testSelfNaming() throws Exception {
+		JmxServer server = new JmxServer(DEFAULT_PORT);
+		SelfNaming obj = new SelfNaming();
+		try {
+			server.start();
+			server.register(obj);
+			JmxClient client = new JmxClient(DEFAULT_PORT);
+			assertEquals(FOO_VALUE, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo"));
+		} finally {
+			server.unregister(obj);
+			server.stop();
+		}
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testInvalidDomain() throws Exception {
+		JmxServer server = new JmxServer(DEFAULT_PORT);
+		InvalidDomain obj = new InvalidDomain();
+		try {
+			server.start();
+			server.register(obj);
+		} finally {
+			server.unregister(obj);
+			server.stop();
+		}
+	}
+
+	@Test
+	public void testNoDescriptions() throws Exception {
+		JmxServer server = new JmxServer(DEFAULT_PORT);
+		NoDescriptions obj = new NoDescriptions();
+		try {
+			server.start();
+			server.register(obj);
+			JmxClient client = new JmxClient(DEFAULT_PORT);
+			assertEquals(FOO_VALUE, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo"));
+		} finally {
+			server.unregister(obj);
+			server.stop();
+		}
+	}
+
+	@Test
+	public void testHasDescription() throws Exception {
+		JmxServer server = new JmxServer(DEFAULT_PORT);
+		HasDescriptions obj = new HasDescriptions();
+		try {
+			server.start();
+			server.register(obj);
+			JmxClient client = new JmxClient(DEFAULT_PORT);
+			assertEquals(FOO_VALUE, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo"));
+		} finally {
+			server.unregister(obj);
+			server.stop();
+		}
+	}
+
+	@Test
+	public void testOperationParameters() throws Exception {
+		JmxServer server = new JmxServer(DEFAULT_PORT);
+		OperationParameters obj = new OperationParameters();
+		try {
+			server.start();
+			server.register(obj);
+			JmxClient client = new JmxClient(DEFAULT_PORT);
+			String someArg = "pfoewjfpeowjfewf ewopjfwefew";
+			assertEquals(someArg, client.invokeOperation(DOMAIN_NAME, OBJECT_NAME, "doSomething", someArg));
+		} finally {
+			server.unregister(obj);
+			server.stop();
+		}
+	}
+
+	@Test(expected = ReflectionException.class)
+	public void testThrowingGet() throws Exception {
+		JmxServer server = new JmxServer(DEFAULT_PORT);
+		MisterThrow obj = new MisterThrow();
+		try {
+			server.start();
+			server.register(obj);
+			JmxClient client = new JmxClient(DEFAULT_PORT);
+			client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo");
+		} finally {
+			server.unregister(obj);
+			server.stop();
+		}
+	}
+
+	@Test(expected = ReflectionException.class)
+	public void testThrowingSet() throws Exception {
+		JmxServer server = new JmxServer(DEFAULT_PORT);
+		MisterThrow obj = new MisterThrow();
+		try {
+			server.start();
+			server.register(obj);
+			JmxClient client = new JmxClient(DEFAULT_PORT);
+			client.setAttribute(DOMAIN_NAME, OBJECT_NAME, "foo", 0);
+		} finally {
+			server.unregister(obj);
+			server.stop();
+		}
+	}
+
+	@Test(expected = ReflectionException.class)
+	public void testThrowingOperation() throws Exception {
+		JmxServer server = new JmxServer(DEFAULT_PORT);
+		MisterThrow obj = new MisterThrow();
+		try {
+			server.start();
+			server.register(obj);
+			JmxClient client = new JmxClient(DEFAULT_PORT);
+			client.invokeOperation(DOMAIN_NAME, OBJECT_NAME, "someCall");
+		} finally {
+			server.unregister(obj);
+			server.stop();
+		}
+	}
+
+	/* ============================================================= */
+
+	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
 	protected static class TestObject {
 
 		private int foo = FOO_VALUE;
 
-		@JmxAttribute(description = "A value")
+		@JmxAttribute
 		public int getFoo() {
 			return foo;
 		}
 
-		@JmxAttribute(description = "A value")
+		@JmxAttribute
 		public void setFoo(int foo) {
 			this.foo = foo;
 		}
 
-		@JmxOperation(description = "A value")
+		@JmxOperation
 		public void resetFoo() {
 			this.foo = 0;
 		}
 
-		@JmxOperation(description = "A value")
+		@JmxOperation
 		public void resetFoo(int newValue) {
 			this.foo = newValue;
 		}
 	}
 
-	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME, folderNames = { FOLDER_NAME })
+	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME, folderNames = { FOLDER_NAME })
 	protected static class TestObjectFolders {
 
-		@JmxAttribute(description = "A value")
+		@JmxAttribute
 		public int getFoo() {
 			return FOO_VALUE;
 		}
 	}
 
-	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
 	protected static class ShortAttributeMethodName {
-		@JmxAttribute(description = "A value")
+		@JmxAttribute
 		public int x() {
 			return 0;
 		}
 	}
 
-	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
 	protected static class JustGet {
-		@JmxAttribute(description = "A value")
+		@JmxAttribute
 		public int get() {
 			return 0;
+		}
+	}
+
+	@JmxResource(domainName = "not the domain name", objectName = "not the object name")
+	protected static class SelfNaming implements JmxSelfNaming {
+		@JmxAttribute
+		public int getFoo() {
+			return FOO_VALUE;
+		}
+		public String getJmxDomainName() {
+			return DOMAIN_NAME;
+		}
+		public String getJmxObjectName() {
+			return OBJECT_NAME;
+		}
+		public JmxFolderName[] getJmxFolderNames() {
+			return null;
+		}
+	}
+
+	@JmxResource(domainName = "", objectName = OBJECT_NAME)
+	protected static class InvalidDomain {
+		@JmxAttribute
+		public int getFoo() {
+			return FOO_VALUE;
+		}
+	}
+
+	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	protected static class NoDescriptions {
+		@JmxAttribute
+		public int getFoo() {
+			return FOO_VALUE;
+		}
+		@JmxOperation
+		public void doSomething() {
+		}
+	}
+
+	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	protected static class HasDescriptions {
+		@JmxAttribute(description = "Foo value")
+		public int getFoo() {
+			return FOO_VALUE;
+		}
+	}
+
+	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	protected static class OperationParameters {
+		@JmxOperation(description = "A value", parameterNames = { "first" }, parameterDescriptions = { "First argument" })
+		public String doSomething(String first) {
+			return first;
+		}
+	}
+
+	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	protected static class MisterThrow {
+		@JmxAttribute
+		public int getFoo() {
+			throw new IllegalStateException("because I can");
+		}
+		@JmxAttribute
+		public void setFoo(int value) {
+			throw new IllegalStateException("because I can");
+		}
+		@JmxOperation
+		public void someCall() {
+			throw new IllegalStateException("because I can");
 		}
 	}
 }

@@ -20,19 +20,19 @@ import javax.management.MBeanOperationInfo;
 public @interface JmxOperation {
 
 	/**
-	 * Description of the attribute for jconsole.
+	 * Description of the attribute for jconsole. Default is something like "someMethod operation".
 	 */
-	public String description();
+	public String description() default "";
 
 	/**
 	 * Array of strings which gives the name each of the parameters to the operation method. This array should be the
-	 * same length as the parameterDescriptions array.
+	 * same length as the parameterDescriptions array. Default is something like "p0".
 	 */
 	public String[] parameterNames() default {};
 
 	/**
 	 * Array of strings which describes each of the parameters to the operation method. This array should be the same
-	 * length as the parameterNames array.
+	 * length as the parameterNames array. If not specified then it will create one with the paramenter number and type.
 	 */
 	public String[] parameterDescriptions() default {};
 

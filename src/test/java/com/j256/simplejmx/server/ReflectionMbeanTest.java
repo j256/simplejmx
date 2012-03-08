@@ -77,28 +77,28 @@ public class ReflectionMbeanTest {
 			try {
 				client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "unknown");
 				fail("Should have thrown");
-			} catch (IllegalArgumentException e) {
+			} catch (Exception e) {
 				// ignored
 			}
 
 			try {
 				client.setAttribute(DOMAIN_NAME, OBJECT_NAME, "unknown", FOO_VALUE);
 				fail("Should have thrown");
-			} catch (IllegalArgumentException e) {
+			} catch (Exception e) {
 				// ignored
 			}
 
 			try {
 				client.invokeOperation(DOMAIN_NAME, OBJECT_NAME, "unknown");
 				fail("Should have thrown");
-			} catch (IllegalArgumentException e) {
+			} catch (Exception e) {
 				// ignored
 			}
 
 			try {
 				client.invokeOperation(DOMAIN_NAME, OBJECT_NAME, "getFoo");
 				fail("Should have thrown");
-			} catch (IllegalArgumentException e) {
+			} catch (Exception e) {
 				// ignored
 			}
 
@@ -132,11 +132,13 @@ public class ReflectionMbeanTest {
 	@Test(expected = JMException.class)
 	public void testBadGet() throws Exception {
 		JmxServer server = new JmxServer(DEFAULT_PORT);
+		BadGetName obj = new BadGetName();
 		try {
 			server.start();
-			server.register(new BadGetName());
+			server.register(obj);
 			fail("Should not get here");
 		} finally {
+			server.unregister(obj);
 			server.stop();
 		}
 	}
@@ -144,11 +146,13 @@ public class ReflectionMbeanTest {
 	@Test(expected = JMException.class)
 	public void testBadGetReturnsVoid() throws Exception {
 		JmxServer server = new JmxServer(DEFAULT_PORT);
+		BadGetReturnsVoid obj = new BadGetReturnsVoid();
 		try {
 			server.start();
-			server.register(new BadGetReturnsVoid());
+			server.register(obj);
 			fail("Should not get here");
 		} finally {
+			server.unregister(obj);
 			server.stop();
 		}
 	}
@@ -156,11 +160,12 @@ public class ReflectionMbeanTest {
 	@Test(expected = JMException.class)
 	public void testBadGetHasArgs() throws Exception {
 		JmxServer server = new JmxServer(DEFAULT_PORT);
+		BadGetHasArgs obj = new BadGetHasArgs();
 		try {
 			server.start();
-			server.register(new BadGetHasArgs());
-			fail("Should not get here");
+			server.register(obj);
 		} finally {
+			server.unregister(obj);
 			server.stop();
 		}
 	}
@@ -168,11 +173,12 @@ public class ReflectionMbeanTest {
 	@Test(expected = JMException.class)
 	public void testBadSetNoArg() throws Exception {
 		JmxServer server = new JmxServer(DEFAULT_PORT);
+		BadSetNoArg obj = new BadSetNoArg();
 		try {
 			server.start();
-			server.register(new BadSetNoArg());
-			fail("Should not get here");
+			server.register(obj);
 		} finally {
+			server.unregister(obj);
 			server.stop();
 		}
 	}
@@ -180,11 +186,12 @@ public class ReflectionMbeanTest {
 	@Test(expected = JMException.class)
 	public void testBadSetReturnsNotVoid() throws Exception {
 		JmxServer server = new JmxServer(DEFAULT_PORT);
+		BadSetReturnsNotVoid obj = new BadSetReturnsNotVoid();
 		try {
 			server.start();
-			server.register(new BadSetReturnsNotVoid());
-			fail("Should not get here");
+			server.register(obj);
 		} finally {
+			server.unregister(obj);
 			server.stop();
 		}
 	}
@@ -192,11 +199,12 @@ public class ReflectionMbeanTest {
 	@Test(expected = JMException.class)
 	public void testBadOperationLooksLikeAttribute() throws Exception {
 		JmxServer server = new JmxServer(DEFAULT_PORT);
+		BadOperationLooksLikeAttribute obj = new BadOperationLooksLikeAttribute();
 		try {
 			server.start();
-			server.register(new BadOperationLooksLikeAttribute());
-			fail("Should not get here");
+			server.register(obj);
 		} finally {
+			server.unregister(obj);
 			server.stop();
 		}
 	}
@@ -204,15 +212,17 @@ public class ReflectionMbeanTest {
 	@Test
 	public void testMultiOperationSameName() throws Exception {
 		JmxServer server = new JmxServer(DEFAULT_PORT);
+		MultiOperationSameName obj = new MultiOperationSameName();
 		try {
 			server.start();
-			server.register(new MultiOperationSameName());
+			server.register(obj);
 			JmxClient client = new JmxClient(DEFAULT_PORT);
 			int x = 1002;
 			assertEquals(x, client.invokeOperation(DOMAIN_NAME, OBJECT_NAME, "assignX", x));
 			int y = 2934;
 			assertEquals(y, client.invokeOperation(DOMAIN_NAME, OBJECT_NAME, "assignX", x, y));
 		} finally {
+			server.unregister(obj);
 			server.stop();
 		}
 	}

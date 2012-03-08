@@ -32,13 +32,4 @@ public class JmxFolderName {
 	public String getValue() {
 		return value;
 	}
-
-	@Override
-	public String toString() {
-		if (field == null) {
-			return "(null-field)=" + value;
-		} else {
-			return field + "=" + value;
-		}
-	}
 }

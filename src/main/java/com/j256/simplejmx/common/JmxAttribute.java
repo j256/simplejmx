@@ -22,7 +22,7 @@ import java.lang.annotation.Target;
 public @interface JmxAttribute {
 
 	/**
-	 * Description of the attribute for jconsole.
+	 * Description of the attribute for jconsole. Default is something like: "foo attribute".
 	 */
-	public String description();
+	public String description() default "";
 }

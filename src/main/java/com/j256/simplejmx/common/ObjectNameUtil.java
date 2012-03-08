@@ -9,6 +9,10 @@ import javax.management.ObjectName;
  */
 public class ObjectNameUtil {
 
+	private ObjectNameUtil() {
+		// only for static methods
+	}
+
 	/**
 	 * Used to construct an object name the same in the client and the server.
 	 * 
@@ -60,37 +64,37 @@ public class ObjectNameUtil {
 	/**
 	 * Used to construct an object name the same in the client and the server. Mostly for testing purposes.
 	 * 
-	 * @param domain
+	 * @param domainName
 	 *            This is the top level folder name for the beans.
-	 * @param name
+	 * @param objectName
 	 *            This is the bean name in the lowest folder level.
 	 * @param folderNameStrings
 	 *            These can be used to setup folders inside of the top folder. Each of the entries in the array can
 	 *            either be in "value" or "name=value" format.
 	 */
-	public static ObjectName makeObjectName(String domain, String name, String[] folderNameStrings) {
-		return makeObjectName(domain, name, null, folderNameStrings);
+	public static ObjectName makeObjectName(String domainName, String objectName, String[] folderNameStrings) {
+		return makeObjectName(domainName, objectName, null, folderNameStrings);
 	}
 
 	/**
 	 * Used to construct an object name the same in the client and the server.
 	 * 
-	 * @param domain
+	 * @param domainName
 	 *            This corresponds to the {@link JmxResource#domainName()} and is the top level folder name for the
 	 *            beans.
-	 * @param name
+	 * @param objectName
 	 *            This corresponds to the {@link JmxResource#objectName()} and is the bean name in the lowest folder
 	 *            level.
 	 */
-	public static ObjectName makeObjectName(String domain, String name) {
-		return makeObjectName(domain, name, null, null);
+	public static ObjectName makeObjectName(String domainName, String objectName) {
+		return makeObjectName(domainName, objectName, null, null);
 	}
 
-	private static ObjectName makeObjectName(String domain, String name, JmxFolderName[] folderNames,
+	private static ObjectName makeObjectName(String domainName, String objectName, JmxFolderName[] folderNames,
 			String[] folderNameStrings) {
-		// j256.backupd:00=clients,name=
+		// j256:00=clients,name=Foo
 		StringBuilder sb = new StringBuilder();
-		sb.append(domain);
+		sb.append(domainName);
 		sb.append(':');
 		boolean first = true;
 		int prefixC = 0;
@@ -130,7 +134,7 @@ public class ObjectNameUtil {
 			sb.append(',');
 		}
 		sb.append("name=");
-		sb.append(name);
+		sb.append(objectName);
 		String objectNameString = sb.toString();
 		try {
 			return new ObjectName(objectNameString);

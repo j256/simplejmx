@@ -347,7 +347,7 @@ public class MainJmxClient {
 			long start = System.currentTimeMillis();
 			Object value = jmxClient.getAttribute(currentName, parts[2]);
 			displayValue("get", parts[2], value, System.currentTimeMillis() - start);
-		} catch (IllegalArgumentException e) {
+		} catch (Exception e) {
 			System.out.println("Error.  Problems getting attribute: " + e.getMessage());
 			return;
 		}
@@ -412,14 +412,14 @@ public class MainJmxClient {
 
 		try {
 			jmxClient.setAttribute(currentName, attrName, valueString);
-		} catch (IllegalArgumentException e) {
+		} catch (Exception e) {
 			System.out.println("Error.  Problems setting information about attribute: " + e.getMessage());
 			return;
 		}
 		Object attr;
 		try {
 			attr = jmxClient.getAttribute(currentName, attrName);
-		} catch (IllegalArgumentException e) {
+		} catch (Exception e) {
 			System.out.println("Error.  Problems setting information about attribute: " + e.getMessage());
 			return;
 		}
@@ -510,7 +510,7 @@ public class MainJmxClient {
 			long start = System.currentTimeMillis();
 			Object value = jmxClient.invokeOperation(currentName, oper, args);
 			displayValue(command, oper, value, System.currentTimeMillis() - start);
-		} catch (IllegalArgumentException e) {
+		} catch (Exception e) {
 			System.out.println("Error.  Problems invoking operation " + oper + ":");
 			for (Throwable y = e; y != null; y = y.getCause()) {
 				System.out.println("  " + y.getMessage());

@@ -42,6 +42,10 @@ public class ReflectionMbean implements DynamicMBean {
 		this.mbeanInfo = buildMbeanInfo();
 	}
 
+	public MBeanInfo getMBeanInfo() {
+		return mbeanInfo;
+	}
+
 	public Object getAttribute(String attribute) throws AttributeNotFoundException, ReflectionException {
 		Method method = fieldGetMap.get(attribute);
 		if (method == null) {
@@ -50,7 +54,8 @@ public class ReflectionMbean implements DynamicMBean {
 		try {
 			return method.invoke(proxy);
 		} catch (Exception e) {
-			throw new ReflectionException(e);
+			throw new ReflectionException(e, "Invoking get attribute method " + method.getName() + " on "
+					+ proxy.getClass() + " threw exception");
 		}
 	}
 
@@ -66,25 +71,6 @@ public class ReflectionMbean implements DynamicMBean {
 		return returnList;
 	}
 
-	public MBeanInfo getMBeanInfo() {
-		return mbeanInfo;
-	}
-
-	public Object invoke(String actionName, Object[] params, String[] signatureTypes) throws MBeanException,
-			ReflectionException {
-		Method method = fieldOperationMap.get(new NameParams(actionName, signatureTypes));
-		if (method == null) {
-			throw new MBeanException(new IllegalArgumentException("Unknown action '" + actionName
-					+ "' with parameter types " + Arrays.toString(signatureTypes)));
-		} else {
-			try {
-				return method.invoke(proxy, params);
-			} catch (Exception e) {
-				throw new ReflectionException(e);
-			}
-		}
-	}
-
 	public void setAttribute(Attribute attribute) throws AttributeNotFoundException, ReflectionException {
 		Method method = fieldSetMap.get(attribute.getName());
 		if (method == null) {
@@ -93,7 +79,8 @@ public class ReflectionMbean implements DynamicMBean {
 			try {
 				method.invoke(proxy, attribute.getValue());
 			} catch (Exception e) {
-				throw new ReflectionException(e);
+				throw new ReflectionException(e, "Invoking set attribute method " + method.getName() + " on "
+						+ proxy.getClass() + " threw exception");
 			}
 		}
 	}
@@ -110,6 +97,22 @@ public class ReflectionMbean implements DynamicMBean {
 			}
 		}
 		return returnList;
+	}
+
+	public Object invoke(String actionName, Object[] params, String[] signatureTypes) throws MBeanException,
+			ReflectionException {
+		Method method = fieldOperationMap.get(new NameParams(actionName, signatureTypes));
+		if (method == null) {
+			throw new MBeanException(new IllegalArgumentException("Unknown action '" + actionName
+					+ "' with parameter types " + Arrays.toString(signatureTypes)));
+		} else {
+			try {
+				return method.invoke(proxy, params);
+			} catch (Exception e) {
+				throw new ReflectionException(e, "Invoking operation method " + method.getName() + " on "
+						+ proxy.getClass() + " threw exception");
+			}
+		}
 	}
 
 	/**
@@ -134,10 +137,6 @@ public class ReflectionMbean implements DynamicMBean {
 			JmxAttribute jmxAttribute = method.getAnnotation(JmxAttribute.class);
 			if (jmxAttribute != null) {
 				String methodName = method.getName();
-				if (methodName.length() < 4) {
-					// shouldn't get here but let's be careful out there
-					continue;
-				}
 				String varName = buildMethodSuffix(methodName);
 				Method getMethod = fieldGetMap.get(varName);
 				if (methodName.startsWith("set") && getMethod != null) {
@@ -150,7 +149,11 @@ public class ReflectionMbean implements DynamicMBean {
 				}
 				Method setMethod = fieldSetMap.get(varName);
 				try {
-					attributes.add(new MBeanAttributeInfo(varName, jmxAttribute.description(), getMethod, setMethod));
+					String description = jmxAttribute.description();
+					if (description == null || description.length() == 0) {
+						description = varName + " attribute";
+					}
+					attributes.add(new MBeanAttributeInfo(varName, description, getMethod, setMethod));
 				} catch (IntrospectionException e) {
 					// ignore this attribute I guess
 				}
@@ -158,7 +161,11 @@ public class ReflectionMbean implements DynamicMBean {
 				JmxOperation jmxOperation = method.getAnnotation(JmxOperation.class);
 				if (jmxOperation != null) {
 					MBeanParameterInfo[] parameterInfos = buildParameterInfos(method, jmxOperation);
-					operations.add(new MBeanOperationInfo(method.getName(), jmxOperation.description(), parameterInfos,
+					String description = jmxOperation.description();
+					if (description == null || description.length() == 0) {
+						description = method.getName() + " operation";
+					}
+					operations.add(new MBeanOperationInfo(method.getName(), description, parameterInfos,
 							method.getReturnType().getName(), jmxOperation.action()));
 					// operations.add(new MBeanOperationInfo(jmxOperation.description(), method));
 				}
@@ -277,7 +284,11 @@ public class ReflectionMbean implements DynamicMBean {
 
 		@Override
 		public int hashCode() {
-			return 31 * (31 + name.hashCode()) + Arrays.hashCode(paramTypes);
+			int hashCode = 31 * (31 + name.hashCode());
+			if (paramTypes != null) {
+				hashCode += Arrays.hashCode(paramTypes);
+			}
+			return hashCode;
 		}
 
 		@Override

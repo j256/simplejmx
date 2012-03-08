@@ -217,37 +217,31 @@ public class JmxClient {
 	/**
 	 * Return the value of a JMX attribute.
 	 */
-	public Object getAttribute(String domain, String objectName, String attributeName) throws IllegalArgumentException {
+	public Object getAttribute(String domain, String objectName, String attributeName) throws Exception {
 		return getAttribute(ObjectNameUtil.makeObjectName(domain, objectName), attributeName);
 	}
 
 	/**
 	 * Return the value of a JMX attribute.
 	 */
-	public Object getAttribute(ObjectName name, String attributeName) throws IllegalArgumentException {
+	public Object getAttribute(ObjectName name, String attributeName) throws Exception {
 		if (mbeanConn == null) {
 			throw new IllegalArgumentException("JmxClient is not connected");
 		}
-
-		try {
-			return mbeanConn.getAttribute(name, attributeName);
-		} catch (Exception e) {
-			throw new IllegalArgumentException("Problems getting " + attributeName + " from " + name, e);
-		}
+		return mbeanConn.getAttribute(name, attributeName);
 	}
 
 	/**
 	 * Return the value of a JMX attribute as a String.
 	 */
-	public String getAttributeString(String domain, String objectName, String attributeName)
-			throws IllegalArgumentException {
+	public String getAttributeString(String domain, String objectName, String attributeName) throws Exception {
 		return getAttributeString(ObjectNameUtil.makeObjectName(domain, objectName), attributeName);
 	}
 
 	/**
 	 * Return the value of a JMX attribute as a String.
 	 */
-	public String getAttributeString(ObjectName name, String attributeName) throws IllegalArgumentException {
+	public String getAttributeString(ObjectName name, String attributeName) throws Exception {
 		Object bean = getAttribute(name, attributeName);
 		if (bean == null) {
 			return "(null)";
@@ -259,15 +253,14 @@ public class JmxClient {
 	/**
 	 * Set the JMX attribute to a particular value string.
 	 */
-	public void setAttribute(String domainName, String objectName, String attrName, String value)
-			throws IllegalArgumentException {
+	public void setAttribute(String domainName, String objectName, String attrName, String value) throws Exception {
 		setAttribute(ObjectNameUtil.makeObjectName(domainName, objectName), attrName, value);
 	}
 
 	/**
 	 * Set the JMX attribute to a particular value string.
 	 */
-	public void setAttribute(ObjectName name, String attrName, String value) throws IllegalArgumentException {
+	public void setAttribute(ObjectName name, String attrName, String value) throws Exception {
 		MBeanAttributeInfo info = getAttrInfo(name, attrName);
 		setAttribute(name, attrName, stringToObject(value, info.getType()));
 	}
@@ -275,25 +268,20 @@ public class JmxClient {
 	/**
 	 * Set the JMX attribute to a particular value string.
 	 */
-	public void setAttribute(String domainName, String objectName, String attrName, Object value)
-			throws IllegalArgumentException {
+	public void setAttribute(String domainName, String objectName, String attrName, Object value) throws Exception {
 		setAttribute(ObjectNameUtil.makeObjectName(domainName, objectName), attrName, value);
 	}
 
 	/**
 	 * Set the JMX attribute to a particular value.
 	 */
-	public void setAttribute(ObjectName name, String attrName, Object value) throws IllegalArgumentException {
+	public void setAttribute(ObjectName name, String attrName, Object value) throws Exception {
 		if (mbeanConn == null) {
 			throw new IllegalArgumentException("JmxClient is not connected");
 		}
 
 		Attribute attribute = new Attribute(attrName, value);
-		try {
-			mbeanConn.setAttribute(name, attribute);
-		} catch (Exception e) {
-			throw new IllegalArgumentException("Problems setting " + attribute + " for object " + name, e);
-		}
+		mbeanConn.setAttribute(name, attribute);
 	}
 
 	/**
@@ -302,7 +290,7 @@ public class JmxClient {
 	 * @return The value returned by the method or null if none.
 	 */
 	public Object invokeOperation(String domain, String objectName, String operName, String... paramStrings)
-			throws IllegalArgumentException {
+			throws Exception {
 		return invokeOperation(ObjectNameUtil.makeObjectName(domain, objectName), operName, paramStrings);
 	}
 
@@ -311,8 +299,7 @@ public class JmxClient {
 	 * 
 	 * @return The value returned by the method or null if none.
 	 */
-	public Object invokeOperation(ObjectName name, String operName, String... paramStrings)
-			throws IllegalArgumentException {
+	public Object invokeOperation(ObjectName name, String operName, String... paramStrings) throws Exception {
 		Object[] paramObjs;
 		if (paramStrings.length == 0) {
 			paramObjs = null;
@@ -331,8 +318,7 @@ public class JmxClient {
 	 * 
 	 * @return The value returned by the method as a string or null if none.
 	 */
-	public String invokeOperationToString(ObjectName name, String operName, String... paramStrings)
-			throws IllegalArgumentException {
+	public String invokeOperationToString(ObjectName name, String operName, String... paramStrings) throws Exception {
 		return invokeOperation(name, operName, paramStrings).toString();
 	}
 
@@ -341,8 +327,7 @@ public class JmxClient {
 	 * 
 	 * @return The value returned by the method or null if none.
 	 */
-	public Object invokeOperation(String domain, String objectName, String operName, Object... params)
-			throws IllegalArgumentException {
+	public Object invokeOperation(String domain, String objectName, String operName, Object... params) throws Exception {
 		return invokeOperation(ObjectNameUtil.makeObjectName(domain, objectName), operName, params);
 	}
 
@@ -351,21 +336,17 @@ public class JmxClient {
 	 * 
 	 * @return The value returned by the method or null if none.
 	 */
-	public Object invokeOperation(ObjectName name, String operName, Object... params) throws IllegalArgumentException {
+	public Object invokeOperation(ObjectName name, String operName, Object... params) throws Exception {
 		String[] paramTypes = lookupParamTypes(name, operName, params);
 		return invokeOperation(name, operName, paramTypes, params);
 	}
 
 	private Object invokeOperation(ObjectName name, String operName, String[] paramTypes, Object[] params)
-			throws IllegalArgumentException {
-		try {
-			if (params != null && params.length == 0) {
-				params = null;
-			}
-			return mbeanConn.invoke(name, operName, params, paramTypes);
-		} catch (Exception e) {
-			throw new IllegalArgumentException("Problems invoking " + operName + " on " + name, e);
+			throws Exception {
+		if (params != null && params.length == 0) {
+			params = null;
 		}
+		return mbeanConn.invoke(name, operName, params, paramTypes);
 	}
 
 	private String[] lookupParamTypes(ObjectName name, String operName, Object[] params) {

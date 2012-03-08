@@ -1,11 +1,14 @@
 package com.j256.simplejmx.server;
 
+import org.junit.Ignore;
+
 import com.j256.simplejmx.common.JmxAttribute;
 import com.j256.simplejmx.common.JmxFolderName;
 import com.j256.simplejmx.common.JmxOperation;
 import com.j256.simplejmx.common.JmxResource;
 import com.j256.simplejmx.common.JmxSelfNaming;
 
+@Ignore("Just for integration testing")
 public class JmxIntegrationTest {
 
 	private static final int DEFAULT_PORT = 5256;
@@ -82,6 +85,8 @@ public class JmxIntegrationTest {
 	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
 	public static class TestSubObject implements JmxSelfNaming {
 
+		int value = 0;
+
 		public String getJmxDomainName() {
 			return null;
 		}
@@ -94,9 +99,19 @@ public class JmxIntegrationTest {
 			return new JmxFolderName[] { new JmxFolderName("Sub") };
 		}
 
-		@JmxAttribute(description = "Integer value")
-		public int getZero() {
-			return 0;
+		@JmxAttribute
+		public int getValue() {
+			return value;
+		}
+
+		@JmxAttribute
+		public void setValue(int value) {
+			this.value = value;
+		}
+
+		@JmxOperation
+		public String returnString() {
+			return "here's your string";
 		}
 	}
 
