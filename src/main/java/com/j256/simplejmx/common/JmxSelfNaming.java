@@ -11,12 +11,19 @@ import javax.management.ObjectName;
 public interface JmxSelfNaming {
 
 	/**
-	 * Return the appropriate array of key and value strings for a {@link ObjectName}.
+	 * Return the domain name of the object that is used to built the associated {@link ObjectName}. Return null to use
+	 * the one from the {@link JmxResource} annotation instead.
 	 */
-	public JmxNamingFieldValue[] getJmxFieldValues();
+	public String getJmxDomainName();
 
 	/**
-	 * Return the name of the object that will be part of "name=..." for a {@link ObjectName}.
+	 * Return the name of the object that will be the "name=..." part of the associated {@link ObjectName}. Return null
+	 * to use the one from the {@link JmxResource} annotation instead.
 	 */
 	public String getJmxObjectName();
+
+	/**
+	 * Return the appropriate array of folder names used to built the associated {@link ObjectName}.
+	 */
+	public JmxFolderName[] getJmxFolderNames();
 }

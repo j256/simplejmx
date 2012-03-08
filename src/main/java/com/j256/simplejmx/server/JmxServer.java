@@ -82,7 +82,12 @@ public class JmxServer {
 	 */
 	public void register(Object obj) throws JMException {
 		ObjectName objectName = extractJmxResourceObjName(obj);
-		ReflectionMbean mbean = new ReflectionMbean(obj);
+		ReflectionMbean mbean;
+		try {
+			mbean = new ReflectionMbean(obj);
+		} catch (Exception e) {
+			throw createJmException("Could not build mbean object for: " + obj, e);
+		}
 		try {
 			mbeanServer.registerMBean(mbean, objectName);
 		} catch (Exception e) {
@@ -162,15 +167,13 @@ public class JmxServer {
 					"Registered class must implement JmxSelfNaming or have JmxResource annotation");
 		}
 		if (obj instanceof JmxSelfNaming) {
-			return ObjectNameUtil.makeObjectName(jmxResource.domainName(), ((JmxSelfNaming) obj).getJmxObjectName(),
-					((JmxSelfNaming) obj).getJmxFieldValues());
+			return ObjectNameUtil.makeObjectName(jmxResource, (JmxSelfNaming) obj);
 		} else {
 			String objectName = jmxResource.objectName();
 			if (objectName == null || objectName.length() == 0) {
 				objectName = obj.getClass().getSimpleName();
 			}
-			return ObjectNameUtil.makeObjectName(jmxResource.domainName(), jmxResource.objectName(),
-					jmxResource.fieldValues());
+			return ObjectNameUtil.makeObjectName(jmxResource, obj);
 		}
 	}
 

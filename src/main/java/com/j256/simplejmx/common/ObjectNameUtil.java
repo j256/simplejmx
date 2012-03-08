@@ -2,42 +2,74 @@ package com.j256.simplejmx.common;
 
 import javax.management.ObjectName;
 
+/**
+ * Utility class that creates {@link ObjectName} objects from various input information.
+ * 
+ * @author graywatson
+ */
 public class ObjectNameUtil {
 
 	/**
 	 * Used to construct an object name the same in the client and the server.
 	 * 
-	 * @param domain
-	 *            This corresponds to the {@link JmxResource#domainName()} and is the top level folder name for the
-	 *            beans.
-	 * @param name
-	 *            This corresponds to the {@link JmxResource#objectName()} and is the bean name in the lowest folder
-	 *            level.
-	 * @param fieldValues
-	 *            These can be used to setup folders inside of the top folder. Each of the entries in the array are in
-	 *            "name=value" format. It is recommended that they are in alphabetic order. I often use ("00",
-	 *            "FolderName"). As far as I can tell, the 00 name is ignored by jconsole.
+	 * @param jmxResource
+	 *            Annotation from the class for which we are creating our ObjectName.
+	 * @param selfNamingObj
+	 *            Object that implements the self-naming interface.
 	 */
-	public static ObjectName makeObjectName(String domain, String name, JmxNamingFieldValue[] fieldValues) {
-		return makeObjectName(domain, name, fieldValues, null);
+	public static ObjectName makeObjectName(JmxResource jmxResource, JmxSelfNaming selfNamingObj) {
+		String domainName = selfNamingObj.getJmxDomainName();
+		if (domainName == null) {
+			domainName = jmxResource.domainName();
+			if (domainName.length() == 0) {
+				throw new IllegalArgumentException(
+						"Could not create ObjectName because domain name not specified in getJmxDomainName() nor @JmxResource");
+			}
+		}
+		String objectName = selfNamingObj.getJmxObjectName();
+		if (objectName == null) {
+			objectName = jmxResource.objectName();
+			if (objectName.length() == 0) {
+				objectName = selfNamingObj.getClass().getSimpleName();
+			}
+		}
+		return makeObjectName(domainName, objectName, selfNamingObj.getJmxFolderNames(), null);
 	}
 
 	/**
 	 * Used to construct an object name the same in the client and the server.
 	 * 
-	 * @param domain
-	 *            This corresponds to the {@link JmxResource#domainName()} and is the top level folder name for the
-	 *            beans.
-	 * @param name
-	 *            This corresponds to the {@link JmxResource#objectName()} and is the bean name in the lowest folder
-	 *            level.
-	 * @param fieldValuesStrings
-	 *            These can be used to setup folders inside of the top folder. Each of the entries in the array should
-	 *            be in "name=value" format. It is recommended that they are in alphabetic order. I often use
-	 *            ("00=FolderName"). As far as I can tell, the 00 name is ignored by jconsole.
+	 * @param jmxResource
+	 *            Annotation from the class for which we are creating our ObjectName.
+	 * @param obj
+	 *            Object for which we are creating our ObjectName
 	 */
-	public static ObjectName makeObjectName(String domain, String name, String[] fieldValueStrings) {
-		return makeObjectName(domain, name, null, fieldValueStrings);
+	public static ObjectName makeObjectName(JmxResource jmxResource, Object obj) {
+		String domainName = jmxResource.domainName();
+		if (domainName.length() == 0) {
+			throw new IllegalArgumentException(
+					"Could not create ObjectName because domain name not specified in @JmxResource");
+		}
+		String objectName = jmxResource.objectName();
+		if (objectName.length() == 0) {
+			objectName = obj.getClass().getSimpleName();
+		}
+		return makeObjectName(domainName, objectName, null, jmxResource.folderNames());
+	}
+
+	/**
+	 * Used to construct an object name the same in the client and the server. Mostly for testing purposes.
+	 * 
+	 * @param domain
+	 *            This is the top level folder name for the beans.
+	 * @param name
+	 *            This is the bean name in the lowest folder level.
+	 * @param folderNameStrings
+	 *            These can be used to setup folders inside of the top folder. Each of the entries in the array can
+	 *            either be in "value" or "name=value" format.
+	 */
+	public static ObjectName makeObjectName(String domain, String name, String[] folderNameStrings) {
+		return makeObjectName(domain, name, null, folderNameStrings);
 	}
 
 	/**
@@ -54,33 +86,44 @@ public class ObjectNameUtil {
 		return makeObjectName(domain, name, null, null);
 	}
 
-	private static ObjectName makeObjectName(String domain, String name, JmxNamingFieldValue[] fieldValues,
-			String[] fieldValueStrings) {
+	private static ObjectName makeObjectName(String domain, String name, JmxFolderName[] folderNames,
+			String[] folderNameStrings) {
 		// j256.backupd:00=clients,name=
 		StringBuilder sb = new StringBuilder();
 		sb.append(domain);
 		sb.append(':');
 		boolean first = true;
-		if (fieldValues != null) {
-			for (JmxNamingFieldValue fieldValue : fieldValues) {
+		int prefixC = 0;
+		if (folderNames != null) {
+			for (JmxFolderName folderName : folderNames) {
 				if (first) {
 					first = false;
 				} else {
 					sb.append(',');
 				}
-				sb.append(fieldValue.getField());
+				String fieldName = folderName.getField();
+				if (fieldName == null) {
+					appendPrefix(sb, prefixC++);
+				} else {
+					sb.append(fieldName);
+				}
 				sb.append('=');
-				sb.append(fieldValue.getValue());
+				sb.append(folderName.getValue());
 			}
 		}
-		if (fieldValueStrings != null) {
-			for (String fieldValue : fieldValueStrings) {
+		if (folderNameStrings != null) {
+			for (String folderNameString : folderNameStrings) {
 				if (first) {
 					first = false;
 				} else {
 					sb.append(',');
 				}
-				sb.append(fieldValue);
+				// if we have no = then prepend a number
+				if (folderNameString.indexOf('=') == -1) {
+					appendPrefix(sb, prefixC++);
+					sb.append('=');
+				}
+				sb.append(folderNameString);
 			}
 		}
 		if (!first) {
@@ -88,10 +131,18 @@ public class ObjectNameUtil {
 		}
 		sb.append("name=");
 		sb.append(name);
+		String objectNameString = sb.toString();
 		try {
-			return new ObjectName(sb.toString());
+			return new ObjectName(objectNameString);
 		} catch (Exception e) {
-			throw new IllegalArgumentException("Invalid ObjectName generated: " + sb.toString(), e);
+			throw new IllegalArgumentException("Invalid ObjectName generated: " + objectNameString, e);
 		}
+	}
+
+	private static void appendPrefix(StringBuilder sb, int prefixC) {
+		if (prefixC < 10) {
+			sb.append('0');
+		}
+		sb.append(prefixC);
 	}
 }

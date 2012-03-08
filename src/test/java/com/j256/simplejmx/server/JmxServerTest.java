@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import com.j256.simplejmx.client.JmxClient;
 import com.j256.simplejmx.common.JmxAttribute;
-import com.j256.simplejmx.common.JmxNamingFieldValue;
 import com.j256.simplejmx.common.JmxOperation;
 import com.j256.simplejmx.common.JmxResource;
 import com.j256.simplejmx.common.ObjectNameUtil;
@@ -141,7 +140,7 @@ public class JmxServerTest {
 		}
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = JMException.class)
 	public void testShortAttributeMethodName() throws Exception {
 		JmxServer server = new JmxServer(DEFAULT_PORT);
 		try {
@@ -152,7 +151,7 @@ public class JmxServerTest {
 		}
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = JMException.class)
 	public void testJustGetAttributeMethodName() throws Exception {
 		JmxServer server = new JmxServer(DEFAULT_PORT);
 		try {
@@ -172,16 +171,15 @@ public class JmxServerTest {
 			JmxClient client = new JmxClient(DEFAULT_PORT);
 			assertEquals(FOO_VALUE, client.getAttribute(
 					ObjectNameUtil.makeObjectName(DOMAIN_NAME, OBJECT_NAME, new String[] { FOLDER_NAME }), "foo"));
-			assertEquals(FOO_VALUE,
+			assertEquals(
+					FOO_VALUE,
 					client.getAttribute(
-							ObjectNameUtil.makeObjectName(DOMAIN_NAME, OBJECT_NAME,
-									new JmxNamingFieldValue[] { new JmxNamingFieldValue(FOLDER_FIELD_NAME,
-											FOLDER_VALUE_NAME) }), "foo"));
+							ObjectNameUtil.makeObjectName(DOMAIN_NAME, OBJECT_NAME, new String[] { FOLDER_FIELD_NAME
+									+ "=" + FOLDER_VALUE_NAME }), "foo"));
 		} finally {
 			server.stop();
 		}
 	}
-
 	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
 	protected static class TestObject {
 
@@ -208,7 +206,7 @@ public class JmxServerTest {
 		}
 	}
 
-	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME, fieldValues = { FOLDER_NAME })
+	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME, folderNames = { FOLDER_NAME })
 	protected static class TestObjectFolders {
 
 		@JmxAttribute(description = "A value")

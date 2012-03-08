@@ -1,7 +1,7 @@
 package com.j256.simplejmx.server;
 
 import com.j256.simplejmx.common.JmxAttribute;
-import com.j256.simplejmx.common.JmxNamingFieldValue;
+import com.j256.simplejmx.common.JmxFolderName;
 import com.j256.simplejmx.common.JmxOperation;
 import com.j256.simplejmx.common.JmxResource;
 import com.j256.simplejmx.common.JmxSelfNaming;
@@ -22,6 +22,7 @@ public class JmxIntegrationTest {
 		try {
 			server.start();
 			server.register(new TestObject(server));
+			server.register(new TestSubObject());
 			synchronized (this) {
 				this.wait();
 			}
@@ -62,7 +63,7 @@ public class JmxIntegrationTest {
 
 		@JmxOperation(description = "Add the two params", parameterNames = { "first", "second" }, parameterDescriptions = {
 				"First one", "Second one" })
-		public String twoArguements(int first, int second) {
+		public String twoArguments(int first, int second) {
 			return first + " + " + second + " = " + (first + second);
 		}
 
@@ -78,6 +79,27 @@ public class JmxIntegrationTest {
 		}
 	}
 
+	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	protected static class TestSubObject implements JmxSelfNaming {
+
+		public String getJmxDomainName() {
+			return null;
+		}
+
+		public String getJmxObjectName() {
+			return null;
+		}
+
+		public JmxFolderName[] getJmxFolderNames() {
+			return new JmxFolderName[] { new JmxFolderName("Sub") };
+		}
+		
+		@JmxAttribute(description = "Integer value")
+		public int getZero() {
+			return 0;
+		}
+	}
+
 	@JmxResource(description = "Test object", domainName = DOMAIN_NAME)
 	protected static class AnotherObject implements JmxSelfNaming {
 
@@ -87,8 +109,12 @@ public class JmxIntegrationTest {
 			this.jmxServer = jmxServer;
 		}
 
-		public JmxNamingFieldValue[] getJmxFieldValues() {
-			return new JmxNamingFieldValue[] { new JmxNamingFieldValue("00", "AnotherObjects") };
+		public String getJmxDomainName() {
+			return null;
+		}
+
+		public JmxFolderName[] getJmxFolderNames() {
+			return new JmxFolderName[] { new JmxFolderName("00", "AnotherObjects") };
 		}
 
 		public String getJmxObjectName() {
