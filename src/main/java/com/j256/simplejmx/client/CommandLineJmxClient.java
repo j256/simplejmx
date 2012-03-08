@@ -21,11 +21,11 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
 /**
- * JMX client class to be built into our main application.
+ * JMX client class to be built into another Main class to provide command-line JMX capabilities.
  * 
  * @author graywatson
  */
-public class MainJmxClient {
+public class CommandLineJmxClient {
 
 	private static final String HELP_COMMAND = "help";
 	private static final String DEFAULT_PROMPT = "Jmx: ";
@@ -33,11 +33,11 @@ public class MainJmxClient {
 
 	private JmxClient jmxClient;
 
-	public MainJmxClient(String host, int port) throws IllegalArgumentException {
+	public CommandLineJmxClient(String host, int port) throws IllegalArgumentException {
 		jmxClient = new JmxClient(host, port);
 	}
 
-	public MainJmxClient(String url) throws IllegalArgumentException {
+	public CommandLineJmxClient(String url) throws IllegalArgumentException {
 		jmxClient = new JmxClient(url);
 	}
 

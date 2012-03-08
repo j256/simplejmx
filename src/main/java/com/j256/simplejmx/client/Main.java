@@ -1,7 +1,8 @@
 package com.j256.simplejmx.client;
 
 /**
- * Main class which starts our JMX client.
+ * Main class which starts our JMX client. We have this separation with {@link CommandLineJmxClient} so others can use it in
+ * their Main classes.
  * 
  * @author graywatson
  */
@@ -18,7 +19,7 @@ public class Main {
 			usage();
 		}
 
-		MainJmxClient jmxClient;
+		CommandLineJmxClient jmxClient;
 		if (args[0].indexOf('/') == -1) {
 			String[] parts = args[0].split(":");
 			if (parts.length != 2) {
@@ -30,9 +31,9 @@ public class Main {
 			} catch (NumberFormatException e) {
 				usage();
 			}
-			jmxClient = new MainJmxClient(parts[0], port);
+			jmxClient = new CommandLineJmxClient(parts[0], port);
 		} else {
-			jmxClient = new MainJmxClient(args[0]);
+			jmxClient = new CommandLineJmxClient(args[0]);
 		}
 
 		if (args.length == 1) {
