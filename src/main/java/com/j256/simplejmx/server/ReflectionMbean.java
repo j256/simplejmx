@@ -24,20 +24,21 @@ import com.j256.simplejmx.common.JmxOperation;
 import com.j256.simplejmx.common.JmxResource;
 
 /**
- * Wrapping of an object so we can dynamically expose its attributes and operations using annotations and reflection.
+ * Wrapping of an object so we can expose its attributes and operations using annotations and reflection. This handles
+ * the JMX server calls to attributes and operations by calling through the delegation object.
  * 
  * @author graywatson
  */
 public class ReflectionMbean implements DynamicMBean {
 
-	private final Object obj;
+	private final Object proxy;
 	private final Map<String, Method> fieldGetMap = new HashMap<String, Method>();
 	private final Map<String, Method> fieldSetMap = new HashMap<String, Method>();
 	private final Map<NameParams, Method> fieldOperationMap = new HashMap<NameParams, Method>();
 	private final MBeanInfo mbeanInfo;
 
-	public ReflectionMbean(Object obj) {
-		this.obj = obj;
+	public ReflectionMbean(Object proxy) {
+		this.proxy = proxy;
 		this.mbeanInfo = buildMbeanInfo();
 	}
 
@@ -45,12 +46,11 @@ public class ReflectionMbean implements DynamicMBean {
 		Method method = fieldGetMap.get(attribute);
 		if (method == null) {
 			throw new AttributeNotFoundException("Unknown attribute " + attribute);
-		} else {
-			try {
-				return method.invoke(obj);
-			} catch (Exception e) {
-				throw new ReflectionException(e);
-			}
+		}
+		try {
+			return method.invoke(proxy);
+		} catch (Exception e) {
+			throw new ReflectionException(e);
 		}
 	}
 
@@ -78,7 +78,7 @@ public class ReflectionMbean implements DynamicMBean {
 					+ "' with parameter types " + Arrays.toString(signatureTypes)));
 		} else {
 			try {
-				return method.invoke(obj, params);
+				return method.invoke(proxy, params);
 			} catch (Exception e) {
 				throw new ReflectionException(e);
 			}
@@ -91,7 +91,7 @@ public class ReflectionMbean implements DynamicMBean {
 			throw new AttributeNotFoundException("Unknown attribute " + attribute);
 		} else {
 			try {
-				method.invoke(obj, attribute.getValue());
+				method.invoke(proxy, attribute.getValue());
 			} catch (Exception e) {
 				throw new ReflectionException(e);
 			}
@@ -116,7 +116,7 @@ public class ReflectionMbean implements DynamicMBean {
 	 * Build our JMX information object by using reflection.
 	 */
 	private MBeanInfo buildMbeanInfo() {
-		Class<?> clazz = obj.getClass();
+		Class<?> clazz = proxy.getClass();
 		JmxResource jmxResource = clazz.getAnnotation(JmxResource.class);
 		String desc;
 		if (jmxResource == null || jmxResource.description() == null || jmxResource.description().length() == 0) {

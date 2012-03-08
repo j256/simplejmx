@@ -21,8 +21,7 @@ import com.j256.simplejmx.common.JmxSelfNaming;
 import com.j256.simplejmx.common.ObjectNameUtil;
 
 /**
- * JMX server connection which sets up a server (with or without JVM parameters) and allows classes to easily publish
- * themselves via RMI.
+ * JMX server which allows classes to easily publish and un-publish themselves.
  * 
  * @author graywatson
  */
@@ -86,7 +85,7 @@ public class JmxServer {
 		try {
 			mbean = new ReflectionMbean(obj);
 		} catch (Exception e) {
-			throw createJmException("Could not build mbean object for: " + obj, e);
+			throw createJmException("Could not build MBean object for: " + obj, e);
 		}
 		try {
 			mbeanServer.registerMBean(mbean, objectName);
