@@ -32,7 +32,7 @@ public class JmxIntegrationTest {
 	}
 
 	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
-	protected static class TestObject {
+	public static class TestObject {
 
 		private final JmxServer jmxServer;
 		private int foo = FOO_VALUE;
@@ -73,6 +73,12 @@ public class JmxIntegrationTest {
 			return "Parameter was: " + someParam;
 		}
 
+		// another operation without any parameter information
+		@JmxOperation(description = "Return the parameter", parameterNames = { "someParam" }, parameterDescriptions = { "Parameter which will be returned" })
+		public String returnParam(Integer someParam) {
+			return "Parameter was: " + someParam;
+		}
+
 		@JmxOperation(description = "Add another object to JMX")
 		public void addAnotherObject() throws Exception {
 			jmxServer.register(new AnotherObject(jmxServer));
@@ -80,7 +86,7 @@ public class JmxIntegrationTest {
 	}
 
 	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
-	protected static class TestSubObject implements JmxSelfNaming {
+	public static class TestSubObject implements JmxSelfNaming {
 
 		public String getJmxDomainName() {
 			return null;
@@ -93,7 +99,7 @@ public class JmxIntegrationTest {
 		public JmxFolderName[] getJmxFolderNames() {
 			return new JmxFolderName[] { new JmxFolderName("Sub") };
 		}
-		
+
 		@JmxAttribute(description = "Integer value")
 		public int getZero() {
 			return 0;

@@ -160,6 +160,7 @@ public class ReflectionMbean implements DynamicMBean {
 					MBeanParameterInfo[] parameterInfos = buildParameterInfos(method, jmxOperation);
 					operations.add(new MBeanOperationInfo(method.getName(), jmxOperation.description(), parameterInfos,
 							method.getReturnType().getName(), jmxOperation.action()));
+					// operations.add(new MBeanOperationInfo(jmxOperation.description(), method));
 				}
 			}
 		}
@@ -174,20 +175,20 @@ public class ReflectionMbean implements DynamicMBean {
 		String[] parameterNames = jmxOperation.parameterNames();
 		String[] parameterDescriptions = jmxOperation.parameterDescriptions();
 		for (int i = 0; i < types.length; i++) {
-			String name;
+			String parameterName;
 			if (i >= parameterNames.length) {
-				name = "p" + i;
+				parameterName = "p" + (i + 1);
 			} else {
-				name = parameterNames[i];
+				parameterName = parameterNames[i];
 			}
 			String typeName = types[i].getName();
 			String description;
 			if (i >= parameterDescriptions.length) {
-				description = "parameter #" + i + " of type: " + typeName;
+				description = "parameter #" + (i + 1) + " of type: " + typeName;
 			} else {
 				description = parameterDescriptions[i];
 			}
-			parameterInfos[i] = new MBeanParameterInfo(name, typeName, description);
+			parameterInfos[i] = new MBeanParameterInfo(parameterName, typeName, description);
 		}
 		return parameterInfos;
 	}
