@@ -253,7 +253,7 @@ public class ReflectionMbean implements DynamicMBean {
 			Class<?>[] types = method.getParameterTypes();
 			String[] stringTypes = new String[types.length];
 			for (int i = 0; i < types.length; i++) {
-				stringTypes[i] = types[i].toString();
+				stringTypes[i] = types[i].getName();
 			}
 			NameParams nameParams = new NameParams(name, stringTypes);
 			fieldOperationMap.put(nameParams, method);
@@ -286,10 +286,10 @@ public class ReflectionMbean implements DynamicMBean {
 				return false;
 			}
 			NameParams other = (NameParams) obj;
-			if (!name.equals(other.name)) {
+			if (!this.name.equals(other.name)) {
 				return false;
 			}
-			return Arrays.equals(paramTypes, other.paramTypes);
+			return Arrays.equals(this.paramTypes, other.paramTypes);
 		}
 	}
 }
