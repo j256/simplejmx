@@ -17,23 +17,27 @@ public class ObjectNameUtil {
 	 * Used to construct an object name the same in the client and the server.
 	 * 
 	 * @param jmxResource
-	 *            Annotation from the class for which we are creating our ObjectName.
+	 *            Annotation from the class for which we are creating our ObjectName. It may be null.
 	 * @param selfNamingObj
 	 *            Object that implements the self-naming interface.
 	 */
 	public static ObjectName makeObjectName(JmxResource jmxResource, JmxSelfNaming selfNamingObj) {
 		String domainName = selfNamingObj.getJmxDomainName();
 		if (domainName == null) {
-			domainName = jmxResource.domainName();
-			if (domainName.length() == 0) {
+			if (jmxResource != null) {
+				domainName = jmxResource.domainName();
+			}
+			if (domainName == null || domainName.length() == 0) {
 				throw new IllegalArgumentException(
 						"Could not create ObjectName because domain name not specified in getJmxDomainName() nor @JmxResource");
 			}
 		}
 		String objectName = selfNamingObj.getJmxObjectName();
 		if (objectName == null) {
-			objectName = jmxResource.objectName();
-			if (objectName.length() == 0) {
+			if (jmxResource != null) {
+				objectName = jmxResource.objectName();
+			}
+			if (objectName == null || objectName.length() == 0) {
 				objectName = selfNamingObj.getClass().getSimpleName();
 			}
 		}

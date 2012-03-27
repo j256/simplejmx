@@ -59,7 +59,7 @@ public @interface JmxResource {
 	public String[] folderNames() default {};
 
 	/**
-	 * Description on the class.
+	 * Description of the class for jconsole. Default is something like: "Jmx information about class-name".
 	 */
 	public String description() default "";
 }

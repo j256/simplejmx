@@ -3,7 +3,7 @@ package com.j256.simplejmx.common;
 import javax.management.ObjectName;
 
 /**
- * This allows objcts to name themselves based on some internal values. This is usually for objects that have multiple
+ * This allows objects to name themselves based on some internal values. This is usually for objects that have multiple
  * instances and that are dynamically added and removed.
  * 
  * @author graywatson
@@ -23,7 +23,8 @@ public interface JmxSelfNaming {
 	public String getJmxObjectName();
 
 	/**
-	 * Return the appropriate array of folder names used to built the associated {@link ObjectName}.
+	 * Return the appropriate array of folder names used to built the associated {@link ObjectName}. Return null for no
+	 * folders in which case the bean will be at the top of the hierarchy in jconsole without any sub-folders.
 	 */
 	public JmxFolderName[] getJmxFolderNames();
 }

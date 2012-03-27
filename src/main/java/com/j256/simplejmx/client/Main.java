@@ -1,8 +1,8 @@
 package com.j256.simplejmx.client;
 
 /**
- * Main class which starts our JMX client. We have this separation with {@link CommandLineJmxClient} so others can use it in
- * their Main classes.
+ * Main class which starts our JMX client. We have this separation with {@link CommandLineJmxClient} so others can use
+ * it in their Main classes.
  * 
  * @author graywatson
  */

@@ -160,7 +160,7 @@ public class ReflectionMbean implements DynamicMBean {
 			} else {
 				JmxOperation jmxOperation = method.getAnnotation(JmxOperation.class);
 				if (jmxOperation != null) {
-					MBeanParameterInfo[] parameterInfos = buildParameterInfos(method, jmxOperation);
+					MBeanParameterInfo[] parameterInfos = buildOperationParameterInfo(method, jmxOperation);
 					String description = jmxOperation.description();
 					if (description == null || description.length() == 0) {
 						description = method.getName() + " operation";
@@ -174,30 +174,6 @@ public class ReflectionMbean implements DynamicMBean {
 
 		return new MBeanInfo(clazz.getName(), desc, attributes.toArray(new MBeanAttributeInfo[attributes.size()]),
 				null, operations.toArray(new MBeanOperationInfo[operations.size()]), null);
-	}
-
-	private MBeanParameterInfo[] buildParameterInfos(Method method, JmxOperation jmxOperation) {
-		Class<?>[] types = method.getParameterTypes();
-		MBeanParameterInfo[] parameterInfos = new MBeanParameterInfo[types.length];
-		String[] parameterNames = jmxOperation.parameterNames();
-		String[] parameterDescriptions = jmxOperation.parameterDescriptions();
-		for (int i = 0; i < types.length; i++) {
-			String parameterName;
-			if (i >= parameterNames.length) {
-				parameterName = "p" + (i + 1);
-			} else {
-				parameterName = parameterNames[i];
-			}
-			String typeName = types[i].getName();
-			String description;
-			if (i >= parameterDescriptions.length) {
-				description = "parameter #" + (i + 1) + " of type: " + typeName;
-			} else {
-				description = parameterDescriptions[i];
-			}
-			parameterInfos[i] = new MBeanParameterInfo(parameterName, typeName, description);
-		}
-		return parameterInfos;
 	}
 
 	/**
@@ -265,6 +241,33 @@ public class ReflectionMbean implements DynamicMBean {
 			NameParams nameParams = new NameParams(name, stringTypes);
 			fieldOperationMap.put(nameParams, method);
 		}
+	}
+
+	/**
+	 * Build our parameter information for an operation.
+	 */
+	private MBeanParameterInfo[] buildOperationParameterInfo(Method method, JmxOperation jmxOperation) {
+		Class<?>[] types = method.getParameterTypes();
+		MBeanParameterInfo[] parameterInfos = new MBeanParameterInfo[types.length];
+		String[] parameterNames = jmxOperation.parameterNames();
+		String[] parameterDescriptions = jmxOperation.parameterDescriptions();
+		for (int i = 0; i < types.length; i++) {
+			String parameterName;
+			if (i >= parameterNames.length) {
+				parameterName = "p" + (i + 1);
+			} else {
+				parameterName = parameterNames[i];
+			}
+			String typeName = types[i].getName();
+			String description;
+			if (i >= parameterDescriptions.length) {
+				description = "parameter #" + (i + 1) + " of type: " + typeName;
+			} else {
+				description = parameterDescriptions[i];
+			}
+			parameterInfos[i] = new MBeanParameterInfo(parameterName, typeName, description);
+		}
+		return parameterInfos;
 	}
 
 	private String buildMethodSuffix(String name) {

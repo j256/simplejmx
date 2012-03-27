@@ -27,7 +27,8 @@ import com.j256.simplejmx.common.ObjectNameUtil;
 public class JmxServer {
 
 	private Registry rmiRegistry;
-	private int port;
+	private int serverPort;
+	private int registryPort;
 	private JMXConnectorServer connector;
 	private MBeanServer mbeanServer;
 
@@ -36,7 +37,7 @@ public class JmxServer {
 	}
 
 	public JmxServer(int port) {
-		this.port = port;
+		this.registryPort = port;
 	}
 
 	/**
@@ -44,7 +45,7 @@ public class JmxServer {
 	 * constructor before {@link #start()} is called.
 	 */
 	public synchronized void start() throws JMException {
-		if (port == 0) {
+		if (registryPort == 0) {
 			throw new IllegalStateException("port must be already set when JmxServer is initialized");
 		}
 		startRmiRegistry();
@@ -128,19 +129,37 @@ public class JmxServer {
 	}
 
 	/**
-	 * Set our port number to listen for JMX connections. This must be set either here on in the {@link #JmxServer(int)}
-	 * constructor before {@link #start()} is called.
+	 * This is actually calls {@link #setRegistryPort(int)}.
 	 */
 	public void setPort(int port) {
-		this.port = port;
+		this.registryPort = port;
+	}
+
+	/**
+	 * Set our port number to listen for JMX connections. In JMX terms, this is the "RMI registry port" but it is the
+	 * port that you specify in jconsole to connect to the server. This must be set either here on in the
+	 * {@link #JmxServer(int)} constructor before {@link #start()} is called.
+	 */
+	public void setRegistryPort(int registryPort) {
+		this.registryPort = registryPort;
+	}
+
+	/**
+	 * Chances are you should be using {@link #setPort(int)} or {@link #setRegistryPort(int)} unless you know what you
+	 * are doing. This sets what JMX calls the "RMI server port". By default this does not have to be set and 1 plus the
+	 * registry port will be used. When you specify a port number in jconsole this port is _not_ used -- see the
+	 * registry port.
+	 */
+	public void setServerPort(int serverPort) {
+		this.serverPort = serverPort;
 	}
 
 	private void startRmiRegistry() throws JMException {
 		if (rmiRegistry == null) {
 			try {
-				rmiRegistry = LocateRegistry.createRegistry(port);
+				rmiRegistry = LocateRegistry.createRegistry(registryPort);
 			} catch (IOException e) {
-				throw createJmException("Unable to create RMI registry on port " + port, e);
+				throw createJmException("Unable to create RMI registry on port " + registryPort, e);
 			}
 		}
 	}
@@ -148,7 +167,10 @@ public class JmxServer {
 	private void startJmxService() throws JMException {
 		if (connector == null) {
 			JMXServiceURL url = null;
-			String urlString = "service:jmx:rmi://localhost:" + (port + 1) + "/jndi/rmi://:" + port + "/jmxrmi";
+			if (serverPort == 0) {
+				serverPort = registryPort + 1;
+			}
+			String urlString = "service:jmx:rmi://localhost:" + serverPort + "/jndi/rmi://:" + registryPort + "/jmxrmi";
 			try {
 				url = new JMXServiceURL(urlString);
 			} catch (MalformedURLException e) {
@@ -173,13 +195,13 @@ public class JmxServer {
 
 	private ObjectName extractJmxResourceObjName(Object obj) {
 		JmxResource jmxResource = obj.getClass().getAnnotation(JmxResource.class);
-		if (jmxResource == null) {
-			throw new IllegalArgumentException(
-					"Registered class must implement JmxSelfNaming or have JmxResource annotation");
-		}
 		if (obj instanceof JmxSelfNaming) {
 			return ObjectNameUtil.makeObjectName(jmxResource, (JmxSelfNaming) obj);
 		} else {
+			if (jmxResource == null) {
+				throw new IllegalArgumentException(
+						"Registered class must implement JmxSelfNaming or have JmxResource annotation");
+			}
 			return ObjectNameUtil.makeObjectName(jmxResource, obj);
 		}
 	}

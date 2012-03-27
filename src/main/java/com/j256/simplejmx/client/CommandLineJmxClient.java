@@ -7,7 +7,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,7 +28,6 @@ public class CommandLineJmxClient {
 
 	private static final String HELP_COMMAND = "help";
 	private static final String DEFAULT_PROMPT = "Jmx: ";
-	private static final String NEWLINE = System.getProperty("line.separator");
 
 	private JmxClient jmxClient;
 
@@ -44,21 +42,17 @@ public class CommandLineJmxClient {
 	/**
 	 * Run the Jmx interface.
 	 */
-	public void runCommands(String[] commands) throws IOException {
-		StringBuilder sb = new StringBuilder();
-		for (String command : commands) {
-			sb.append(command).append(NEWLINE);
-		}
-		final BufferedReader reader = new BufferedReader(new StringReader(sb.toString()));
-		try {
-			doLines(0, new LineReader() {
-				public String getNextLine(String prompt) throws IOException {
-					return reader.readLine();
+	public void runCommands(final String[] commands) throws IOException {
+		doLines(0, new LineReader() {
+			private int commandC = 0;
+			public String getNextLine(String prompt) {
+				if (commandC >= commands.length) {
+					return null;
+				} else {
+					return commands[commandC++];
 				}
-			}, true);
-		} finally {
-			reader.close();
-		}
+			}
+		}, true);
 	}
 
 	/**
@@ -160,7 +154,7 @@ public class CommandLineJmxClient {
 					try {
 						Thread.sleep(Long.parseLong(lineParts[1]));
 					} catch (NumberFormatException e) {
-						System.out.println("Error.  Usage: sleep millis, invalid millis number " + lineParts[1]);
+						System.out.println("Error.  Usage: sleep millis, invalid millis number '" + lineParts[1] + "'");
 					} catch (InterruptedException e) {
 						Thread.currentThread().interrupt();
 					}
@@ -190,7 +184,7 @@ public class CommandLineJmxClient {
 		System.out.println("get object-name attr  -  output the value associated with this attribute");
 		System.out.println("set object-name attr val  -  set the value associated with this attribute");
 		System.out.println("ops object-name  -  list the operations associated with the bean");
-		System.out.println("do object-name oper arg1 arg2 -  invoke this method name");
+		System.out.println("do object-name oper arg1 arg2 ... -  invoke this method name with variable number of args");
 		System.out.println("dolines object-name oper -  invoke method name, args on next line(s), end with blank");
 	}
 
@@ -361,10 +355,7 @@ public class CommandLineJmxClient {
 		if (currentName == null) {
 			return;
 		}
-		if (parts.length != 2) {
-			System.out.println("Error.  Usage: get objectName [attr]");
-			return;
-		}
+		// have to have 2 arguments
 
 		MBeanAttributeInfo[] attrs;
 		try {
@@ -401,14 +392,14 @@ public class CommandLineJmxClient {
 			return;
 		}
 		String attrName = parts[2];
-		StringBuilder valueBuilder = new StringBuilder();
+		StringBuilder sb = new StringBuilder();
 		for (int partC = 3; partC < parts.length; partC++) {
 			if (partC > 3) {
-				valueBuilder.append(' ');
+				sb.append(' ');
 			}
-			valueBuilder.append(parts[partC]);
+			sb.append(parts[partC]);
 		}
-		String valueString = valueBuilder.toString();
+		String valueString = sb.toString();
 
 		try {
 			jmxClient.setAttribute(currentName, attrName, valueString);
@@ -436,6 +427,10 @@ public class CommandLineJmxClient {
 		if (currentName == null) {
 			return;
 		}
+		if (parts.length != 2) {
+			System.out.println("Error.  Usage: ops objectName");
+			return;
+		}
 
 		MBeanOperationInfo[] opers;
 		try {
@@ -446,8 +441,14 @@ public class CommandLineJmxClient {
 		}
 		for (MBeanOperationInfo info : opers) {
 			System.out.print("  " + info.getReturnType() + " " + info.getName() + "(");
+			boolean first = true;
 			for (MBeanParameterInfo param : info.getSignature()) {
-				System.out.print(param.getType() + ", ");
+				if (first) {
+					first = false;
+				} else {
+					System.out.print(", ");
+				}
+				System.out.print(param.getType());
 			}
 			System.out.println(")");
 		}
@@ -513,7 +514,7 @@ public class CommandLineJmxClient {
 		} catch (Exception e) {
 			System.out.println("Error.  Problems invoking operation " + oper + ":");
 			for (Throwable y = e; y != null; y = y.getCause()) {
-				System.out.println("  " + y.getMessage());
+				System.out.println("  " + y);
 			}
 		}
 	}
@@ -532,7 +533,7 @@ public class CommandLineJmxClient {
 	}
 
 	private void displayValue(String action, String what, Object value, long millis) {
-		displayValue(value, "  ", action + " " + what + " in " + millis + "ms");
+		displayValue(value, "  ", action + " '" + what + "' in " + millis + "ms");
 	}
 
 	private void displayValue(Object value, String indent, String prefix) {
@@ -540,17 +541,71 @@ public class CommandLineJmxClient {
 		System.out.print(prefix);
 		if (value == null) {
 			System.out.println(" = null");
-		} else if (value.getClass().isArray()) {
-			System.out.println(" is a " + value.getClass().getSimpleName() + " array:");
+			return;
+		}
+		Class<? extends Object> clazz = value.getClass();
+		if (!clazz.isArray()) {
+			System.out.println(" = " + value.toString());
+			return;
+		}
+
+		System.out.println(" is a " + clazz.getSimpleName() + " array:");
+		if (clazz == byte[].class) {
+			byte[] array = (byte[]) value;
+			for (int arrayC = 0; arrayC < array.length; arrayC++) {
+				// recurse to get any sub-arrays
+				displayValue(array[arrayC], indent + "  ", "[" + arrayC + "]");
+			}
+		} else if (clazz == short[].class) {
+			short[] array = (short[]) value;
+			for (int arrayC = 0; arrayC < array.length; arrayC++) {
+				// recurse to get any sub-arrays
+				displayValue(array[arrayC], indent + "  ", "[" + arrayC + "]");
+			}
+		} else if (clazz == int[].class) {
+			int[] array = (int[]) value;
+			for (int arrayC = 0; arrayC < array.length; arrayC++) {
+				// recurse to get any sub-arrays
+				displayValue(array[arrayC], indent + "  ", "[" + arrayC + "]");
+			}
+		} else if (clazz == long[].class) {
+			long[] array = (long[]) value;
+			for (int arrayC = 0; arrayC < array.length; arrayC++) {
+				// recurse to get any sub-arrays
+				displayValue(array[arrayC], indent + "  ", "[" + arrayC + "]");
+			}
+		} else if (clazz == boolean[].class) {
+			boolean[] array = (boolean[]) value;
+			for (int arrayC = 0; arrayC < array.length; arrayC++) {
+				// recurse to get any sub-arrays
+				displayValue(array[arrayC], indent + "  ", "[" + arrayC + "]");
+			}
+		} else if (clazz == char[].class) {
+			char[] array = (char[]) value;
+			for (int arrayC = 0; arrayC < array.length; arrayC++) {
+				// recurse to get any sub-arrays
+				displayValue(array[arrayC], indent + "  ", "[" + arrayC + "]");
+			}
+		} else if (clazz == float[].class) {
+			float[] array = (float[]) value;
+			for (int arrayC = 0; arrayC < array.length; arrayC++) {
+				// recurse to get any sub-arrays
+				displayValue(array[arrayC], indent + "  ", "[" + arrayC + "]");
+			}
+		} else if (clazz == double[].class) {
+			double[] array = (double[]) value;
+			for (int arrayC = 0; arrayC < array.length; arrayC++) {
+				// recurse to get any sub-arrays
+				displayValue(array[arrayC], indent + "  ", "[" + arrayC + "]");
+			}
+		} else {
 			Object[] array = (Object[]) value;
 			for (int arrayC = 0; arrayC < array.length; arrayC++) {
 				// recurse to get any sub-arrays
 				displayValue(array[arrayC], indent + "  ", "[" + arrayC + "]");
 			}
-			System.out.println(indent + "END of " + value.getClass().getSimpleName() + " array:");
-		} else {
-			System.out.println(" = " + value.toString());
 		}
+		System.out.println(indent + "END of " + clazz.getSimpleName() + " array:");
 	}
 
 	private InputStream getInputStream(String filePath) throws IOException {

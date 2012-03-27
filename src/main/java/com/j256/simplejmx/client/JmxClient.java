@@ -307,6 +307,9 @@ public class JmxClient {
 			paramObjs = new Object[paramStrings.length];
 		}
 		String[] paramTypes = lookupParamTypes(name, operName, paramStrings);
+		if (paramTypes == null) {
+
+		}
 		for (int i = 0; i < paramStrings.length; i++) {
 			paramObjs[i] = stringToObject(paramStrings[i], paramTypes[i]);
 		}
@@ -336,29 +339,29 @@ public class JmxClient {
 	 * 
 	 * @return The value returned by the method or null if none.
 	 */
-	public Object invokeOperation(ObjectName name, String operName, Object... params) throws Exception {
-		String[] paramTypes = lookupParamTypes(name, operName, params);
-		return invokeOperation(name, operName, paramTypes, params);
+	public Object invokeOperation(ObjectName objectName, String operName, Object... params) throws Exception {
+		String[] paramTypes = lookupParamTypes(objectName, operName, params);
+		return invokeOperation(objectName, operName, paramTypes, params);
 	}
 
-	private Object invokeOperation(ObjectName name, String operName, String[] paramTypes, Object[] params)
+	private Object invokeOperation(ObjectName objectName, String operName, String[] paramTypes, Object[] params)
 			throws Exception {
 		if (params != null && params.length == 0) {
 			params = null;
 		}
-		return mbeanConn.invoke(name, operName, params, paramTypes);
+		return mbeanConn.invoke(objectName, operName, params, paramTypes);
 	}
 
-	private String[] lookupParamTypes(ObjectName name, String operName, Object[] params) {
+	private String[] lookupParamTypes(ObjectName objectName, String operName, Object[] params) {
 		if (mbeanConn == null) {
 			throw new IllegalArgumentException("JmxClient is not connected");
 		}
 
 		if (operations == null) {
 			try {
-				operations = mbeanConn.getMBeanInfo(name).getOperations();
+				operations = mbeanConn.getMBeanInfo(objectName).getOperations();
 			} catch (Exception e) {
-				throw new IllegalArgumentException("Cannot get attribute info from " + name, e);
+				throw new IllegalArgumentException("Cannot get attribute info from " + objectName, e);
 			}
 		}
 		String[] paramTypes = new String[params.length];
@@ -385,19 +388,22 @@ public class JmxClient {
 			}
 		}
 
-		if (nameC > 1) {
-			throw new IllegalArgumentException("Cannot find method named '" + name + "' with matching argument types");
+		if (nameC == 0) {
+			throw new IllegalArgumentException("Cannot find operation named '" + operName);
+		} else if (nameC > 1) {
+			throw new IllegalArgumentException("Cannot find operation named '" + operName
+					+ "' with matching argument types");
 		} else {
 			return first;
 		}
 	}
 
-	private MBeanAttributeInfo getAttrInfo(ObjectName name, String attrName) throws IllegalArgumentException {
+	private MBeanAttributeInfo getAttrInfo(ObjectName objectName, String attrName) throws IllegalArgumentException {
 		if (attributes == null) {
 			try {
-				attributes = mbeanConn.getMBeanInfo(name).getAttributes();
+				attributes = mbeanConn.getMBeanInfo(objectName).getAttributes();
 			} catch (Exception e) {
-				throw new IllegalArgumentException("Cannot get attribute info from " + name, e);
+				throw new IllegalArgumentException("Cannot get attribute info from " + objectName, e);
 			}
 		}
 		for (MBeanAttributeInfo info : attributes) {

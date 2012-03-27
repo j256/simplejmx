@@ -32,7 +32,7 @@ public @interface JmxOperation {
 
 	/**
 	 * Array of strings which describes each of the parameters to the operation method. This array should be the same
-	 * length as the parameterNames array. If not specified then it will create one with the paramenter number and type.
+	 * length as the parameterNames array. If not specified then it will create one with the parameter number and type.
 	 */
 	public String[] parameterDescriptions() default {};
 
