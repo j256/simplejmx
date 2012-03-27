@@ -58,8 +58,8 @@ public class CommandLineJmxClient {
 	/**
 	 * Run the Jmx interface.
 	 */
-	public void runBatchFile(String batchFile) throws IOException {
-		final BufferedReader reader = new BufferedReader(new FileReader(new File(batchFile)));
+	public void runBatchFile(File batchFile) throws IOException {
+		final BufferedReader reader = new BufferedReader(new FileReader(batchFile));
 		try {
 			doLines(0, new LineReader() {
 				public String getNextLine(String prompt) throws IOException {
@@ -157,6 +157,7 @@ public class CommandLineJmxClient {
 						System.out.println("Error.  Usage: sleep millis, invalid millis number '" + lineParts[1] + "'");
 					} catch (InterruptedException e) {
 						Thread.currentThread().interrupt();
+						return;
 					}
 				} else {
 					System.out.println("Error.  Usage: sleep millis");
@@ -418,6 +419,7 @@ public class CommandLineJmxClient {
 		if (attr.toString().equals(valueString)) {
 			System.out.println("  Attribute " + parts[1] + " set to " + valueString);
 		} else {
+			// may never happen but let's be careful out there
 			System.out.println("Error.  Set attribute " + parts[1] + " to " + valueString + " but new value is " + attr);
 		}
 	}

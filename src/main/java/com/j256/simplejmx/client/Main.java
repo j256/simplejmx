@@ -1,5 +1,7 @@
 package com.j256.simplejmx.client;
 
+import java.io.File;
+
 /**
  * Main class which starts our JMX client. We have this separation with {@link CommandLineJmxClient} so others can use
  * it in their Main classes.
@@ -39,7 +41,7 @@ public class Main {
 		if (args.length == 1) {
 			jmxClient.runCommandLine();
 		} else if (args.length == 2) {
-			jmxClient.runBatchFile(args[1]);
+			jmxClient.runBatchFile(new File(args[1]));
 		} else {
 			usage();
 		}

@@ -5,6 +5,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.PrintStream;
 
 import org.junit.AfterClass;
@@ -29,10 +31,10 @@ public class CommandLineJmxClientTest {
 	public static void beforeClass() throws Exception {
 		server = new JmxServer(JMX_PORT);
 		server.start();
-		OurJmxClass obj = new OurJmxClass();
+		CommandLineJmxClientTestObject obj = new CommandLineJmxClientTestObject();
 		server.register(obj);
 		client = new CommandLineJmxClient("localhost", JMX_PORT);
-		objectName = JMX_DOMAIN + ":name=" + OurJmxClass.class.getSimpleName();
+		objectName = JMX_DOMAIN + ":name=" + CommandLineJmxClientTestObject.class.getSimpleName();
 	}
 
 	@AfterClass
@@ -59,6 +61,64 @@ public class CommandLineJmxClientTest {
 	}
 
 	@Test
+	public void testDifferentConstructor() throws Exception {
+		CommandLineJmxClient client =
+				new CommandLineJmxClient("service:jmx:rmi:///jndi/rmi://localhost:" + JMX_PORT + "/jmxrmi");
+		String output = getClientOutput(client, "help");
+		assertTrue(output, output.matches("(?s).*execute a script.*"));
+	}
+
+	@Test
+	public void testRunBatch() throws Exception {
+		CommandLineJmxClient client = new CommandLineJmxClient("localhost", JMX_PORT);
+		File scriptFile = new File("target/scriptFileTest.t");
+		try {
+			scriptFile.delete();
+			FileWriter writer = new FileWriter(scriptFile);
+			try {
+				writer.write("help\n");
+			} finally {
+				writer.close();
+			}
+			ByteArrayOutputStream array = new ByteArrayOutputStream();
+			System.setOut(new PrintStream(array));
+			client.runBatchFile(scriptFile);
+			String output = new String(array.toByteArray());
+			assertTrue(output, output.matches("(?s).*execute a script.*"));
+		} finally {
+			scriptFile.delete();
+		}
+	}
+
+	@Test
+	public void testScriptFileLoop() throws Exception {
+		CommandLineJmxClient client = new CommandLineJmxClient("localhost", JMX_PORT);
+		File scriptFile = new File("target/scriptFileTest.t");
+		try {
+			scriptFile.delete();
+			FileWriter writer = new FileWriter(scriptFile);
+			try {
+				writer.write("run " + scriptFile.getPath() + "\n");
+			} finally {
+				writer.close();
+			}
+			ByteArrayOutputStream array = new ByteArrayOutputStream();
+			System.setOut(new PrintStream(array));
+			client.runBatchFile(scriptFile);
+			String output = new String(array.toByteArray());
+			assertTrue(output, output.matches("(?s).*Ignoring possible recursion.*"));
+		} finally {
+			scriptFile.delete();
+		}
+	}
+
+	@Test
+	public void testRunScriptHelp() throws Exception {
+		String output = getClientOutput(client, "run classpath:/script1.txt");
+		assertTrue(output, output.matches("(?s).*execute a script.*"));
+	}
+
+	@Test
 	public void testListObjects() throws Exception {
 		String output = getClientOutput(client, "objects");
 		assertTrue(output, output.contains(objectName));
@@ -66,7 +126,7 @@ public class CommandLineJmxClientTest {
 
 	@Test
 	public void testListObjectsPattern() throws Exception {
-		String output = getClientOutput(client, "objects " + OurJmxClass.class.getSimpleName());
+		String output = getClientOutput(client, "objects " + CommandLineJmxClientTestObject.class.getSimpleName());
 		assertTrue(output, output.contains(objectName));
 	}
 
@@ -161,6 +221,12 @@ public class CommandLineJmxClientTest {
 	public void testListOperationsTooManyArgs() throws Exception {
 		String output = getClientOutput(client, "ops " + objectName + " 1 2 3");
 		assertTrue(output, output.matches("(?s).*Usage: ops.*"));
+	}
+
+	@Test
+	public void testListOperationsAlt() throws Exception {
+		String output = getClientOutput(client, "opers " + objectName);
+		assertTrue(output, output.matches("(?s).*int times\\(int, int\\).*"));
 	}
 
 	@Test
@@ -370,6 +436,26 @@ public class CommandLineJmxClientTest {
 		assertTrue(output, output.matches("(?s).*Script file is not found.*"));
 	}
 
+	@Test
+	public void testRunFileCantRead() throws Exception {
+		File file = new File("target/cantread.t");
+		file.delete();
+		file.createNewFile();
+		try {
+			file.setReadable(false);
+			String output = getClientOutput(client, "run " + file.getPath());
+			assertTrue(output, output.matches("(?s).*Could not load script.*"));
+		} finally {
+			file.delete();
+		}
+	}
+
+	@Test
+	public void testQuit() throws Exception {
+		String output = getClientOutput(client, "quit");
+		assertTrue(output, output.matches("(?s).*> quit.*"));
+	}
+
 	/* ============================= */
 
 	private String getClientOutput(CommandLineJmxClient client, String command) throws Exception {
@@ -384,7 +470,7 @@ public class CommandLineJmxClientTest {
 	}
 
 	@JmxResource(domainName = JMX_DOMAIN)
-	protected static class OurJmxClass {
+	protected static class CommandLineJmxClientTestObject {
 		int x;
 		@JmxAttribute
 		public void setX(int x) {

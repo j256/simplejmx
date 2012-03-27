@@ -35,7 +35,7 @@ public class JmxClient {
 
 	public JmxClient(String url) throws IllegalArgumentException {
 		if (url == null) {
-			throw new NullPointerException("Jmx URL cannot be null");
+			throw new IllegalArgumentException("Jmx URL cannot be null");
 		}
 
 		try {
@@ -239,12 +239,12 @@ public class JmxClient {
 	}
 
 	/**
-	 * Return the value of a JMX attribute as a String.
+	 * Return the value of a JMX attribute as a String or null if attribute has a null value.
 	 */
 	public String getAttributeString(ObjectName name, String attributeName) throws Exception {
 		Object bean = getAttribute(name, attributeName);
 		if (bean == null) {
-			return "(null)";
+			return null;
 		} else {
 			return bean.toString();
 		}
