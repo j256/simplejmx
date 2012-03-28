@@ -5,8 +5,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Date;
 import java.util.Set;
 
+import javax.management.JMException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.MBeanParameterInfo;
@@ -63,7 +65,7 @@ public class JmxClientTest {
 		new JmxClient(null);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = JMException.class)
 	public void testInvalidUrl() throws Exception {
 		new JmxClient("invalid url");
 	}
@@ -162,10 +164,12 @@ public class JmxClientTest {
 	@Test
 	public void testGetOperationsInfo() throws Exception {
 		MBeanOperationInfo[] infos = client.getOperationsInfo(objectName);
-		assertEquals(3, infos.length);
+		assertEquals(13, infos.length);
 		assertEquals("times", infos[0].getName());
 		assertEquals("doThrow", infos[1].getName());
 		assertEquals("returnNull", infos[2].getName());
+		assertEquals("returnNull", infos[3].getName());
+		assertEquals("dateToString", infos[4].getName());
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -179,9 +183,9 @@ public class JmxClientTest {
 		assertNotNull(info);
 		MBeanParameterInfo[] params = info.getSignature();
 		assertEquals(2, params.length);
-		assertEquals(int.class.getName(), params[0].getType());
-		assertEquals(long.class.getName(), params[1].getType());
-		assertEquals(String.class.getName(), info.getReturnType());
+		assertEquals(short.class.getName(), params[0].getType());
+		assertEquals(int.class.getName(), params[1].getType());
+		assertEquals(long.class.getName(), info.getReturnType());
 	}
 
 	@Test
@@ -271,6 +275,138 @@ public class JmxClientTest {
 		closedClient.setAttribute(objectName, "x", 1);
 	}
 
+	@Test
+	public void testInvokeOperationStringString() throws Exception {
+		short val1 = 231;
+		int val2 = 524;
+		Object result = client.invokeOperation(JMX_DOMAIN, objectNameName, "times", val1, val2);
+		long times = val1 * val2;
+		assertEquals(times, result);
+	}
+
+	@Test
+	public void testInvokeOperationStringStringString() throws Exception {
+		short val1 = 231;
+		int val2 = 524;
+		Object result =
+				client.invokeOperation(JMX_DOMAIN, objectNameName, "times", Short.toString(val1),
+						Integer.toString(val2));
+		long times = val1 * val2;
+		assertEquals(times, result);
+	}
+
+	@Test
+	public void testInvokeOperation() throws Exception {
+		short val1 = 231;
+		int val2 = 524;
+		Object result = client.invokeOperation(objectName, "times", val1, val2);
+		long times = val1 * val2;
+		assertEquals(times, result);
+	}
+
+	@Test
+	public void testInvokeOperationStrings() throws Exception {
+		short val1 = 231;
+		int val2 = 524;
+		Object result = client.invokeOperation(objectName, "times", Short.toString(val1), Integer.toString(val2));
+		long times = val1 * val2;
+		assertEquals(times, result);
+	}
+
+	@Test
+	public void testInvokeOperationStringsNoArgs() throws Exception {
+		assertNull(client.invokeOperation(objectName, "returnNull", new String[0]));
+	}
+
+	@Test
+	public void testInvokeOperationNoArgs() throws Exception {
+		assertNull(client.invokeOperation(objectName, "returnNull", new Object[0]));
+	}
+
+	@Test
+	public void testInvokeOperationArgs() throws Exception {
+		assertNull(client.invokeOperation(objectName, "returnNull", 1));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testInvokeOperationClosed() throws Exception {
+		closedClient.invokeOperation(objectName, "returnNull", new Object[0]);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testInvokeOperationUnknown() throws Exception {
+		client.invokeOperation(objectName, "unknown-operation");
+	}
+
+	@Test
+	public void testInvokeOperationToString() throws Exception {
+		short val1 = 21231;
+		int val2 = 524;
+		String result =
+				client.invokeOperationToString(objectName, "times", Short.toString(val1), Integer.toString(val2));
+		long times = val1 * val2;
+		assertEquals(Long.toString(times), result);
+	}
+
+	@Test
+	public void testBoolToString() throws Exception {
+		testThingtoString("booleanToString", true);
+	}
+
+	@Test
+	public void testCharToString() throws Exception {
+		testThingtoString("charToString", '\0');
+	}
+
+	@Test
+	public void testCharToStringNoArg() throws Exception {
+		testThingtoString("charToString", "\0", "");
+	}
+
+	@Test
+	public void testByteToString() throws Exception {
+		testThingtoString("byteToString", (byte) 10);
+	}
+
+	@Test
+	public void testShortToString() throws Exception {
+		testThingtoString("shortToString", (short) 1042);
+	}
+
+	@Test
+	public void testIntToString() throws Exception {
+		testThingtoString("intToString", (int) 123423320);
+	}
+
+	@Test
+	public void testLongToString() throws Exception {
+		testThingtoString("longToString", (long) 10824424242L);
+	}
+
+	@Test
+	public void testFloatToString() throws Exception {
+		testThingtoString("floatToString", (float) 12.56);
+	}
+
+	@Test
+	public void testDoubleToString() throws Exception {
+		testThingtoString("doubleToString", (double) 1313.4122);
+	}
+
+	@Test
+	public void testInvokeOperationStringsObject() throws Exception {
+		testThingtoString("dateToString", new Date());
+	}
+
+	private void testThingtoString(String methodName, Object arg) throws Exception {
+		String argString = arg.toString();
+		testThingtoString(methodName, argString, argString);
+	}
+
+	private void testThingtoString(String methodName, String expected, String argString) throws Exception {
+		assertEquals(expected, client.invokeOperationToString(objectName, methodName, argString));
+	}
+
 	@JmxResource(domainName = JMX_DOMAIN)
 	protected static class JmxClientTestObject {
 		int x;
@@ -287,8 +423,8 @@ public class JmxClientTest {
 			return null;
 		}
 		@JmxOperation
-		public String times(int x1, long x2) {
-			return Long.valueOf(x1 * x2).toString();
+		public long times(short x1, int x2) {
+			return x1 * x2;
 		}
 		@JmxOperation
 		public void doThrow() {
@@ -297,6 +433,46 @@ public class JmxClientTest {
 		@JmxOperation
 		public Object returnNull() {
 			return null;
+		}
+		@JmxOperation
+		public Object returnNull(int anotherArg) {
+			return null;
+		}
+		@JmxOperation
+		public String dateToString(Date date) {
+			return date.toString();
+		}
+		@JmxOperation
+		public String booleanToString(boolean booleanVal) {
+			return Boolean.toString(booleanVal);
+		}
+		@JmxOperation
+		public String charToString(char charVal) {
+			return Character.toString(charVal);
+		}
+		@JmxOperation
+		public String byteToString(byte byteVal) {
+			return Byte.toString(byteVal);
+		}
+		@JmxOperation
+		public String shortToString(short shortVal) {
+			return Short.toString(shortVal);
+		}
+		@JmxOperation
+		public String intToString(int intVal) {
+			return Integer.toString(intVal);
+		}
+		@JmxOperation
+		public String longToString(long longVal) {
+			return Long.toString(longVal);
+		}
+		@JmxOperation
+		public String floatToString(float floatVal) {
+			return Float.toString(floatVal);
+		}
+		@JmxOperation
+		public String doubleToString(double doubleVal) {
+			return Double.toString(doubleVal);
 		}
 	}
 }

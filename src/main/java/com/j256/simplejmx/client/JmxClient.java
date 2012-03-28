@@ -33,7 +33,7 @@ public class JmxClient {
 	private MBeanAttributeInfo[] attributes;
 	private MBeanOperationInfo[] operations;
 
-	public JmxClient(String url) throws IllegalArgumentException {
+	public JmxClient(String url) throws JMException {
 		if (url == null) {
 			throw new IllegalArgumentException("Jmx URL cannot be null");
 		}
@@ -41,7 +41,7 @@ public class JmxClient {
 		try {
 			this.serviceUrl = new JMXServiceURL(url);
 		} catch (MalformedURLException e) {
-			throw new IllegalArgumentException("JmxServiceUrl was malformed: " + url, e);
+			throw createJmException("JmxServiceUrl was malformed: " + url, e);
 		}
 
 		try {
@@ -56,15 +56,15 @@ public class JmxClient {
 				}
 				jmxConnector = null;
 			}
-			throw new IllegalArgumentException("Problems connecting to the server" + e, e);
+			throw createJmException("Problems connecting to the server" + e, e);
 		}
 	}
 
-	public JmxClient(int localPort) throws IllegalArgumentException {
+	public JmxClient(int localPort) throws JMException {
 		this(generalJmxUrlForHostNamePort("", localPort));
 	}
 
-	public JmxClient(String hostName, int port) throws IllegalArgumentException {
+	public JmxClient(String hostName, int port) throws JMException {
 		this(generalJmxUrlForHostNamePort(hostName, port));
 	}
 
@@ -106,105 +106,82 @@ public class JmxClient {
 	/**
 	 * Return an array of the bean's domain names.
 	 */
-	public String[] getBeanDomains() throws IllegalArgumentException {
-		if (mbeanConn == null) {
-			throw new IllegalArgumentException("JmxClient is not connected");
-		}
+	public String[] getBeanDomains() throws JMException {
+		checkClientConnected();
 
 		try {
 			return mbeanConn.getDomains();
 		} catch (IOException e) {
-			throw new IllegalArgumentException("Problems getting jmx domains: " + e, e);
+			throw createJmException("Problems getting jmx domains: " + e, e);
 		}
 	}
 
 	/**
 	 * Return a set of the various bean names associated with the Jmx server.
 	 */
-	public Set<ObjectName> getBeanNames() throws IllegalArgumentException {
-		if (mbeanConn == null) {
-			throw new IllegalArgumentException("JmxClient is not connected");
-		}
+	public Set<ObjectName> getBeanNames() throws JMException {
+		checkClientConnected();
 
 		try {
 			return mbeanConn.queryNames(null, null);
 		} catch (IOException e) {
-			throw new IllegalArgumentException("Problems querying for jmx bean names: " + e, e);
+			throw createJmException("Problems querying for jmx bean names: " + e, e);
 		}
 	}
 
 	/**
 	 * Return an array of the attributes associated with the bean name.
 	 */
-	public MBeanAttributeInfo[] getAttributesInfo(String domainName, String name) throws IllegalArgumentException {
+	public MBeanAttributeInfo[] getAttributesInfo(String domainName, String name) throws JMException {
 		return getAttributesInfo(ObjectNameUtil.makeObjectName(domainName, name));
 	}
 
 	/**
 	 * Return an array of the attributes associated with the bean name.
 	 */
-	public MBeanAttributeInfo[] getAttributesInfo(ObjectName name) throws IllegalArgumentException {
-		if (mbeanConn == null) {
-			throw new IllegalArgumentException("JmxClient is not connected");
-		}
+	public MBeanAttributeInfo[] getAttributesInfo(ObjectName name) throws JMException {
+		checkClientConnected();
 
 		try {
 			return mbeanConn.getMBeanInfo(name).getAttributes();
 		} catch (Exception e) {
-			throw new IllegalArgumentException("Problems getting bean information from " + name, e);
+			throw createJmException("Problems getting bean information from " + name, e);
 		}
 	}
 
 	/**
 	 * Return information for a particular attribute name.
 	 */
-	public MBeanAttributeInfo getAttributeInfo(ObjectName name, String attrName) throws IllegalArgumentException {
-		if (mbeanConn == null) {
-			throw new IllegalArgumentException("JmxClient is not connected");
-		}
+	public MBeanAttributeInfo getAttributeInfo(ObjectName name, String attrName) throws JMException {
+		checkClientConnected();
 
-		MBeanInfo mbeanInfo;
-		try {
-			mbeanInfo = mbeanConn.getMBeanInfo(name);
-		} catch (Exception e) {
-			throw new IllegalArgumentException("Problems getting bean information from " + name, e);
-		}
-		for (MBeanAttributeInfo info : mbeanInfo.getAttributes()) {
-			if (info.getName().equals(attrName)) {
-				return info;
-			}
-		}
-		return null;
+		return getAttrInfo(name, attrName);
 	}
 
 	/**
 	 * Return an array of the operations associated with the bean name.
 	 */
-	public MBeanOperationInfo[] getOperationsInfo(ObjectName name) throws IllegalArgumentException {
-		if (mbeanConn == null) {
-			throw new IllegalArgumentException("JmxClient is not connected");
-		}
+	public MBeanOperationInfo[] getOperationsInfo(ObjectName name) throws JMException {
+		checkClientConnected();
 
 		try {
 			return mbeanConn.getMBeanInfo(name).getOperations();
 		} catch (Exception e) {
-			throw new IllegalArgumentException("Problems getting bean information from " + name, e);
+			throw createJmException("Problems getting bean information from " + name, e);
 		}
 	}
 
 	/**
 	 * Return an array of the operations associated with the bean name.
 	 */
-	public MBeanOperationInfo getOperationInfo(ObjectName name, String oper) throws IllegalArgumentException {
-		if (mbeanConn == null) {
-			throw new IllegalArgumentException("JmxClient is not connected");
-		}
+	public MBeanOperationInfo getOperationInfo(ObjectName name, String oper) throws JMException {
+		checkClientConnected();
 
 		MBeanInfo mbeanInfo;
 		try {
 			mbeanInfo = mbeanConn.getMBeanInfo(name);
 		} catch (Exception e) {
-			throw new IllegalArgumentException("Problems getting bean information from " + name, e);
+			throw createJmException("Problems getting bean information from " + name, e);
 		}
 		for (MBeanOperationInfo info : mbeanInfo.getOperations()) {
 			if (oper.equals(info.getName())) {
@@ -225,9 +202,7 @@ public class JmxClient {
 	 * Return the value of a JMX attribute.
 	 */
 	public Object getAttribute(ObjectName name, String attributeName) throws Exception {
-		if (mbeanConn == null) {
-			throw new IllegalArgumentException("JmxClient is not connected");
-		}
+		checkClientConnected();
 		return mbeanConn.getAttribute(name, attributeName);
 	}
 
@@ -276,9 +251,7 @@ public class JmxClient {
 	 * Set the JMX attribute to a particular value.
 	 */
 	public void setAttribute(ObjectName name, String attrName, Object value) throws Exception {
-		if (mbeanConn == null) {
-			throw new IllegalArgumentException("JmxClient is not connected");
-		}
+		checkClientConnected();
 
 		Attribute attribute = new Attribute(attrName, value);
 		mbeanConn.setAttribute(name, attribute);
@@ -300,15 +273,12 @@ public class JmxClient {
 	 * @return The value returned by the method or null if none.
 	 */
 	public Object invokeOperation(ObjectName name, String operName, String... paramStrings) throws Exception {
+		String[] paramTypes = lookupParamTypes(name, operName, paramStrings);
 		Object[] paramObjs;
 		if (paramStrings.length == 0) {
 			paramObjs = null;
 		} else {
 			paramObjs = new Object[paramStrings.length];
-		}
-		String[] paramTypes = lookupParamTypes(name, operName, paramStrings);
-		if (paramTypes == null) {
-
 		}
 		for (int i = 0; i < paramStrings.length; i++) {
 			paramObjs[i] = stringToObject(paramStrings[i], paramTypes[i]);
@@ -352,16 +322,14 @@ public class JmxClient {
 		return mbeanConn.invoke(objectName, operName, params, paramTypes);
 	}
 
-	private String[] lookupParamTypes(ObjectName objectName, String operName, Object[] params) {
-		if (mbeanConn == null) {
-			throw new IllegalArgumentException("JmxClient is not connected");
-		}
+	private String[] lookupParamTypes(ObjectName objectName, String operName, Object[] params) throws JMException {
+		checkClientConnected();
 
 		if (operations == null) {
 			try {
 				operations = mbeanConn.getMBeanInfo(objectName).getOperations();
 			} catch (Exception e) {
-				throw new IllegalArgumentException("Cannot get attribute info from " + objectName, e);
+				throw createJmException("Cannot get attribute info from " + objectName, e);
 			}
 		}
 		String[] paramTypes = new String[params.length];
@@ -375,35 +343,43 @@ public class JmxClient {
 				continue;
 			}
 			MBeanParameterInfo[] mbeanParams = info.getSignature();
-			if (params.length == mbeanParams.length) {
-				nameC++;
-				String[] signatureTypes = new String[mbeanParams.length];
-				for (int i = 0; i < params.length; i++) {
-					signatureTypes[i] = mbeanParams[i].getType();
-				}
-				first = signatureTypes;
-				if (Arrays.equals(paramTypes, signatureTypes)) {
-					return signatureTypes;
-				}
+			if (params.length != mbeanParams.length) {
+				continue;
 			}
+			String[] signatureTypes = new String[mbeanParams.length];
+			for (int i = 0; i < params.length; i++) {
+				signatureTypes[i] = mbeanParams[i].getType();
+			}
+			if (Arrays.equals(paramTypes, signatureTypes)) {
+				return signatureTypes;
+			}
+			first = signatureTypes;
+			nameC++;
 		}
 
-		if (nameC == 0) {
-			throw new IllegalArgumentException("Cannot find operation named '" + operName);
+		if (first == null) {
+			throw new IllegalArgumentException("Cannot find operation named '" + operName + "'");
 		} else if (nameC > 1) {
 			throw new IllegalArgumentException("Cannot find operation named '" + operName
 					+ "' with matching argument types");
 		} else {
+			// return the first one we found that matches the name
 			return first;
 		}
 	}
 
-	private MBeanAttributeInfo getAttrInfo(ObjectName objectName, String attrName) throws IllegalArgumentException {
+	private void checkClientConnected() {
+		if (mbeanConn == null) {
+			throw new IllegalArgumentException("JmxClient is not connected");
+		}
+	}
+
+	private MBeanAttributeInfo getAttrInfo(ObjectName objectName, String attrName) throws JMException {
 		if (attributes == null) {
 			try {
 				attributes = mbeanConn.getMBeanInfo(objectName).getAttributes();
 			} catch (Exception e) {
-				throw new IllegalArgumentException("Cannot get attribute info from " + objectName, e);
+				throw createJmException("Cannot get attribute info from " + objectName, e);
 			}
 		}
 		for (MBeanAttributeInfo info : attributes) {
@@ -439,8 +415,7 @@ public class JmxClient {
 		} else if (typeString.equals("double") || typeString.equals("java.lang.Double")) {
 			return Double.parseDouble(string);
 		} else {
-			Class<Object> clazz = getClassFromString(typeString);
-			Constructor<?> constr = getConstructor(typeString, clazz);
+			Constructor<?> constr = getConstructor(typeString);
 			try {
 				return constr.newInstance(new Object[] { string });
 			} catch (Exception e) {
@@ -450,24 +425,21 @@ public class JmxClient {
 		}
 	}
 
-	private Class<Object> getClassFromString(String typeString) throws IllegalArgumentException {
+	private <C> Constructor<C> getConstructor(String typeString) throws IllegalArgumentException {
+		Class<Object> clazz;
 		try {
 			@SuppressWarnings("unchecked")
-			Class<Object> clazz = (Class<Object>) Class.forName(typeString);
-			return clazz;
+			Class<Object> clazzCast = (Class<Object>) Class.forName(typeString);
+			clazz = clazzCast;
 		} catch (ClassNotFoundException e) {
 			throw new IllegalArgumentException("Unknown class for type " + typeString);
 		}
-	}
-
-	private <C> Constructor<C> getConstructor(String typeString, Class<C> clazz) throws IllegalArgumentException {
 		try {
 			@SuppressWarnings("unchecked")
-			Constructor<C> constructor =
-					(Constructor<C>) Class.forName(typeString).getConstructor(new Class[] { clazz });
+			Constructor<C> constructor = (Constructor<C>) clazz.getConstructor(new Class[] { String.class });
 			return constructor;
 		} catch (Exception e) {
-			throw new IllegalArgumentException("Could not find string constructor for type " + typeString);
+			throw new IllegalArgumentException("Could not find string constructor for " + clazz);
 		}
 	}
 

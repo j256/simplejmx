@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import javax.management.JMException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.MBeanParameterInfo;
@@ -31,11 +32,11 @@ public class CommandLineJmxClient {
 
 	private JmxClient jmxClient;
 
-	public CommandLineJmxClient(String host, int port) throws IllegalArgumentException {
+	public CommandLineJmxClient(String host, int port) throws JMException {
 		jmxClient = new JmxClient(host, port);
 	}
 
-	public CommandLineJmxClient(String url) throws IllegalArgumentException {
+	public CommandLineJmxClient(String url) throws JMException {
 		jmxClient = new JmxClient(url);
 	}
 
@@ -237,7 +238,7 @@ public class CommandLineJmxClient {
 		Set<ObjectName> objectNames;
 		try {
 			objectNames = jmxClient.getBeanNames();
-		} catch (IllegalArgumentException e) {
+		} catch (Exception e) {
 			System.out.println("Error.  Problems getting bean names information: " + e.getMessage());
 			return;
 		}
@@ -303,7 +304,7 @@ public class CommandLineJmxClient {
 		MBeanAttributeInfo[] attrs;
 		try {
 			attrs = jmxClient.getAttributesInfo(currentName);
-		} catch (IllegalArgumentException e) {
+		} catch (Exception e) {
 			System.out.println("Error.  Problems getting information about " + currentName + ": " + e.getMessage());
 			return;
 		}
@@ -437,7 +438,7 @@ public class CommandLineJmxClient {
 		MBeanOperationInfo[] opers;
 		try {
 			opers = jmxClient.getOperationsInfo(currentName);
-		} catch (IllegalArgumentException e) {
+		} catch (Exception e) {
 			System.out.println("Error.  Problems getting information about name: " + e.getMessage());
 			return;
 		}
