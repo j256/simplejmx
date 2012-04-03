@@ -18,7 +18,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.j256.simplejmx.common.JmxAttribute;
+import com.j256.simplejmx.common.JmxAttributeMethod;
 import com.j256.simplejmx.common.JmxOperation;
 import com.j256.simplejmx.common.JmxResource;
 import com.j256.simplejmx.common.ObjectNameUtil;
@@ -166,10 +166,10 @@ public class JmxClientTest {
 		MBeanOperationInfo[] infos = client.getOperationsInfo(objectName);
 		assertEquals(13, infos.length);
 		assertEquals("times", infos[0].getName());
-		assertEquals("doThrow", infos[1].getName());
-		assertEquals("returnNull", infos[2].getName());
-		assertEquals("returnNull", infos[3].getName());
-		assertEquals("dateToString", infos[4].getName());
+		assertEquals("shortToString", infos[1].getName());
+		assertEquals("byteToString", infos[2].getName());
+		assertEquals("charToString", infos[3].getName());
+		assertEquals("doThrow", infos[4].getName());
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -410,15 +410,15 @@ public class JmxClientTest {
 	@JmxResource(domainName = JMX_DOMAIN)
 	protected static class JmxClientTestObject {
 		int x;
-		@JmxAttribute
+		@JmxAttributeMethod
 		public void setX(int x) {
 			this.x = x;
 		}
-		@JmxAttribute
+		@JmxAttributeMethod
 		public int getX() {
 			return x;
 		}
-		@JmxAttribute
+		@JmxAttributeMethod
 		public String getNull() {
 			return null;
 		}

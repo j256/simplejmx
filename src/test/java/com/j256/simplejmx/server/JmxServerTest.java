@@ -13,7 +13,7 @@ import javax.management.ReflectionException;
 import org.junit.Test;
 
 import com.j256.simplejmx.client.JmxClient;
-import com.j256.simplejmx.common.JmxAttribute;
+import com.j256.simplejmx.common.JmxAttributeMethod;
 import com.j256.simplejmx.common.JmxFolderName;
 import com.j256.simplejmx.common.JmxOperation;
 import com.j256.simplejmx.common.JmxResource;
@@ -361,12 +361,12 @@ public class JmxServerTest {
 
 		private int foo = FOO_VALUE;
 
-		@JmxAttribute
+		@JmxAttributeMethod
 		public int getFoo() {
 			return foo;
 		}
 
-		@JmxAttribute
+		@JmxAttributeMethod
 		public void setFoo(int foo) {
 			this.foo = foo;
 		}
@@ -385,7 +385,7 @@ public class JmxServerTest {
 	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME, folderNames = { FOLDER_NAME })
 	protected static class TestObjectFolders {
 
-		@JmxAttribute
+		@JmxAttributeMethod
 		public int getFoo() {
 			return FOO_VALUE;
 		}
@@ -393,7 +393,7 @@ public class JmxServerTest {
 
 	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
 	protected static class ShortAttributeMethodName {
-		@JmxAttribute
+		@JmxAttributeMethod
 		public int x() {
 			return 0;
 		}
@@ -401,7 +401,7 @@ public class JmxServerTest {
 
 	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
 	protected static class JustGet {
-		@JmxAttribute
+		@JmxAttributeMethod
 		public int get() {
 			return 0;
 		}
@@ -409,7 +409,7 @@ public class JmxServerTest {
 
 	@JmxResource(domainName = "not the domain name", objectName = "not the object name")
 	protected static class SelfNaming implements JmxSelfNaming {
-		@JmxAttribute
+		@JmxAttributeMethod
 		public int getFoo() {
 			return FOO_VALUE;
 		}
@@ -426,7 +426,7 @@ public class JmxServerTest {
 
 	@JmxResource(domainName = "", objectName = OBJECT_NAME)
 	protected static class InvalidDomain {
-		@JmxAttribute
+		@JmxAttributeMethod
 		public int getFoo() {
 			return FOO_VALUE;
 		}
@@ -434,7 +434,7 @@ public class JmxServerTest {
 
 	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
 	protected static class NoDescriptions {
-		@JmxAttribute
+		@JmxAttributeMethod
 		public int getFoo() {
 			return FOO_VALUE;
 		}
@@ -445,7 +445,7 @@ public class JmxServerTest {
 
 	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
 	protected static class HasDescriptions {
-		@JmxAttribute(description = "Foo value")
+		@JmxAttributeMethod(description = "Foo value")
 		public int getFoo() {
 			return FOO_VALUE;
 		}
@@ -461,11 +461,11 @@ public class JmxServerTest {
 
 	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
 	protected static class MisterThrow {
-		@JmxAttribute
+		@JmxAttributeMethod
 		public int getFoo() {
 			throw new IllegalStateException("because I can");
 		}
-		@JmxAttribute
+		@JmxAttributeMethod
 		public void setFoo(int value) {
 			throw new IllegalStateException("because I can");
 		}

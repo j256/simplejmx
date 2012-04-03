@@ -13,7 +13,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.j256.simplejmx.common.JmxAttribute;
+import com.j256.simplejmx.common.JmxAttributeMethod;
 import com.j256.simplejmx.common.JmxOperation;
 import com.j256.simplejmx.common.JmxResource;
 import com.j256.simplejmx.server.JmxServer;
@@ -472,11 +472,11 @@ public class CommandLineJmxClientTest {
 	@JmxResource(domainName = JMX_DOMAIN)
 	protected static class CommandLineJmxClientTestObject {
 		int x;
-		@JmxAttribute
+		@JmxAttributeMethod
 		public void setX(int x) {
 			this.x = x;
 		}
-		@JmxAttribute
+		@JmxAttributeMethod
 		public int getX() {
 			return x;
 		}

@@ -2,7 +2,7 @@ package com.j256.simplejmx.server;
 
 import org.junit.Ignore;
 
-import com.j256.simplejmx.common.JmxAttribute;
+import com.j256.simplejmx.common.JmxAttributeMethod;
 import com.j256.simplejmx.common.JmxFolderName;
 import com.j256.simplejmx.common.JmxOperation;
 import com.j256.simplejmx.common.JmxResource;
@@ -44,12 +44,12 @@ public class JmxIntegrationTest {
 			this.jmxServer = jmxServer;
 		}
 
-		@JmxAttribute(description = "Integer value")
+		@JmxAttributeMethod(description = "Integer value")
 		public int getFoo() {
 			return foo;
 		}
 
-		@JmxAttribute(description = "Integer value")
+		@JmxAttributeMethod(description = "Integer value")
 		public void setFoo(int foo) {
 			this.foo = foo;
 		}
@@ -99,12 +99,12 @@ public class JmxIntegrationTest {
 			return new JmxFolderName[] { new JmxFolderName("Sub") };
 		}
 
-		@JmxAttribute
+		@JmxAttributeMethod
 		public int getValue() {
 			return value;
 		}
 
-		@JmxAttribute
+		@JmxAttributeMethod
 		public void setValue(int value) {
 			this.value = value;
 		}

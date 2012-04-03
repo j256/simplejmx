@@ -2,7 +2,7 @@ package com.j256.simplejmx.server;
 
 import org.junit.Ignore;
 
-import com.j256.simplejmx.common.JmxAttribute;
+import com.j256.simplejmx.common.JmxAttributeMethod;
 import com.j256.simplejmx.common.JmxOperation;
 import com.j256.simplejmx.common.JmxResource;
 
@@ -41,17 +41,17 @@ public class ExampleTest {
 		private int hitCount;
 		private boolean enabled;
 
-		@JmxAttribute(description = "Number of hits in the cache")
+		@JmxAttributeMethod(description = "Number of hits in the cache")
 		public int getHitCount() {
 			return hitCount;
 		}
 
-		@JmxAttribute(description = "Is the cache enabled?")
+		@JmxAttributeMethod(description = "Is the cache enabled?")
 		public boolean getEnabled() {
 			return enabled;
 		}
 
-		@JmxAttribute(description = "Is the cache enabled?")
+		@JmxAttributeMethod(description = "Is the cache enabled?")
 		public void setEnabled(boolean enabled) {
 			this.enabled = enabled;
 		}

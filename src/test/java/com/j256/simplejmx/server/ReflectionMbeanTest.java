@@ -3,13 +3,17 @@ package com.j256.simplejmx.server;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import javax.management.AttributeNotFoundException;
 import javax.management.JMException;
 import javax.management.MBeanAttributeInfo;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.j256.simplejmx.client.JmxClient;
-import com.j256.simplejmx.common.JmxAttribute;
+import com.j256.simplejmx.common.JmxAttributeField;
+import com.j256.simplejmx.common.JmxAttributeMethod;
 import com.j256.simplejmx.common.JmxOperation;
 import com.j256.simplejmx.common.JmxResource;
 
@@ -20,57 +24,32 @@ public class ReflectionMbeanTest {
 	private static final String OBJECT_NAME = "testObject";
 	private static final int FOO_VALUE = 1459243;
 
-	@Test
-	public void testJmxServer() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
-		try {
-			server.start();
-		} finally {
-			server.stop();
-		}
+	private static final int READ_ONLY_DEFAULT = 789543534;
+	private static final int READ_WRITE_DEFAULT = 234534;
+	private static final int WRITE_ONLY_DEFAULT = 623423;
+	private static final int NEITHER_DEFAULT = 7985547;
+
+	private JmxServer server;
+
+	@Before
+	public void before() throws Exception {
+		server = new JmxServer(DEFAULT_PORT);
+		server.start();
 	}
 
-	@Test
-	public void testJmxServerStartStopStart() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
-		try {
-			server.start();
+	@After
+	public void after() {
+		if (server != null) {
 			server.stop();
-			server.start();
-		} finally {
-			server.stop();
-		}
-	}
-
-	@Test
-	public void testJmxServerInt() throws Exception {
-		JmxServer server = new JmxServer();
-		try {
-			server.setPort(DEFAULT_PORT);
-			server.start();
-		} finally {
-			server.stop();
-		}
-	}
-
-	@Test(expected = IllegalStateException.class)
-	public void testJmxServerStartNoPort() throws Exception {
-		JmxServer server = new JmxServer();
-		try {
-			server.start();
-			fail("Should not have gotten here");
-		} finally {
-			server.stop();
+			server = null;
 		}
 	}
 
 	@Test
 	public void testRegister() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		TestObject obj = new TestObject();
 		JmxClient client;
 		try {
-			server.start();
 			client = new JmxClient(DEFAULT_PORT);
 			server.register(obj);
 
@@ -104,17 +83,14 @@ public class ReflectionMbeanTest {
 
 		} finally {
 			server.unregister(obj);
-			server.stop();
 		}
 	}
 
 	@Test
 	public void testGetAttributes() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		TestObject obj = new TestObject();
 		JmxClient client;
 		try {
-			server.start();
 			client = new JmxClient(DEFAULT_PORT);
 			server.register(obj);
 
@@ -125,96 +101,75 @@ public class ReflectionMbeanTest {
 
 		} finally {
 			server.unregister(obj);
-			server.stop();
 		}
 	}
 
 	@Test(expected = JMException.class)
 	public void testBadGet() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		BadGetName obj = new BadGetName();
 		try {
-			server.start();
 			server.register(obj);
 			fail("Should not get here");
 		} finally {
 			server.unregister(obj);
-			server.stop();
 		}
 	}
 
 	@Test(expected = JMException.class)
 	public void testBadGetReturnsVoid() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		BadGetReturnsVoid obj = new BadGetReturnsVoid();
 		try {
-			server.start();
 			server.register(obj);
 			fail("Should not get here");
 		} finally {
 			server.unregister(obj);
-			server.stop();
 		}
 	}
 
 	@Test(expected = JMException.class)
 	public void testBadGetHasArgs() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		BadGetHasArgs obj = new BadGetHasArgs();
 		try {
-			server.start();
 			server.register(obj);
 		} finally {
 			server.unregister(obj);
-			server.stop();
 		}
 	}
 
 	@Test(expected = JMException.class)
 	public void testBadSetNoArg() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		BadSetNoArg obj = new BadSetNoArg();
 		try {
-			server.start();
 			server.register(obj);
 		} finally {
 			server.unregister(obj);
-			server.stop();
 		}
 	}
 
 	@Test(expected = JMException.class)
 	public void testBadSetReturnsNotVoid() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		BadSetReturnsNotVoid obj = new BadSetReturnsNotVoid();
 		try {
-			server.start();
 			server.register(obj);
 		} finally {
 			server.unregister(obj);
-			server.stop();
 		}
 	}
 
 	@Test(expected = JMException.class)
 	public void testBadOperationLooksLikeAttribute() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		BadOperationLooksLikeAttribute obj = new BadOperationLooksLikeAttribute();
 		try {
-			server.start();
 			server.register(obj);
 		} finally {
 			server.unregister(obj);
-			server.stop();
 		}
 	}
 
 	@Test
 	public void testMultiOperationSameName() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		MultiOperationSameName obj = new MultiOperationSameName();
 		try {
-			server.start();
 			server.register(obj);
 			JmxClient client = new JmxClient(DEFAULT_PORT);
 			int x = 1002;
@@ -223,7 +178,74 @@ public class ReflectionMbeanTest {
 			assertEquals(y, client.invokeOperation(DOMAIN_NAME, OBJECT_NAME, "assignX", x, y));
 		} finally {
 			server.unregister(obj);
-			server.stop();
+		}
+	}
+
+	@Test
+	public void testAttributeFieldGets() throws Exception {
+		AttributeField attributeField = new AttributeField();
+		try {
+			server.register(attributeField);
+			JmxClient client = new JmxClient(DEFAULT_PORT);
+			assertEquals(READ_ONLY_DEFAULT, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "readOnly"));
+			assertEquals(READ_WRITE_DEFAULT, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "readWrite"));
+			try {
+				client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "writeOnly");
+				fail("Should have thrown");
+			} catch (AttributeNotFoundException e) {
+				// expected
+			}
+			try {
+				client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "neither");
+				fail("Should have thrown");
+			} catch (AttributeNotFoundException e) {
+				// expected
+			}
+			try {
+				client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "noAnnotation");
+				fail("Should have thrown");
+			} catch (AttributeNotFoundException e) {
+				// expected
+			}
+		} finally {
+			server.unregister(attributeField);
+		}
+	}
+
+	@Test
+	public void testAttributeFieldSets() throws Exception {
+		AttributeField attributeField = new AttributeField();
+		try {
+			server.register(attributeField);
+			JmxClient client = new JmxClient(DEFAULT_PORT);
+			try {
+				client.setAttribute(DOMAIN_NAME, OBJECT_NAME, "readOnly", 1);
+				fail("Should have thrown");
+			} catch (AttributeNotFoundException e) {
+				// expected
+			}
+			assertEquals(READ_WRITE_DEFAULT, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "readWrite"));
+			int val = 530534543;
+			client.setAttribute(DOMAIN_NAME, OBJECT_NAME, "readWrite", val);
+			assertEquals(val, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "readWrite"));
+			assertEquals(val, attributeField.readWrite);
+			val = 342323423;
+			client.setAttribute(DOMAIN_NAME, OBJECT_NAME, "writeOnly", val);
+			assertEquals(val, attributeField.writeOnly);
+			try {
+				client.setAttribute(DOMAIN_NAME, OBJECT_NAME, "neither", 1);
+				fail("Should have thrown");
+			} catch (AttributeNotFoundException e) {
+				// expected
+			}
+			try {
+				client.setAttribute(DOMAIN_NAME, OBJECT_NAME, "noAnnotation", 1);
+				fail("Should have thrown");
+			} catch (AttributeNotFoundException e) {
+				// expected
+			}
+		} finally {
+			server.unregister(attributeField);
 		}
 	}
 
@@ -234,12 +256,12 @@ public class ReflectionMbeanTest {
 
 		private int foo = FOO_VALUE;
 
-		@JmxAttribute(description = "A value")
+		@JmxAttributeMethod(description = "A value")
 		public int getFoo() {
 			return foo;
 		}
 
-		@JmxAttribute(description = "A value")
+		@JmxAttributeMethod(description = "A value")
 		public void setFoo(int foo) {
 			this.foo = foo;
 		}
@@ -257,7 +279,7 @@ public class ReflectionMbeanTest {
 
 	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
 	protected static class BadGetName {
-		@JmxAttribute(description = "A value")
+		@JmxAttributeMethod(description = "A value")
 		public int notGet() {
 			return 0;
 		}
@@ -265,14 +287,14 @@ public class ReflectionMbeanTest {
 
 	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
 	protected static class BadGetReturnsVoid {
-		@JmxAttribute(description = "A value")
+		@JmxAttributeMethod(description = "A value")
 		public void getFoo() {
 		}
 	}
 
 	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
 	protected static class BadGetHasArgs {
-		@JmxAttribute(description = "A value")
+		@JmxAttributeMethod(description = "A value")
 		public int getFoo(int x) {
 			return 0;
 		}
@@ -280,14 +302,14 @@ public class ReflectionMbeanTest {
 
 	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
 	protected static class BadSetNoArg {
-		@JmxAttribute(description = "A value")
+		@JmxAttributeMethod(description = "A value")
 		public void setFoo() {
 		}
 	}
 
 	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
 	protected static class BadSetReturnsNotVoid {
-		@JmxAttribute(description = "A value")
+		@JmxAttributeMethod(description = "A value")
 		public int setFoo(int x) {
 			return 0;
 		}
@@ -303,6 +325,30 @@ public class ReflectionMbeanTest {
 	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
 	protected static class MultiOperationSameName {
 		int x;
+		@JmxOperation(description = "Do stuff")
+		public int assignX(int x) {
+			return x;
+		}
+		@JmxOperation(description = "Do stuff")
+		public int assignX(int x, int y) {
+			return y;
+		}
+	}
+
+	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	protected static class AttributeField {
+		@SuppressWarnings("unused")
+		@JmxAttributeField(description = "some thing")
+		private int readOnly = READ_ONLY_DEFAULT;
+		@JmxAttributeField(isWritable = true)
+		private int readWrite = READ_WRITE_DEFAULT;
+		@JmxAttributeField(isReadible = false, isWritable = true)
+		private int writeOnly = WRITE_ONLY_DEFAULT;
+		@SuppressWarnings("unused")
+		@JmxAttributeField(isReadible = false, isWritable = false)
+		private int neither = NEITHER_DEFAULT;
+		@SuppressWarnings("unused")
+		private int noAnnotation = 4;
 		@JmxOperation(description = "Do stuff")
 		public int assignX(int x) {
 			return x;
