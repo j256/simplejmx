@@ -15,41 +15,52 @@ import com.j256.simplejmx.common.JmxResource;
 @Ignore("Just here as an example")
 public class ExampleTest {
 
+	private static final int JMX_PORT = 8000;
+
 	public static void main(String[] args) throws Exception {
 		new ExampleTest().doMain(args);
 	}
 
 	private void doMain(String[] args) throws Exception {
+		// create the object we will be exposing with JMX
 		RuntimeCounter lookupCache = new RuntimeCounter();
-		// create a new server listening on port 8000
-		JmxServer jmxServer = new JmxServer(8000);
+
+		// create a new JMX server listening on a port
+		JmxServer jmxServer = new JmxServer(JMX_PORT);
 		try {
 			// start our server
 			jmxServer.start();
+
 			// register our lookupCache object defined below
 			jmxServer.register(lookupCache);
+			// we can register other objects here
 			// jmxServer.register(someOtherObject);
 
 			// do your other code here...
-
 			// we just sleep forever to let the server do its stuff
 			Thread.sleep(1000000000);
+
 		} finally {
 			// stop our server
 			jmxServer.stop();
 		}
 	}
 
+	/**
+	 * Here is our little bean that we are exposing via JMX. It can be in another class -- it's just an inner class here
+	 * for convenience.
+	 */
 	@JmxResource(description = "Runtime counter", domainName = "j256", objectName = "runtimeCounter")
 	public static class RuntimeCounter {
 
 		// start our timer
 		private long startMillis = System.currentTimeMillis();
 
-		// or we can do fields directly, isReadible defaults to true
+		// we can annotate fields directly to be published inJMX, isReadible defaults to true
 		@JmxAttributeField(description = "Show runtime in seconds", isWritable = true)
 		private boolean showSeconds;
 
+		// we can annotate getter methods
 		@JmxAttributeMethod(description = "Run time in seconds or milliseconds")
 		public long getRunTime() {
 			long diffMillis = System.currentTimeMillis() - startMillis;
@@ -61,7 +72,7 @@ public class ExampleTest {
 		}
 
 		/*
-		 * NOTE: there is no setHitCount() so it won't be writable.
+		 * NOTE: there is no setRunTime(...) so it won't be writable.
 		 */
 
 		// this is an operation that shows up on the operations jconsole tab
