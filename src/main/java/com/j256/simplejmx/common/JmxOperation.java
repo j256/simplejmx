@@ -8,10 +8,22 @@ import java.lang.annotation.Target;
 import javax.management.MBeanOperationInfo;
 
 /**
- * Similar to Spring's ManagedOperation to show which methods are operations. This gets set on a method that is not
- * named "get..." or "set...". The method can either return void or return an object. It is recommended that the method
- * return a simple object that will be for sure in jconsole's classpath and will not throw an unknown exception class
- * either.
+ * This identify which methods are operations. This is added to methods that are _not_ named "get..." or "set...". The
+ * method can either return void or return an object. It is recommended that the method return a simple object that will
+ * be for sure in jconsole's classpath and also should not throw an unknown exception class either. Similar to Spring's
+ * ManagedOperation.
+ * 
+ * <p>
+ * 
+ * <pre>
+ * &#64;JmxOperation(description = "Reset our max/min values",
+ *               parameterNames = { "minValue", "maxValue" },
+ *               parameterDescriptions = { "low water mark", "high water mark" }
+ * public void resetMaxMin(int minValue, int maxValue) {
+ *    ...
+ * </pre>
+ * 
+ * </p>
  * 
  * @author graywatson
  */
@@ -26,20 +38,44 @@ public @interface JmxOperation {
 
 	/**
 	 * Array of strings which gives the name each of the parameters to the operation method. This array should be the
-	 * same length as the parameterDescriptions array. Default is something like "p0".
+	 * same length as the {@link #parameterDescriptions()} array. Default is something like "p0". For example:
+	 * 
+	 * <p>
+	 * 
+	 * <pre>
+	 * &#64;JmxOperation(parameterNames = { "minValue", "maxValue" },
+	 *               parameterDescriptions = { "low water mark", "high water mark" }
+	 * public void resetMaxMin(int minValue, int maxValue) {
+	 * ...
+	 * </pre>
+	 * 
+	 * </p>
 	 */
 	public String[] parameterNames() default {};
 
 	/**
 	 * Array of strings which describes each of the parameters to the operation method. This array should be the same
-	 * length as the parameterNames array. If not specified then it will create one with the parameter number and type.
+	 * length as the {@link #parameterNames()} array. If not specified then it will create one with the parameter number
+	 * and type -- something like "parameter #0 of type: int".
+	 * 
+	 * <p>
+	 * 
+	 * <pre>
+	 * &#64;JmxOperation(parameterNames = { "minValue", "maxValue" },
+	 *               parameterDescriptions = { "low water mark", "high water mark" }
+	 * public void resetMaxMin(int minValue, int maxValue) {
+	 * ...
+	 * </pre>
+	 * 
+	 * </p>
 	 */
 	public String[] parameterDescriptions() default {};
 
 	/**
 	 * This is used by the JMX system to describe what sort of work is being done in this operation. Current choices
-	 * are: INFO (read-like that returns information), ACTION (write-like that modified the bean in some way,
-	 * ACTION_INFO (both read-like and write-like), and UNKNOWN (the default which is no action specified).
+	 * are: {@link MBeanOperationInfo#INFO} (read-like that returns information), {@link MBeanOperationInfo#ACTION}
+	 * (write-like that modified the bean in some way, {@link MBeanOperationInfo#ACTION_INFO} (both read-like and
+	 * write-like), and {@link MBeanOperationInfo#UNKNOWN} (the default which is no action specified).
 	 */
 	public int action() default MBeanOperationInfo.UNKNOWN;
 }

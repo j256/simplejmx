@@ -32,10 +32,16 @@ public class JmxServer {
 	private JMXConnectorServer connector;
 	private MBeanServer mbeanServer;
 
+	/**
+	 * Create a JMX server that will be set with the port using setters. Used with spring.
+	 */
 	public JmxServer() {
 		// for spring
 	}
 
+	/**
+	 * Create a JMX server running on a particular port.
+	 */
 	public JmxServer(int port) {
 		this.registryPort = port;
 	}
@@ -46,7 +52,7 @@ public class JmxServer {
 	 */
 	public synchronized void start() throws JMException {
 		if (registryPort == 0) {
-			throw new IllegalStateException("port must be already set when JmxServer is initialized");
+			throw new IllegalStateException("registry-port must be already set when JmxServer is initialized");
 		}
 		startRmiRegistry();
 		startJmxService();
@@ -132,7 +138,7 @@ public class JmxServer {
 	 * This is actually calls {@link #setRegistryPort(int)}.
 	 */
 	public void setPort(int port) {
-		this.registryPort = port;
+		setRegistryPort(port);
 	}
 
 	/**
@@ -147,8 +153,8 @@ public class JmxServer {
 	/**
 	 * Chances are you should be using {@link #setPort(int)} or {@link #setRegistryPort(int)} unless you know what you
 	 * are doing. This sets what JMX calls the "RMI server port". By default this does not have to be set and 1 plus the
-	 * registry port will be used. When you specify a port number in jconsole this port is _not_ used -- see the
-	 * registry port.
+	 * registry port will be used. When you specify a port number in jconsole this is not the port that should be
+	 * specified -- see the registry port.
 	 */
 	public void setServerPort(int serverPort) {
 		this.serverPort = serverPort;

@@ -14,7 +14,7 @@ public class ObjectNameUtil {
 	}
 
 	/**
-	 * Used to construct an object name the same in the client and the server.
+	 * Constructs an object-name from a jmx-resource and a self naming object.
 	 * 
 	 * @param jmxResource
 	 *            Annotation from the class for which we are creating our ObjectName. It may be null.
@@ -45,7 +45,7 @@ public class ObjectNameUtil {
 	}
 
 	/**
-	 * Used to construct an object name the same in the client and the server.
+	 * Constructs an object-name from a jmx-resource and a object which is not self-naming.
 	 * 
 	 * @param jmxResource
 	 *            Annotation from the class for which we are creating our ObjectName.
@@ -66,7 +66,7 @@ public class ObjectNameUtil {
 	}
 
 	/**
-	 * Used to construct an object name the same in the client and the server. Mostly for testing purposes.
+	 * Constructs an object-name from a domain-name, object-name, and folder-name strings.
 	 * 
 	 * @param domainName
 	 *            This is the top level folder name for the beans.
@@ -81,7 +81,7 @@ public class ObjectNameUtil {
 	}
 
 	/**
-	 * Used to construct an object name the same in the client and the server.
+	 * Constructs an object-name from a domain-name and object-name.
 	 * 
 	 * @param domainName
 	 *            This corresponds to the {@link JmxResource#domainName()} and is the top level folder name for the

@@ -15,11 +15,18 @@ public class JmxFolderName {
 	private final String field;
 	private final String value;
 
+	/**
+	 * Create a folder-name that turns into "00=value" in the {@link ObjectName}. The numerical field is auto-generated
+	 * by {@link ObjectNameUtil}.
+	 */
 	public JmxFolderName(String value) {
 		this.field = null;
 		this.value = value;
 	}
 
+	/**
+	 * Create a folder-name that turns into "field=value" in the {@link ObjectName}.
+	 */
 	public JmxFolderName(String field, String value) {
 		this.field = field;
 		this.value = value;

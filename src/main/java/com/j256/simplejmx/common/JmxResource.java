@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Similar to Spring's ManagedResource to have the object specify its own ObjectName.
+ * This is used to identify an object which is going to be exported using JMX. Similar to Spring's ManagedResource.
  * 
  * @author graywatson
  */

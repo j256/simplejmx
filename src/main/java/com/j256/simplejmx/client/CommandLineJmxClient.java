@@ -32,16 +32,44 @@ public class CommandLineJmxClient {
 
 	private JmxClient jmxClient;
 
+	/**
+	 * Create a command line interface on the passed in client.
+	 */
+	public CommandLineJmxClient(JmxClient jmxClient) {
+		this.jmxClient = jmxClient;
+	}
+
+	/**
+	 * Create a command line interface connected to the local host at a certain port number.
+	 */
+	public CommandLineJmxClient(int port) throws JMException {
+		jmxClient = new JmxClient(port);
+	}
+
+	/**
+	 * Create a command line interface connected to a host and port combination.
+	 */
 	public CommandLineJmxClient(String host, int port) throws JMException {
 		jmxClient = new JmxClient(host, port);
 	}
 
-	public CommandLineJmxClient(String url) throws JMException {
-		jmxClient = new JmxClient(url);
+	/**
+	 * Create a command line interface connected to a JMX server using the full JMX URL format. The URL should look
+	 * something like:
+	 * <p>
+	 * 
+	 * <pre>
+	 * service:jmx:rmi:///jndi/rmi://hostName:portNumber/jmxrmi
+	 * </pre>
+	 * 
+	 * </p>
+	 */
+	public CommandLineJmxClient(String jmxUrl) throws JMException {
+		jmxClient = new JmxClient(jmxUrl);
 	}
 
 	/**
-	 * Run the Jmx interface.
+	 * Run commands from the String array.
 	 */
 	public void runCommands(final String[] commands) throws IOException {
 		doLines(0, new LineReader() {
@@ -57,7 +85,7 @@ public class CommandLineJmxClient {
 	}
 
 	/**
-	 * Run the Jmx interface.
+	 * Read in commands from the batch-file and execute them.
 	 */
 	public void runBatchFile(File batchFile) throws IOException {
 		final BufferedReader reader = new BufferedReader(new FileReader(batchFile));
@@ -73,7 +101,7 @@ public class CommandLineJmxClient {
 	}
 
 	/**
-	 * Run the Jmx command line client.
+	 * Run the Jmx command line client reading commands from {@link System#in}.
 	 */
 	public void runCommandLine() throws IOException {
 		final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -349,9 +377,6 @@ public class CommandLineJmxClient {
 		}
 	}
 
-	/**
-	 * @return Objects from the attributes
-	 */
 	private void getAttributes(String[] parts) {
 		ObjectName currentName = getObjectName("get", parts);
 		if (currentName == null) {

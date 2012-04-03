@@ -33,15 +33,25 @@ public class JmxClient {
 	private MBeanAttributeInfo[] attributes;
 	private MBeanOperationInfo[] operations;
 
-	public JmxClient(String url) throws JMException {
-		if (url == null) {
+	/**
+	 * Connect the client to a JMX server using the full JMX URL format. The URL should look something like:
+	 * <p>
+	 * 
+	 * <pre>
+	 * service:jmx:rmi:///jndi/rmi://hostName:portNumber/jmxrmi
+	 * </pre>
+	 * 
+	 * </p>
+	 */
+	public JmxClient(String jmxUrl) throws JMException {
+		if (jmxUrl == null) {
 			throw new IllegalArgumentException("Jmx URL cannot be null");
 		}
 
 		try {
-			this.serviceUrl = new JMXServiceURL(url);
+			this.serviceUrl = new JMXServiceURL(jmxUrl);
 		} catch (MalformedURLException e) {
-			throw createJmException("JmxServiceUrl was malformed: " + url, e);
+			throw createJmException("JmxServiceUrl was malformed: " + jmxUrl, e);
 		}
 
 		try {
@@ -60,10 +70,16 @@ public class JmxClient {
 		}
 	}
 
+	/**
+	 * Connect the client to the local host at a certain port number.
+	 */
 	public JmxClient(int localPort) throws JMException {
 		this(generalJmxUrlForHostNamePort("", localPort));
 	}
 
+	/**
+	 * Connect the client to a host and port combination.
+	 */
 	public JmxClient(String hostName, int port) throws JMException {
 		this(generalJmxUrlForHostNamePort(hostName, port));
 	}

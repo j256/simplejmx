@@ -24,21 +24,22 @@ import com.j256.simplejmx.common.JmxOperation;
 import com.j256.simplejmx.common.JmxResource;
 
 /**
- * Wrapping of an object so we can expose its attributes and operations using annotations and reflection. This handles
- * the JMX server calls to attributes and operations by calling through the delegation object.
+ * This wraps an object that has been registered in the server using {@link JmxServer#register(Object)}. We wrap the
+ * object so we can expose its attributes and operations using annotations and reflection. This handles the JMX server
+ * calls to attributes and operations by calling through the delegation object.
  * 
  * @author graywatson
  */
 public class ReflectionMbean implements DynamicMBean {
 
-	private final Object proxy;
+	private final Object delegate;
 	private final Map<String, Method> fieldGetMap = new HashMap<String, Method>();
 	private final Map<String, Method> fieldSetMap = new HashMap<String, Method>();
 	private final Map<NameParams, Method> fieldOperationMap = new HashMap<NameParams, Method>();
 	private final MBeanInfo mbeanInfo;
 
-	public ReflectionMbean(Object proxy) {
-		this.proxy = proxy;
+	public ReflectionMbean(Object delegate) {
+		this.delegate = delegate;
 		this.mbeanInfo = buildMbeanInfo();
 	}
 
@@ -52,10 +53,10 @@ public class ReflectionMbean implements DynamicMBean {
 			throw new AttributeNotFoundException("Unknown attribute " + attribute);
 		}
 		try {
-			return method.invoke(proxy);
+			return method.invoke(delegate);
 		} catch (Exception e) {
 			throw new ReflectionException(e, "Invoking get attribute method " + method.getName() + " on "
-					+ proxy.getClass() + " threw exception");
+					+ delegate.getClass() + " threw exception");
 		}
 	}
 
@@ -65,7 +66,7 @@ public class ReflectionMbean implements DynamicMBean {
 			try {
 				returnList.add(new Attribute(name, getAttribute(name)));
 			} catch (Exception e) {
-				returnList.add(new Attribute(name, e.getMessage()));
+				returnList.add(new Attribute(name, "Getting attribute threw: " + e.getMessage()));
 			}
 		}
 		return returnList;
@@ -77,10 +78,10 @@ public class ReflectionMbean implements DynamicMBean {
 			throw new AttributeNotFoundException("Unknown attribute " + attribute);
 		} else {
 			try {
-				method.invoke(proxy, attribute.getValue());
+				method.invoke(delegate, attribute.getValue());
 			} catch (Exception e) {
 				throw new ReflectionException(e, "Invoking set attribute method " + method.getName() + " on "
-						+ proxy.getClass() + " threw exception");
+						+ delegate.getClass() + " threw exception");
 			}
 		}
 	}
@@ -107,10 +108,10 @@ public class ReflectionMbean implements DynamicMBean {
 					+ "' with parameter types " + Arrays.toString(signatureTypes)));
 		} else {
 			try {
-				return method.invoke(proxy, params);
+				return method.invoke(delegate, params);
 			} catch (Exception e) {
 				throw new ReflectionException(e, "Invoking operation method " + method.getName() + " on "
-						+ proxy.getClass() + " threw exception");
+						+ delegate.getClass() + " threw exception");
 			}
 		}
 	}
@@ -119,7 +120,7 @@ public class ReflectionMbean implements DynamicMBean {
 	 * Build our JMX information object by using reflection.
 	 */
 	private MBeanInfo buildMbeanInfo() {
-		Class<?> clazz = proxy.getClass();
+		Class<?> clazz = delegate.getClass();
 		JmxResource jmxResource = clazz.getAnnotation(JmxResource.class);
 		String desc;
 		if (jmxResource == null || jmxResource.description() == null || jmxResource.description().length() == 0) {

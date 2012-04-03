@@ -21,7 +21,7 @@ public class Main {
 	 * This is public for testing purposes.
 	 * 
 	 * @param throwOnError
-	 *            Throw an exception when we quit otherwise exit.
+	 *            If true then throw an exception when we quit otherwise exit.
 	 */
 	public void doMain(String[] args, boolean throwOnError) throws Exception {
 		if (args.length == 0) {
