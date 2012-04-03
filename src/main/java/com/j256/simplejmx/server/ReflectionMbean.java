@@ -443,8 +443,8 @@ public class ReflectionMbean implements DynamicMBean {
 			}
 			this.isGetter = isGetter;
 			this.isSetter = isSetter;
-			if (field.getName().startsWith("is") && field.getType().equals(Boolean.TYPE)
-					|| field.getType().equals(Boolean.class)) {
+			if (field.getName().startsWith("is")
+					&& (field.getType() == boolean.class || field.getType() == Boolean.class)) {
 				this.isIs = true;
 			} else {
 				this.isIs = false;
