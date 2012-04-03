@@ -18,7 +18,6 @@ import javax.management.remote.JMXServiceURL;
 import com.j256.simplejmx.common.JmxResource;
 import com.j256.simplejmx.common.JmxSelfNaming;
 import com.j256.simplejmx.common.ObjectNameUtil;
-import com.j256.simplejmx.server.JmxServerTest.SelfNaming;
 
 /**
  * JMX server which allows classes to easily publish and un-publish themselves.
@@ -106,7 +105,7 @@ public class JmxServer {
 
 	/**
 	 * Register the object parameter for exposure with JMX. The object passed in must have a {@link JmxResource}
-	 * annotation or must implement {@link SelfNaming}.
+	 * annotation or must implement {@link JmxSelfNaming}.
 	 */
 	public synchronized void register(Object obj) throws JMException {
 		ObjectName objectName = extractJmxResourceObjName(obj);
