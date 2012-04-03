@@ -2,6 +2,7 @@ package com.j256.simplejmx.server;
 
 import org.junit.Ignore;
 
+import com.j256.simplejmx.common.JmxAttributeField;
 import com.j256.simplejmx.common.JmxAttributeMethod;
 import com.j256.simplejmx.common.JmxOperation;
 import com.j256.simplejmx.common.JmxResource;
@@ -11,11 +12,15 @@ import com.j256.simplejmx.common.JmxResource;
  * 
  * @author graywatson
  */
-@Ignore
+@Ignore("Just here as an example")
 public class ExampleTest {
 
 	public static void main(String[] args) throws Exception {
-		LookupCache lookupCache = new LookupCache();
+		new ExampleTest().doMain(args);
+	}
+
+	private void doMain(String[] args) throws Exception {
+		RuntimeCounter lookupCache = new RuntimeCounter();
 		// create a new server listening on port 8000
 		JmxServer jmxServer = new JmxServer(8000);
 		try {
@@ -27,38 +32,43 @@ public class ExampleTest {
 
 			// do your other code here...
 
-			// we just sleep to let he server do its stuff
-			Thread.sleep(100000);
+			// we just sleep forever to let the server do its stuff
+			Thread.sleep(1000000000);
 		} finally {
 			// stop our server
 			jmxServer.stop();
 		}
 	}
 
-	@JmxResource(description = "Lookup cache", domainName = "j256", objectName = "lookupCache")
-	public static class LookupCache {
+	@JmxResource(description = "Runtime counter", domainName = "j256", objectName = "runtimeCounter")
+	public static class RuntimeCounter {
 
-		private int hitCount;
-		private boolean enabled;
+		// start our timer
+		private long startMillis = System.currentTimeMillis();
 
-		@JmxAttributeMethod(description = "Number of hits in the cache")
-		public int getHitCount() {
-			return hitCount;
+		// or we can do fields directly, isReadible defaults to true
+		@JmxAttributeField(description = "Show runtime in seconds", isWritable = true)
+		private boolean showSeconds;
+
+		@JmxAttributeMethod(description = "Run time in seconds or milliseconds")
+		public long getRunTime() {
+			long diffMillis = System.currentTimeMillis() - startMillis;
+			if (showSeconds) {
+				return diffMillis / 1000;
+			} else {
+				return diffMillis;
+			}
 		}
 
-		@JmxAttributeMethod(description = "Is the cache enabled?")
-		public boolean getEnabled() {
-			return enabled;
-		}
+		/*
+		 * NOTE: there is no setHitCount() so it won't be writable.
+		 */
 
-		@JmxAttributeMethod(description = "Is the cache enabled?")
-		public void setEnabled(boolean enabled) {
-			this.enabled = enabled;
-		}
-
-		@JmxOperation(description = "Flush the cache")
-		public String flushCache() {
-			return "Cache is flushed";
+		// this is an operation that shows up on the operations jconsole tab
+		@JmxOperation(description = "Restart our timer")
+		public String restartTimer() {
+			startMillis = System.currentTimeMillis();
+			return "Timer has been restarted";
 		}
 	}
 }

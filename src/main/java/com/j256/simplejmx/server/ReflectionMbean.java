@@ -35,28 +35,12 @@ import com.j256.simplejmx.common.JmxSelfNaming;
  */
 public class ReflectionMbean implements DynamicMBean {
 
-	private final static Method ATTRIBUTE_FIELD_GET_METHOD;
-	private final static Method ATTRIBUTE_FIELD_SET_METHOD;
-
 	private final Object delegate;
 	private final Map<String, AttributeMethodInfo> attributeMethodMap = new HashMap<String, AttributeMethodInfo>();
 	private final Map<NameParams, OperationMethodInfo> operationMethodMap =
 			new HashMap<NameParams, OperationMethodInfo>();
 	private final Map<String, AttributeFieldInfo> attributeFieldMap = new HashMap<String, AttributeFieldInfo>();
 	private final MBeanInfo mbeanInfo;
-
-	static {
-		try {
-			ATTRIBUTE_FIELD_GET_METHOD = AttributeFieldInfo.class.getMethod("getMethod");
-		} catch (Exception e) {
-			throw new RuntimeException("Could not find get method in " + AttributeFieldInfo.class);
-		}
-		try {
-			ATTRIBUTE_FIELD_SET_METHOD = AttributeFieldInfo.class.getMethod("setMethod", Object.class);
-		} catch (Exception e) {
-			throw new RuntimeException("Could not find set method in " + AttributeFieldInfo.class);
-		}
-	}
 
 	/**
 	 * Create a mbean associated with a delegate object that implements self-naming.
@@ -89,9 +73,10 @@ public class ReflectionMbean implements DynamicMBean {
 		if (methodInfo == null) {
 			AttributeFieldInfo fieldInfo = attributeFieldMap.get(attributeName);
 			if (fieldInfo == null || !fieldInfo.isGetter) {
-				throw new AttributeNotFoundException("Unknown attribute " + attributeName);
+				throwUnknownAttributeException(attributeName);
 			}
 			try {
+				// get the value by using reflection on the Field
 				return fieldInfo.field.get(delegate);
 			} catch (Exception e) {
 				throw new ReflectionException(e, "Invoking getter attribute on field " + fieldInfo.field.getName()
@@ -99,9 +84,10 @@ public class ReflectionMbean implements DynamicMBean {
 			}
 		} else {
 			if (methodInfo.getterMethod == null) {
-				throw new AttributeNotFoundException("Unknown attribute " + attributeName);
+				throwUnknownAttributeException(attributeName);
 			}
 			try {
+				// get the value by calling the method
 				return methodInfo.getterMethod.invoke(delegate);
 			} catch (Exception e) {
 				throw new ReflectionException(e, "Invoking getter attribute method "
@@ -133,7 +119,7 @@ public class ReflectionMbean implements DynamicMBean {
 		if (methodInfo == null) {
 			AttributeFieldInfo fieldInfo = attributeFieldMap.get(attribute.getName());
 			if (fieldInfo == null || !fieldInfo.isSetter) {
-				throw new AttributeNotFoundException("Unknown attribute " + attribute);
+				throwUnknownAttributeException(attribute.getName());
 			}
 			try {
 				fieldInfo.field.set(delegate, attribute.getValue());
@@ -143,7 +129,7 @@ public class ReflectionMbean implements DynamicMBean {
 			}
 		} else {
 			if (methodInfo.setterMethod == null) {
-				throw new AttributeNotFoundException("Unknown attribute " + attribute);
+				throwUnknownAttributeException(attribute.getName());
 			}
 			try {
 				methodInfo.setterMethod.invoke(delegate, attribute.getValue());
@@ -158,7 +144,7 @@ public class ReflectionMbean implements DynamicMBean {
 	 * @see {@link DynamicMBean#setAttributes(AttributeList)}.
 	 */
 	public AttributeList setAttributes(AttributeList attributes) {
-		AttributeList returnList = new AttributeList();
+		AttributeList returnList = new AttributeList(attributes.size());
 		for (Attribute attribute : attributes.asList()) {
 			String name = attribute.getName();
 			try {
@@ -217,12 +203,8 @@ public class ReflectionMbean implements DynamicMBean {
 			}
 		}
 		for (AttributeFieldInfo fieldInfo : attributeFieldMap.values()) {
-			try {
-				attributes.add(new MBeanAttributeInfo(fieldInfo.field.getName(), fieldInfo.description,
-						fieldInfo.getGetterMethod(), fieldInfo.getSetterMethod()));
-			} catch (IntrospectionException e) {
-				// ignore this attribute if it throws I guess
-			}
+			attributes.add(new MBeanAttributeInfo(fieldInfo.field.getName(), fieldInfo.field.getType().getName(),
+					fieldInfo.description, fieldInfo.isGetter, fieldInfo.isSetter, fieldInfo.isIs));
 		}
 		List<MBeanOperationInfo> operations = new ArrayList<MBeanOperationInfo>(operationMethodMap.size());
 		// we have to go back because we need to match up the getters and setters
@@ -234,7 +216,6 @@ public class ReflectionMbean implements DynamicMBean {
 		return new MBeanInfo(clazz.getName(), desc, attributes.toArray(new MBeanAttributeInfo[attributes.size()]),
 				null, operations.toArray(new MBeanOperationInfo[operations.size()]), null);
 	}
-
 	/**
 	 * Using reflection, find attribute methods from our object that will be exposed via JMX.
 	 */
@@ -365,6 +346,17 @@ public class ReflectionMbean implements DynamicMBean {
 	}
 
 	/**
+	 * We do this to standardize our exceptions around unknown attributes.
+	 */
+	private void throwUnknownAttributeException(String attributeName) throws AttributeNotFoundException {
+		throw new AttributeNotFoundException("Unknown attribute " + attributeName);
+	}
+
+	private static boolean isEmpty(String string) {
+		return string == null || string.trim().length() == 0;
+	}
+
+	/**
 	 * Key class for our hashmap to find matching methods based on name and parameter list.
 	 */
 	private static class NameParams {
@@ -423,7 +415,7 @@ public class ReflectionMbean implements DynamicMBean {
 		public OperationMethodInfo(String methodName, String description, Method method,
 				MBeanParameterInfo[] parameterInfos, int action) {
 			this.methodName = methodName;
-			if (description == null || description.length() == 0) {
+			if (isEmpty(description)) {
 				this.description = methodName + " attribute";
 			} else {
 				this.description = description;
@@ -440,45 +432,23 @@ public class ReflectionMbean implements DynamicMBean {
 		final String description;
 		final boolean isGetter;
 		final boolean isSetter;
+		final boolean isIs;
 
 		public AttributeFieldInfo(Field field, String description, boolean isGetter, boolean isSetter) {
 			this.field = field;
-			this.description = description;
+			if (isEmpty(description)) {
+				this.description = field.getName() + " attribute";
+			} else {
+				this.description = description;
+			}
 			this.isGetter = isGetter;
 			this.isSetter = isSetter;
-		}
-
-		public Method getGetterMethod() {
-			if (isGetter) {
-				return ATTRIBUTE_FIELD_GET_METHOD;
+			if (field.getName().startsWith("is") && field.getType().equals(Boolean.TYPE)
+					|| field.getType().equals(Boolean.class)) {
+				this.isIs = true;
 			} else {
-				return null;
+				this.isIs = false;
 			}
-		}
-
-		public Method getSetterMethod() {
-			if (isSetter) {
-				return ATTRIBUTE_FIELD_SET_METHOD;
-			} else {
-				return null;
-			}
-		}
-
-		/**
-		 * These are used (in gross fashion) to be able to generate a fake getter Method.
-		 */
-		@SuppressWarnings("unused")
-		public Object getMethod() {
-			// noop
-			return null;
-		}
-
-		/**
-		 * These are used (in gross fashion) to be able to generate a fake setter Method.
-		 */
-		@SuppressWarnings("unused")
-		public void setMethod(Object obj) {
-			// noop
 		}
 	}
 }

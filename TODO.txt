@@ -1,6 +1,3 @@
 ===================================================
 Used to maintain requested features or future work.
 ===================================================
-
-- add the ability to set/get directly on a field inside of a class:
-	- need to open access to it
