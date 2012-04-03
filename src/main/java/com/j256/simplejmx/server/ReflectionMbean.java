@@ -124,7 +124,7 @@ public class ReflectionMbean implements DynamicMBean {
 		JmxResource jmxResource = clazz.getAnnotation(JmxResource.class);
 		String desc;
 		if (jmxResource == null || jmxResource.description() == null || jmxResource.description().length() == 0) {
-			desc = "Jmx information about " + clazz;
+			desc = "Information about " + clazz;
 		} else {
 			desc = jmxResource.description();
 		}

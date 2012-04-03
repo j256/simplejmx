@@ -21,7 +21,8 @@ import javax.management.remote.JMXServiceURL;
 import com.j256.simplejmx.common.ObjectNameUtil;
 
 /**
- * JMX client connection implementation.
+ * JMX client connection implementation which connects to a JMX server and gets JMX information, gets/sets attributes,
+ * and invokes operations.
  * 
  * @author graywatson
  */

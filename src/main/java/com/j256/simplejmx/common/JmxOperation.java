@@ -8,10 +8,10 @@ import java.lang.annotation.Target;
 import javax.management.MBeanOperationInfo;
 
 /**
- * This identify which methods are operations. This is added to methods that are _not_ named "get..." or "set...". The
+ * This identifies which methods are operations. It is added to methods that are _not_ named "get..." or "set...". The
  * method can either return void or return an object. It is recommended that the method return a simple object that will
- * be for sure in jconsole's classpath and also should not throw an unknown exception class either. Similar to Spring's
- * ManagedOperation.
+ * be for sure in jconsole's classpath and also should not throw an unknown exception class either. This class is
+ * similar to Spring's &#64;ManagedOperation.
  * 
  * <p>
  * 

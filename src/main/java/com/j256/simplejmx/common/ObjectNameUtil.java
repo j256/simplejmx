@@ -3,7 +3,7 @@ package com.j256.simplejmx.common;
 import javax.management.ObjectName;
 
 /**
- * Utility class that creates {@link ObjectName} objects from various input information.
+ * Utility class that creates {@link ObjectName} objects from various arguments.
  * 
  * @author graywatson
  */

@@ -21,7 +21,7 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
 /**
- * JMX client class to be built into another Main class to provide command-line JMX capabilities.
+ * Command-line client that can be used to support interactive or batch-file JMX operations.
  * 
  * @author graywatson
  */

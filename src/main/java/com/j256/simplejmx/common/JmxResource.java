@@ -5,8 +5,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.j256.simplejmx.server.JmxServer;
+
 /**
- * This is used to identify an object which is going to be exported using JMX. Similar to Spring's ManagedResource.
+ * This is used to identify an object which is going to be exported using JMX. Objects that are passed to
+ * {@link JmxServer#register(Object)} must either have this annotation or must implement {@link JmxSelfNaming}. This
+ * class is similar to Spring's &#64;ManagedResource.
  * 
  * @author graywatson
  */
@@ -15,7 +19,7 @@ import java.lang.annotation.Target;
 public @interface JmxResource {
 
 	/**
-	 * JMX domain name of the object. This turns into the top-level folder inside of JMX. *
+	 * Domain name of the object which turns into the top-level folder inside of jconsole.
 	 * <p>
 	 * If the object implements {@link JmxSelfNaming} then this would be replaced by
 	 * {@link JmxSelfNaming#getJmxDomainName()}. If the object doesn't implement {@link JmxSelfNaming} and this is not
@@ -35,9 +39,10 @@ public @interface JmxResource {
 	public String objectName() default "";
 
 	/**
-	 * Other strings which go before the name= line which translate into sub-folders below the domain-name that was
-	 * specified above. They can either be in "name=value" format in which case they should be in alphabetic order by
-	 * name. They can also just be in "value" format in which case a ## prefix will be added by the code.x
+	 * Other strings which go before the <tt>name=</tt> line which translate into sub-folders below the domain-name that
+	 * was specified above. They can either be in <tt>name=value</tt> format in which case they should be in alphabetic
+	 * order by name. They can also just be in <tt>value</tt> format in which case a ## prefix will be added by the
+	 * code.
 	 * 
 	 * <p>
 	 * The following are basically synonymous:
@@ -49,7 +54,6 @@ public @interface JmxResource {
 	 * 
 	 * </p>
 	 * 
-	 * *
 	 * <p>
 	 * If the object implements {@link JmxSelfNaming} then this would be replaced by
 	 * {@link JmxSelfNaming#getJmxFolderNames()}. If the object doesn't implement {@link JmxSelfNaming} and this is not
@@ -59,7 +63,7 @@ public @interface JmxResource {
 	public String[] folderNames() default {};
 
 	/**
-	 * Description of the class for jconsole. Default is something like: "Jmx information about class-name".
+	 * Description of the class for jconsole. Default is something like: "Information about class-name".
 	 */
 	public String description() default "";
 }

@@ -3,10 +3,10 @@ package com.j256.simplejmx.common;
 import javax.management.ObjectName;
 
 /**
- * Wrapper around a folder-name that is used in {@link JmxSelfNaming#getJmxFolderNames()} and
- * {@link ObjectNameUtil#makeObjectName(JmxResource, JmxSelfNaming)}. Either it can be a field/value pair which turns
- * into "field=value" in the {@link ObjectName} or it can be just a value in which case a numerical field prefix is
- * auto-generated.
+ * Wrapper around a folder-name that turns into the "field=value" parts of the object-name. It is used in
+ * {@link JmxSelfNaming#getJmxFolderNames()} and {@link ObjectNameUtil#makeObjectName(JmxResource, JmxSelfNaming)}. It
+ * can either be a field/value pair which turns into "field=value" in the {@link ObjectName} or it can be just a value
+ * in which case a numerical field prefix is auto-generated.
  * 
  * @author graywatson
  */

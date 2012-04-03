@@ -4,13 +4,16 @@ import java.io.File;
 import java.util.Arrays;
 
 /**
- * Main class which starts our JMX client. We have this separation with {@link CommandLineJmxClient} so others can use
- * it in their Main classes.
+ * Sample main class which starts our JMX client. We have this separated from {@link CommandLineJmxClient} so others can
+ * use it in their Main classes.
  * 
  * @author graywatson
  */
 public class Main {
 
+	/**
+	 * Standard main method that can be called from the command line.
+	 */
 	public static void main(String[] args) throws Exception {
 		// turn into an instance various quickly
 		Main main = new Main();
