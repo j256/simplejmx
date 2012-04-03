@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<!-- simplejmx pom configuration file for Maven (http://maven.apache.org/) -->
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.j256</groupId>
 	<artifactId>simpleJmx</artifactId>
-	<version>0.1-SNAPSHOT</version>
+	<version>0.1</version>
 	<packaging>jar</packaging>
 	<name>Simple JMX</name>
 	<url>http://sourceforge.net/projects/simplejmx/</url>
@@ -21,9 +21,9 @@
 		<version>5</version>
 	</parent>
 	<scm>
-		<url>http://ormlite.svn.sourceforge.net/viewvc/ormlite/ormlite-core/trunk/</url>
-		<connection>scm:svn:https://ormlite.svn.sourceforge.net/svnroot/ormlite/ormlite-core/trunk</connection>
-		<developerConnection>scm:svn:https://ormlite.svn.sourceforge.net/svnroot/ormlite/ormlite-core/trunk
+		<url>http://ormlite.svn.sourceforge.net/viewvc/ormlite/ormlite-core/tags/simpleJmx-0.1</url>
+		<connection>scm:svn:https://ormlite.svn.sourceforge.net/svnroot/ormlite/ormlite-core/tags/simpleJmx-0.1</connection>
+		<developerConnection>scm:svn:https://ormlite.svn.sourceforge.net/svnroot/ormlite/ormlite-core/tags/simpleJmx-0.1
 		</developerConnection>
 	</scm>
 	<developers>
