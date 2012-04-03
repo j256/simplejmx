@@ -22,8 +22,8 @@
 	</parent>
 	<scm>
 		<url>http://svn.code.sf.net/p/simplejmx/code/trunk/</url>
-		<connection>scm:svn:http://svn.code.sf.net/p/simplejmx/code/trunk</connection>
-		<developerConnection>scm:svn:http://svn.code.sf.net/p/simplejmx/code/trunk</developerConnection>
+		<connection>scm:svn:https://svn.code.sf.net/p/simplejmx/code/trunk</connection>
+		<developerConnection>scm:svn:https://svn.code.sf.net/p/simplejmx/code/trunk</developerConnection>
 	</scm>
 	<developers>
 		<developer>
