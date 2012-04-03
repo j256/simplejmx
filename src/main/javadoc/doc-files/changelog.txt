@@ -1,0 +1,2 @@
+0.2: 4/3/2012 (svn rYYYY)
+	* Initial public release.  Tweaked javadocs and the like.
