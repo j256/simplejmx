@@ -22,6 +22,7 @@ import javax.management.ReflectionException;
 import com.j256.simplejmx.common.JmxAttribute;
 import com.j256.simplejmx.common.JmxOperation;
 import com.j256.simplejmx.common.JmxResource;
+import com.j256.simplejmx.common.JmxSelfNaming;
 
 /**
  * This wraps an object that has been registered in the server using {@link JmxServer#register(Object)}. We wrap the
@@ -38,15 +39,32 @@ public class ReflectionMbean implements DynamicMBean {
 	private final Map<NameParams, Method> fieldOperationMap = new HashMap<NameParams, Method>();
 	private final MBeanInfo mbeanInfo;
 
+	/**
+	 * Create a mbean associated with a delegate object that implements self-naming.
+	 */
+	public ReflectionMbean(JmxSelfNaming delegate) {
+		this.delegate = delegate;
+		this.mbeanInfo = buildMbeanInfo();
+	}
+
+	/**
+	 * Create a mbean associated with a delegate object that must have a {@link JmxResource} annotation.
+	 */
 	public ReflectionMbean(Object delegate) {
 		this.delegate = delegate;
 		this.mbeanInfo = buildMbeanInfo();
 	}
 
+	/**
+	 * @see {@link DynamicMBean#getMBeanInfo()}.
+	 */
 	public MBeanInfo getMBeanInfo() {
 		return mbeanInfo;
 	}
 
+	/**
+	 * @see {@link DynamicMBean#getAttribute(String)}.
+	 */
 	public Object getAttribute(String attribute) throws AttributeNotFoundException, ReflectionException {
 		Method method = fieldGetMap.get(attribute);
 		if (method == null) {
@@ -60,6 +78,9 @@ public class ReflectionMbean implements DynamicMBean {
 		}
 	}
 
+	/**
+	 * @see {@link DynamicMBean#getAttributes(String[])}.
+	 */
 	public AttributeList getAttributes(String[] attributeNames) {
 		AttributeList returnList = new AttributeList();
 		for (String name : attributeNames) {
@@ -72,6 +93,9 @@ public class ReflectionMbean implements DynamicMBean {
 		return returnList;
 	}
 
+	/**
+	 * @see {@link DynamicMBean#setAttribute(Attribute)}.
+	 */
 	public void setAttribute(Attribute attribute) throws AttributeNotFoundException, ReflectionException {
 		Method method = fieldSetMap.get(attribute.getName());
 		if (method == null) {
@@ -86,6 +110,9 @@ public class ReflectionMbean implements DynamicMBean {
 		}
 	}
 
+	/**
+	 * @see {@link DynamicMBean#setAttributes(AttributeList)}.
+	 */
 	public AttributeList setAttributes(AttributeList attributes) {
 		AttributeList returnList = new AttributeList();
 		for (Attribute attribute : attributes.asList()) {
@@ -100,6 +127,9 @@ public class ReflectionMbean implements DynamicMBean {
 		return returnList;
 	}
 
+	/**
+	 * @see {@link DynamicMBean#invoke(String, Object[], String[])}.
+	 */
 	public Object invoke(String actionName, Object[] params, String[] signatureTypes) throws MBeanException,
 			ReflectionException {
 		Method method = fieldOperationMap.get(new NameParams(actionName, signatureTypes));

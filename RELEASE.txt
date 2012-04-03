@@ -40,7 +40,7 @@ To release SimpleJmx:
 
 8) Possibly trim the older releases in the release directory on SF.  Try to leave last major release and couple minors.
 
-	create_sf_shell							(script)
+	create_sf_shell
 	cd /home/frs/project/simplejmx/releases/com/j256/simplejmx
 	rm -rf 1.11 1.12
 	shutdown
