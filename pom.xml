@@ -3,12 +3,12 @@
 	<!-- simplejmx pom configuration file for Maven (http://maven.apache.org/) -->
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.j256</groupId>
-	<artifactId>simpleJmx</artifactId>
+	<artifactId>simplejmx</artifactId>
 	<version>0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Simple JMX</name>
 	<url>http://sourceforge.net/projects/simplejmx/</url>
-	<description>Lightweight Object Relational Model (ORM) for persisting objects to SQL databases.</description>
+	<description>Simple JMX Classes</description>
 	<licenses>
 		<license>
 			<name>ISC License</name>
@@ -72,7 +72,7 @@
 		</profile>
 	</profiles>
 	<build>
-		<finalName>simpleJmx</finalName>
+		<finalName>simplejmx</finalName>
 		<!-- Resources -->
 		<resources>
 			<resource>
