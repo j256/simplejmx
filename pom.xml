@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.j256</groupId>
 	<artifactId>simpleJmx</artifactId>
-	<version>0.1</version>
+	<version>0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Simple JMX</name>
 	<url>http://sourceforge.net/projects/simplejmx/</url>
@@ -22,8 +22,8 @@
 	</parent>
 	<scm>
 		<url>http://svn.code.sf.net/p/simplejmx/code/simpleJmx-0.1</url>
-		<connection>scm:svn+ssh://svn.code.sf.net/p/simplejmx/code/tags/simpleJmx-0.1</connection>
-		<developerConnection>scm:svn+ssh://svn.code.sf.net/p/simplejmx/code/tags/simpleJmx-0.1
+		<connection>scm:svn:http://svn.code.sf.net/p/simplejmx/code/tags/simpleJmx-0.1</connection>
+		<developerConnection>scm:svn:http://svn.code.sf.net/p/simplejmx/code/tags/simpleJmx-0.1
 		</developerConnection>
 	</scm>
 	<developers>
