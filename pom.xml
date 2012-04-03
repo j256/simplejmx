@@ -21,9 +21,9 @@
 		<version>5</version>
 	</parent>
 	<scm>
-		<url>http://ormlite.svn.sourceforge.net/viewvc/ormlite/ormlite-core/tags/simpleJmx-0.1</url>
-		<connection>scm:svn:https://ormlite.svn.sourceforge.net/svnroot/ormlite/ormlite-core/tags/simpleJmx-0.1</connection>
-		<developerConnection>scm:svn:https://ormlite.svn.sourceforge.net/svnroot/ormlite/ormlite-core/tags/simpleJmx-0.1
+		<url>http://svn.code.sf.net/p/simplejmx/code/simpleJmx-0.1</url>
+		<connection>scm:svn+ssh://svn.code.sf.net/p/simplejmx/code/tags/simpleJmx-0.1</connection>
+		<developerConnection>scm:svn+ssh://svn.code.sf.net/p/simplejmx/code/tags/simpleJmx-0.1
 		</developerConnection>
 	</scm>
 	<developers>
