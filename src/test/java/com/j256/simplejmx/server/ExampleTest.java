@@ -22,6 +22,7 @@ public class ExampleTest {
 	}
 
 	private void doMain(String[] args) throws Exception {
+
 		// create the object we will be exposing with JMX
 		RuntimeCounter lookupCache = new RuntimeCounter();
 
@@ -41,13 +42,15 @@ public class ExampleTest {
 			Thread.sleep(1000000000);
 
 		} finally {
+			// we can do this but it is not necessary if we are stopping the server
+			jmxServer.unregister(lookupCache);
 			// stop our server
 			jmxServer.stop();
 		}
 	}
 
 	/**
-	 * Here is our little bean that we are exposing via JMX. It can be in another class -- it's just an inner class here
+	 * Here is our little bean that we are exposing via JMX. It can be in another class. It's just an inner class here
 	 * for convenience.
 	 */
 	@JmxResource(description = "Runtime counter", domainName = "j256", objectName = "runtimeCounter")
@@ -63,10 +66,13 @@ public class ExampleTest {
 		// we can annotate getter methods
 		@JmxAttributeMethod(description = "Run time in seconds or milliseconds")
 		public long getRunTime() {
+			// show how long we are running
 			long diffMillis = System.currentTimeMillis() - startMillis;
 			if (showSeconds) {
+				// as seconds
 				return diffMillis / 1000;
 			} else {
+				// or as milliseconds
 				return diffMillis;
 			}
 		}
@@ -75,7 +81,7 @@ public class ExampleTest {
 		 * NOTE: there is no setRunTime(...) so it won't be writable.
 		 */
 
-		// this is an operation that shows up on the operations jconsole tab
+		// this is an operation that shows up in the operations tab in jconsole.
 		@JmxOperation(description = "Restart our timer")
 		public String restartTimer() {
 			startMillis = System.currentTimeMillis();
