@@ -39,6 +39,7 @@ public class ExampleTest {
 
 			// do your other code here...
 			// we just sleep forever to let the server do its stuff
+			System.out.println("Sleeping for a while to let the server do its stuff");
 			Thread.sleep(1000000000);
 
 		} finally {
