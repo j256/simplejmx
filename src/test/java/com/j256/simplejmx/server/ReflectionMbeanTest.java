@@ -1,6 +1,8 @@
 package com.j256.simplejmx.server;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import javax.management.AttributeNotFoundException;
@@ -215,9 +217,9 @@ public class ReflectionMbeanTest {
 	@Test
 	public void testAttributeFieldSets() throws Exception {
 		AttributeField attributeField = new AttributeField();
+		JmxClient client = new JmxClient(DEFAULT_PORT);
 		try {
 			server.register(attributeField);
-			JmxClient client = new JmxClient(DEFAULT_PORT);
 			try {
 				client.setAttribute(DOMAIN_NAME, OBJECT_NAME, "readOnly", 1);
 				fail("Should have thrown");
@@ -246,6 +248,22 @@ public class ReflectionMbeanTest {
 			}
 		} finally {
 			server.unregister(attributeField);
+			client.close();
+		}
+	}
+
+	@Test
+	public void testIsMethod() throws Exception {
+		IsMethod isMethod = new IsMethod();
+		JmxClient client = new JmxClient(DEFAULT_PORT);
+		try {
+			server.register(isMethod);
+			assertFalse((Boolean) client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "flag"));
+			client.setAttribute(DOMAIN_NAME, OBJECT_NAME, "flag", true);
+			assertTrue((Boolean) client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "flag"));
+		} finally {
+			server.unregister(isMethod);
+			client.close();
 		}
 	}
 
@@ -277,7 +295,7 @@ public class ReflectionMbeanTest {
 		}
 	}
 
-	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
 	protected static class BadGetName {
 		@JmxAttributeMethod(description = "A value")
 		public int notGet() {
@@ -285,14 +303,14 @@ public class ReflectionMbeanTest {
 		}
 	}
 
-	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
 	protected static class BadGetReturnsVoid {
 		@JmxAttributeMethod(description = "A value")
 		public void getFoo() {
 		}
 	}
 
-	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
 	protected static class BadGetHasArgs {
 		@JmxAttributeMethod(description = "A value")
 		public int getFoo(int x) {
@@ -300,14 +318,14 @@ public class ReflectionMbeanTest {
 		}
 	}
 
-	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
 	protected static class BadSetNoArg {
 		@JmxAttributeMethod(description = "A value")
 		public void setFoo() {
 		}
 	}
 
-	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
 	protected static class BadSetReturnsNotVoid {
 		@JmxAttributeMethod(description = "A value")
 		public int setFoo(int x) {
@@ -315,7 +333,7 @@ public class ReflectionMbeanTest {
 		}
 	}
 
-	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
 	protected static class BadOperationLooksLikeAttribute {
 		@JmxOperation(description = "A value")
 		public void setFoo(int x) {
@@ -335,7 +353,20 @@ public class ReflectionMbeanTest {
 		}
 	}
 
-	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	protected static class IsMethod {
+		boolean flag;
+		@JmxAttributeMethod
+		public boolean isFlag() {
+			return flag;
+		}
+		@JmxAttributeMethod
+		public void setFlag(boolean flag) {
+			this.flag = flag;
+		}
+	}
+
+	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
 	protected static class AttributeField {
 		@SuppressWarnings("unused")
 		@JmxAttributeField(description = "some thing")

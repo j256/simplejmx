@@ -12,7 +12,6 @@ import javax.management.Attribute;
 import javax.management.AttributeList;
 import javax.management.AttributeNotFoundException;
 import javax.management.DynamicMBean;
-import javax.management.IntrospectionException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanException;
 import javax.management.MBeanInfo;
@@ -37,8 +36,7 @@ public class ReflectionMbean implements DynamicMBean {
 
 	private final Object delegate;
 	private final Map<String, AttributeMethodInfo> attributeMethodMap = new HashMap<String, AttributeMethodInfo>();
-	private final Map<NameParams, OperationMethodInfo> operationMethodMap =
-			new HashMap<NameParams, OperationMethodInfo>();
+	private final Map<NameParams, Method> operationMethodMap = new HashMap<NameParams, Method>();
 	private final Map<String, AttributeFieldInfo> attributeFieldMap = new HashMap<String, AttributeFieldInfo>();
 	private final MBeanInfo mbeanInfo;
 
@@ -162,17 +160,16 @@ public class ReflectionMbean implements DynamicMBean {
 	 */
 	public Object invoke(String actionName, Object[] params, String[] signatureTypes) throws MBeanException,
 			ReflectionException {
-		OperationMethodInfo methodInfo = operationMethodMap.get(new NameParams(actionName, signatureTypes));
-		if (methodInfo == null) {
+		Method method = operationMethodMap.get(new NameParams(actionName, signatureTypes));
+		if (method == null) {
 			throw new MBeanException(new IllegalArgumentException("Unknown action '" + actionName
 					+ "' with parameter types " + Arrays.toString(signatureTypes)));
-		} else {
-			try {
-				return methodInfo.method.invoke(delegate, params);
-			} catch (Exception e) {
-				throw new ReflectionException(e, "Invoking operation method " + methodInfo.method.getName() + " on "
-						+ delegate.getClass() + " threw exception");
-			}
+		}
+		try {
+			return method.invoke(delegate, params);
+		} catch (Exception e) {
+			throw new ReflectionException(e, "Invoking operation method " + method.getName() + " on "
+					+ delegate.getClass() + " threw exception");
 		}
 	}
 
@@ -182,57 +179,44 @@ public class ReflectionMbean implements DynamicMBean {
 	private MBeanInfo buildMbeanInfo() {
 		Class<?> clazz = delegate.getClass();
 		JmxResource jmxResource = clazz.getAnnotation(JmxResource.class);
-		String desc;
+		String mbeanDescription;
 		if (jmxResource == null || jmxResource.description() == null || jmxResource.description().length() == 0) {
-			desc = "Information about " + clazz;
+			mbeanDescription = "Information about " + clazz;
 		} else {
-			desc = jmxResource.description();
+			mbeanDescription = jmxResource.description();
 		}
+
 		Method[] methods = clazz.getMethods();
-		discoverAttributeMethods(methods);
-		discoverOperations(methods);
-		discoverAttributeFields();
+		List<MBeanAttributeInfo> attributes = new ArrayList<MBeanAttributeInfo>();
+		discoverAttributeMethods(methods, attributes);
+		discoverAttributeFields(attributes);
+		List<MBeanOperationInfo> operations = discoverOperations(methods);
 
-		List<MBeanAttributeInfo> attributes = new ArrayList<MBeanAttributeInfo>(attributeMethodMap.size());
-		for (AttributeMethodInfo methodInfo : attributeMethodMap.values()) {
-			try {
-				attributes.add(new MBeanAttributeInfo(methodInfo.varName, methodInfo.description,
-						methodInfo.getterMethod, methodInfo.setterMethod));
-			} catch (IntrospectionException e) {
-				// ignore this attribute if it throws I guess
-			}
-		}
-		for (AttributeFieldInfo fieldInfo : attributeFieldMap.values()) {
-			attributes.add(new MBeanAttributeInfo(fieldInfo.field.getName(), fieldInfo.field.getType().getName(),
-					fieldInfo.description, fieldInfo.isGetter, fieldInfo.isSetter, fieldInfo.isIs));
-		}
-		List<MBeanOperationInfo> operations = new ArrayList<MBeanOperationInfo>(operationMethodMap.size());
-		// we have to go back because we need to match up the getters and setters
-		for (OperationMethodInfo methodInfo : operationMethodMap.values()) {
-			operations.add(new MBeanOperationInfo(methodInfo.methodName, methodInfo.description,
-					methodInfo.parameterInfos, methodInfo.method.getReturnType().getName(), methodInfo.action));
-		}
-
-		return new MBeanInfo(clazz.getName(), desc, attributes.toArray(new MBeanAttributeInfo[attributes.size()]),
-				null, operations.toArray(new MBeanOperationInfo[operations.size()]), null);
+		return new MBeanInfo(clazz.getName(), mbeanDescription,
+				attributes.toArray(new MBeanAttributeInfo[attributes.size()]), null,
+				operations.toArray(new MBeanOperationInfo[operations.size()]), null);
 	}
+
 	/**
 	 * Using reflection, find attribute methods from our object that will be exposed via JMX.
 	 */
-	private void discoverAttributeMethods(Method[] methods) {
+	private void discoverAttributeMethods(Method[] methods, List<MBeanAttributeInfo> attributes) {
 		for (Method method : methods) {
 			JmxAttributeMethod jmxAttribute = method.getAnnotation(JmxAttributeMethod.class);
 			if (jmxAttribute == null) {
 				// skip it if no annotation
 				continue;
 			}
-			String name = method.getName();
-			if (name.length() < 4) {
-				throw new IllegalArgumentException("Method '" + method + "' has a name that is too short");
+			String methodName = method.getName();
+			boolean isIs;
+			if (methodName.startsWith("is")) {
+				isIs = true;
+			} else {
+				isIs = false;
 			}
-			String varName = buildMethodSuffix(name);
+			String varName = buildMethodSuffix(method, methodName, isIs);
 			AttributeMethodInfo methodInfo = attributeMethodMap.get(varName);
-			if (name.startsWith("get")) {
+			if (isIs || methodName.startsWith("get")) {
 				if (method.getParameterTypes().length != 0) {
 					throw new IllegalArgumentException("Method '" + method + "' starts with 'get' but has arguments");
 				}
@@ -244,9 +228,10 @@ public class ReflectionMbean implements DynamicMBean {
 					attributeMethodMap.put(varName, new AttributeMethodInfo(varName, jmxAttribute.description(),
 							method, null));
 				} else {
+					// setter must have already started our method-info, add the getter to it
 					methodInfo.getterMethod = method;
 				}
-			} else if (name.startsWith("set")) {
+			} else if (methodName.startsWith("set")) {
 				if (method.getParameterTypes().length != 1) {
 					throw new IllegalArgumentException("Method '" + method
 							+ "' starts with 'set' but does not have 1 argument");
@@ -259,6 +244,7 @@ public class ReflectionMbean implements DynamicMBean {
 					attributeMethodMap.put(varName, new AttributeMethodInfo(varName, jmxAttribute.description(), null,
 							method));
 				} else {
+					// getter must have already started our method-info, add the setter to it
 					methodInfo.setterMethod = method;
 				}
 			} else {
@@ -266,12 +252,22 @@ public class ReflectionMbean implements DynamicMBean {
 						+ "' is marked as an attribute but does not start with 'get' or 'set'");
 			}
 		}
+
+		/*
+		 * we have to go back and post process the attribute-method-map because the getter and setter methods change the
+		 * method-info multiple times.
+		 */
+		for (AttributeMethodInfo methodInfo : attributeMethodMap.values()) {
+			attributes.add(new MBeanAttributeInfo(methodInfo.varName, methodInfo.type.getName(),
+					methodInfo.description, (methodInfo.getterMethod != null), (methodInfo.setterMethod != null),
+					methodInfo.isIs()));
+		}
 	}
 
 	/**
 	 * Using reflection, find attribute methods from our object that will be exposed via JMX.
 	 */
-	private void discoverAttributeFields() {
+	private void discoverAttributeFields(List<MBeanAttributeInfo> attributes) {
 		Class<?> clazz = delegate.getClass();
 		Field[] fields = clazz.getDeclaredFields();
 		for (Field field : fields) {
@@ -283,35 +279,59 @@ public class ReflectionMbean implements DynamicMBean {
 			if (!field.isAccessible()) {
 				field.setAccessible(true);
 			}
-			attributeFieldMap.put(field.getName(), new AttributeFieldInfo(field, attributeField.description(),
-					attributeField.isReadible(), attributeField.isWritable()));
+			attributeFieldMap.put(field.getName(), new AttributeFieldInfo(field, attributeField.isReadible(),
+					attributeField.isWritable()));
+
+			String description = attributeField.description();
+			if (isEmpty(description)) {
+				description = field.getName() + " attribute";
+			}
+
+			boolean isIs;
+			if (field.getName().startsWith("is")
+					&& (field.getType() == boolean.class || field.getType() == Boolean.class)) {
+				isIs = true;
+			} else {
+				isIs = false;
+			}
+			attributes.add(new MBeanAttributeInfo(field.getName(), field.getType().getName(), description,
+					attributeField.isReadible(), attributeField.isWritable(), isIs));
 		}
 	}
 
 	/**
 	 * Using reflection, find operation methods from our object that will be exposed via JMX.
 	 */
-	private void discoverOperations(Method[] methods) {
+	private List<MBeanOperationInfo> discoverOperations(Method[] methods) {
+		List<MBeanOperationInfo> operations = new ArrayList<MBeanOperationInfo>(operationMethodMap.size());
 		for (Method method : methods) {
 			JmxOperation jmxOperation = method.getAnnotation(JmxOperation.class);
 			if (jmxOperation == null) {
 				continue;
 			}
-			String name = method.getName();
-			if (name.startsWith("get") || name.startsWith("set")) {
+			String methodName = method.getName();
+			if (methodName.startsWith("get") || methodName.startsWith("is") || methodName.startsWith("set")) {
 				throw new IllegalArgumentException("Operation method " + method
-						+ " cannot start with get or set.  Is this an attribute?");
+						+ " cannot start with 'get', 'is', or 'set'.  Did you use the wrong annotation?");
 			}
 			Class<?>[] types = method.getParameterTypes();
 			String[] stringTypes = new String[types.length];
 			for (int i = 0; i < types.length; i++) {
 				stringTypes[i] = types[i].getName();
 			}
-			NameParams nameParams = new NameParams(name, stringTypes);
+			NameParams nameParams = new NameParams(methodName, stringTypes);
 			MBeanParameterInfo[] parameterInfos = buildOperationParameterInfo(method, jmxOperation);
-			operationMethodMap.put(nameParams, new OperationMethodInfo(name, jmxOperation.description(), method,
-					parameterInfos, jmxOperation.action()));
+			operationMethodMap.put(nameParams, method);
+
+			String description = jmxOperation.description();
+			if (isEmpty(description)) {
+				description = methodName + " attribute";
+			}
+
+			operations.add(new MBeanOperationInfo(methodName, description, parameterInfos, method.getReturnType()
+					.getName(), jmxOperation.action()));
 		}
+		return operations;
 	}
 
 	/**
@@ -341,8 +361,18 @@ public class ReflectionMbean implements DynamicMBean {
 		return parameterInfos;
 	}
 
-	private String buildMethodSuffix(String name) {
-		return Character.toLowerCase(name.charAt(3)) + name.substring(4);
+	private String buildMethodSuffix(Method method, String methodName, boolean isIs) {
+		if (isIs) {
+			if (methodName.length() < 3) {
+				throw new IllegalArgumentException("Method '" + methodName + "' has a name that is too short");
+			}
+			return Character.toLowerCase(methodName.charAt(2)) + methodName.substring(3);
+		} else {
+			if (methodName.length() < 4) {
+				throw new IllegalArgumentException("Method '" + methodName + "' has a name that is too short");
+			}
+			return Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
+		}
 	}
 
 	/**
@@ -389,11 +419,16 @@ public class ReflectionMbean implements DynamicMBean {
 		}
 	}
 
+	/**
+	 * Information about attribute methods.
+	 */
 	private static class AttributeMethodInfo {
 		final String varName;
 		final String description;
 		Method getterMethod;
 		Method setterMethod;
+		final Class<?> type;
+
 		public AttributeMethodInfo(String varName, String description, Method getterMethod, Method setterMethod) {
 			this.varName = varName;
 			if (description == null || description.length() == 0) {
@@ -403,52 +438,36 @@ public class ReflectionMbean implements DynamicMBean {
 			}
 			this.getterMethod = getterMethod;
 			this.setterMethod = setterMethod;
-		}
-	}
-
-	private static class OperationMethodInfo {
-		final String methodName;
-		final String description;
-		final Method method;
-		final MBeanParameterInfo[] parameterInfos;
-		final int action;
-		public OperationMethodInfo(String methodName, String description, Method method,
-				MBeanParameterInfo[] parameterInfos, int action) {
-			this.methodName = methodName;
-			if (isEmpty(description)) {
-				this.description = methodName + " attribute";
+			if (getterMethod == null) {
+				type = setterMethod.getParameterTypes()[0];
 			} else {
-				this.description = description;
+				type = getterMethod.getReturnType();
 			}
-			this.method = method;
-			this.parameterInfos = parameterInfos;
-			this.action = action;
+		}
+
+		public boolean isIs() {
+			if (getterMethod != null && getterMethod.getName().startsWith("is")
+					&& (type == boolean.class || type == Boolean.class)) {
+				return true;
+			} else {
+				return false;
+			}
 		}
 	}
 
+	/**
+	 * Information about attribute fields
+	 */
 	private static class AttributeFieldInfo {
 
 		final Field field;
-		final String description;
 		final boolean isGetter;
 		final boolean isSetter;
-		final boolean isIs;
 
-		public AttributeFieldInfo(Field field, String description, boolean isGetter, boolean isSetter) {
+		public AttributeFieldInfo(Field field, boolean isGetter, boolean isSetter) {
 			this.field = field;
-			if (isEmpty(description)) {
-				this.description = field.getName() + " attribute";
-			} else {
-				this.description = description;
-			}
 			this.isGetter = isGetter;
 			this.isSetter = isSetter;
-			if (field.getName().startsWith("is")
-					&& (field.getType() == boolean.class || field.getType() == Boolean.class)) {
-				this.isIs = true;
-			} else {
-				this.isIs = false;
-			}
 		}
 	}
 }

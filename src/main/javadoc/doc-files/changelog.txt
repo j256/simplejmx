@@ -1,5 +1,7 @@
-0.3: 4/3/2012 (svn rYYYY)
-	* Added support for JmxAttributeField that annotates a field instead of a getter/setter.
+0.4: 4/XXX/2012 (svn rYYYY)
+
+0.3: 4/3/2012 (svn r52)
+	* Added support for JmxAttributeField that annotates a field instead of a getter/setter.  Thanks Chris.
 	* Renamed JmxAttribute to JmxAttributeMethod which annotates the getXxx() and setXxx() methods.
 
 0.2: 4/3/2012 (svn r43)
