@@ -5,9 +5,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.List;
+
+import javax.management.Attribute;
 import javax.management.AttributeNotFoundException;
 import javax.management.JMException;
 import javax.management.MBeanAttributeInfo;
+import javax.management.ReflectionException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -267,6 +271,80 @@ public class ReflectionMbeanTest {
 		}
 	}
 
+	@Test(expected = AttributeNotFoundException.class)
+	public void testUnknownSetter() throws Exception {
+		TestObject testObj = new TestObject();
+		JmxClient client = new JmxClient(DEFAULT_PORT);
+		try {
+			server.register(testObj);
+			client.setAttribute(DOMAIN_NAME, OBJECT_NAME, "unknown-attribute", 1);
+		} finally {
+			server.unregister(testObj);
+			client.close();
+		}
+	}
+
+	@Test(expected = ReflectionException.class)
+	public void testGetThrows() throws Exception {
+		AttributeThrows getThrow = new AttributeThrows();
+		JmxClient client = new JmxClient(DEFAULT_PORT);
+		try {
+			server.register(getThrow);
+			client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "throws");
+		} finally {
+			server.unregister(getThrow);
+			client.close();
+		}
+	}
+
+	@Test(expected = ReflectionException.class)
+	public void testSetThrows() throws Exception {
+		AttributeThrows setThrow = new AttributeThrows();
+		JmxClient client = new JmxClient(DEFAULT_PORT);
+		try {
+			server.register(setThrow);
+			client.setAttribute(DOMAIN_NAME, OBJECT_NAME, "throws", 1);
+		} finally {
+			server.unregister(setThrow);
+			client.close();
+		}
+	}
+
+	@Test
+	public void testGetSetMultiple() throws Exception {
+		MultipleAttributes obj = new MultipleAttributes();
+		JmxClient client = new JmxClient(DEFAULT_PORT);
+		try {
+			server.register(obj);
+			int x = 2134;
+			obj.x = x;
+			int y = 242634;
+			obj.y = y;
+
+			List<Attribute> attributes = client.getAttributes(DOMAIN_NAME, OBJECT_NAME, new String[] { "x", "y" });
+			assertEquals(2, attributes.size());
+			assertEquals(x, attributes.get(0).getValue());
+			assertEquals(y, attributes.get(1).getValue());
+
+			int x2 = x + 1;
+			int y2 = y + 1;
+			attributes.clear();
+			attributes.add(new Attribute("x", x2));
+			attributes.add(new Attribute("y", y2));
+			client.setAttributes(DOMAIN_NAME, OBJECT_NAME, attributes);
+
+			attributes = client.getAttributes(DOMAIN_NAME, OBJECT_NAME, new String[] { "x", "y" });
+			assertEquals(2, attributes.size());
+			assertEquals("x", attributes.get(0).getName());
+			assertEquals(x2, attributes.get(0).getValue());
+			assertEquals("y", attributes.get(1).getName());
+			assertEquals(y2, attributes.get(1).getValue());
+		} finally {
+			server.unregister(obj);
+			client.close();
+		}
+	}
+
 	/* ======================================================================= */
 
 	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
@@ -388,5 +466,27 @@ public class ReflectionMbeanTest {
 		public int assignX(int x, int y) {
 			return y;
 		}
+	}
+
+	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	protected static class AttributeThrows {
+
+		@JmxAttributeMethod
+		public int getThrows() {
+			throw new IllegalStateException("throw away!");
+		}
+
+		@JmxAttributeMethod
+		public void setThrows(int val) {
+			throw new IllegalStateException("throw away!");
+		}
+	}
+
+	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	protected static class MultipleAttributes {
+		@JmxAttributeField(isWritable = true)
+		int x;
+		@JmxAttributeField(isWritable = true)
+		int y;
 	}
 }

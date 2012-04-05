@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import javax.management.Attribute;
+import javax.management.AttributeList;
 import javax.management.JMException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
@@ -36,6 +38,7 @@ public class JmxClient {
 
 	/**
 	 * Connect the client to a JMX server using the full JMX URL format. The URL should look something like:
+	 * 
 	 * <p>
 	 * 
 	 * <pre>
@@ -243,6 +246,22 @@ public class JmxClient {
 	}
 
 	/**
+	 * Get multiple attributes at once from the server.
+	 */
+	public List<Attribute> getAttributes(ObjectName name, String[] attributes) throws Exception {
+		checkClientConnected();
+		return mbeanConn.getAttributes(name, attributes).asList();
+	}
+
+	/**
+	 * Get multiple attributes at once from the server.
+	 */
+	public List<Attribute> getAttributes(String domain, String objectName, String[] attributes) throws Exception {
+		checkClientConnected();
+		return getAttributes(ObjectNameUtil.makeObjectName(domain, objectName), attributes);
+	}
+
+	/**
 	 * Set the JMX attribute to a particular value string.
 	 */
 	public void setAttribute(String domainName, String objectName, String attrName, String value) throws Exception {
@@ -272,6 +291,21 @@ public class JmxClient {
 
 		Attribute attribute = new Attribute(attrName, value);
 		mbeanConn.setAttribute(name, attribute);
+	}
+
+	/**
+	 * Set a multiple attributes at once on the server.
+	 */
+	public void setAttributes(ObjectName name, List<Attribute> attributes) throws Exception {
+		checkClientConnected();
+		mbeanConn.setAttributes(name, new AttributeList(attributes));
+	}
+
+	/**
+	 * Set a multiple attributes at once on the server.
+	 */
+	public void setAttributes(String domainName, String objectName, List<Attribute> attributes) throws Exception {
+		setAttributes(ObjectNameUtil.makeObjectName(domainName, objectName), attributes);
 	}
 
 	/**
