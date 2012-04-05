@@ -1,4 +1,6 @@
 0.4: 4/XXX/2012 (svn rYYYY)
+	* Added set and get multiple attributed to the client.
+	* Revamped the way we build the mbean information structures internally.
 
 0.3: 4/3/2012 (svn r52)
 	* Added support for JmxAttributeField that annotates a field instead of a getter/setter.  Thanks Chris.
