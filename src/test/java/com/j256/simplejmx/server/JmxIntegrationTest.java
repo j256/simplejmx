@@ -91,7 +91,7 @@ public class JmxIntegrationTest {
 			return null;
 		}
 
-		public String getJmxObjectName() {
+		public String getJmxNameOfObject() {
 			return null;
 		}
 
@@ -132,7 +132,7 @@ public class JmxIntegrationTest {
 			return new JmxFolderName[] { new JmxFolderName("00", "AnotherObjects") };
 		}
 
-		public String getJmxObjectName() {
+		public String getJmxNameOfObject() {
 			return Integer.toString(System.identityHashCode(this));
 		}
 

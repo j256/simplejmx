@@ -109,7 +109,7 @@ public class ObjectNameUtilTest {
 		public String getJmxDomainName() {
 			return null;
 		}
-		public String getJmxObjectName() {
+		public String getJmxNameOfObject() {
 			return null;
 		}
 		public JmxFolderName[] getJmxFolderNames() {
@@ -122,7 +122,7 @@ public class ObjectNameUtilTest {
 		public String getJmxDomainName() {
 			return DOMAIN_NAME;
 		}
-		public String getJmxObjectName() {
+		public String getJmxNameOfObject() {
 			return null;
 		}
 		public JmxFolderName[] getJmxFolderNames() {
@@ -139,7 +139,7 @@ public class ObjectNameUtilTest {
 		public String getJmxDomainName() {
 			return null;
 		}
-		public String getJmxObjectName() {
+		public String getJmxNameOfObject() {
 			return null;
 		}
 		public JmxFolderName[] getJmxFolderNames() {
@@ -161,7 +161,7 @@ public class ObjectNameUtilTest {
 		public String getJmxDomainName() {
 			return null;
 		}
-		public String getJmxObjectName() {
+		public String getJmxNameOfObject() {
 			return null;
 		}
 		public JmxFolderName[] getJmxFolderNames() {
@@ -174,7 +174,7 @@ public class ObjectNameUtilTest {
 		public String getJmxDomainName() {
 			return null;
 		}
-		public String getJmxObjectName() {
+		public String getJmxNameOfObject() {
 			return null;
 		}
 		public JmxFolderName[] getJmxFolderNames() {
@@ -195,7 +195,7 @@ public class ObjectNameUtilTest {
 		public String getJmxDomainName() {
 			return null;
 		}
-		public String getJmxObjectName() {
+		public String getJmxNameOfObject() {
 			return null;
 		}
 		public JmxFolderName[] getJmxFolderNames() {
@@ -207,7 +207,7 @@ public class ObjectNameUtilTest {
 		public String getJmxDomainName() {
 			return "foo";
 		}
-		public String getJmxObjectName() {
+		public String getJmxNameOfObject() {
 			return null;
 		}
 		public JmxFolderName[] getJmxFolderNames() {

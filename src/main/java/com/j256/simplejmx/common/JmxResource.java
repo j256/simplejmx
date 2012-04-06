@@ -32,7 +32,7 @@ public @interface JmxResource {
 	 * Name of the object for the name= part of the ObjectName. This turns into the name of the JMX bean in the folder.
 	 * <p>
 	 * If the object implements {@link JmxSelfNaming} then this would be replaced by
-	 * {@link JmxSelfNaming#getJmxObjectName()}. If the object doesn't implement {@link JmxSelfNaming} and this is not
+	 * {@link JmxSelfNaming#getJmxNameOfObject()}. If the object doesn't implement {@link JmxSelfNaming} and this is not
 	 * specified then the object class name is used.
 	 * </p>
 	 */

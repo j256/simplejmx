@@ -416,7 +416,7 @@ public class JmxServerTest {
 		public String getJmxDomainName() {
 			return DOMAIN_NAME;
 		}
-		public String getJmxObjectName() {
+		public String getJmxNameOfObject() {
 			return OBJECT_NAME;
 		}
 		public JmxFolderName[] getJmxFolderNames() {
