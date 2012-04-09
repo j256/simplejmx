@@ -38,15 +38,23 @@ To release SimpleJmx:
 
 	https://sourceforge.net/projects/simplejmx/files/releases/com/j256/simplejmx/
 
-8) Possibly trim the older releases in the release directory on SF.  Try to leave last major release and couple minors.
+8) Update the simplejmx website:
+
+	- cd /var/www/256.com/sources/simplejmx/releases
+	- sh get_release.sh  [enter release number]
+	- cd ..
+	- sh explode_javadocs.sh
+	- add new release to the release/index.shtml file
+
+9) Possibly trim the older releases in the release directory on SF.  Try to leave last major release and couple minors.
 
 	create_sf_shell
 	cd /home/frs/project/simplejmx/releases/com/j256/simplejmx
 	rm -rf 1.11 1.12
 	shutdown
 	
-9) Add a News section to SF with the svn log highlights and subject: released version X.X
+10) Add a News section to SF with the svn log highlights and subject: released version X.X
 
-10) Possibly publish to announcements forum if the release needs more information.
+11) Possibly publish to announcements forum if the release needs more information.
 
-11) Watch to make sure the central repository was updated.  http://repo1.maven.org/maven2/com/j256/simplejmx/
+12) Watch to make sure the central repository was updated.  http://repo1.maven.org/maven2/com/j256/simplejmx/
