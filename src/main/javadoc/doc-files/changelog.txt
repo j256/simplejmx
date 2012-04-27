@@ -1,4 +1,8 @@
-0.4: 4/6/2012 (svn rYYYY)
+0.5: 5/XX/2012 (svn rYYYY)
+	* Removed all external usage of an objectName String which was being confused with the JMX ObjectName.
+	* Deprecated JmxResource.objectName().  Folks should move to JmxResource.beanName().
+
+0.4: 4/6/2012 (svn r63)
 	* Added set and get multiple attributed to JmxClient.
 	* Revamped the way we build the mbean information structures internally.
 	* Renamed JmxSelfNaming.getObjectName() to be getNameOfObject() to not be confused with ObjectName class.

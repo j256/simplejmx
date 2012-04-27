@@ -32,16 +32,16 @@ public class ObjectNameUtil {
 						"Could not create ObjectName because domain name not specified in getJmxDomainName() nor @JmxResource");
 			}
 		}
-		String objectName = selfNamingObj.getJmxNameOfObject();
-		if (objectName == null) {
+		String beanName = selfNamingObj.getJmxNameOfObject();
+		if (beanName == null) {
 			if (jmxResource != null) {
-				objectName = jmxResource.objectName();
+				beanName = getBeanName(jmxResource);
 			}
-			if (objectName == null || objectName.length() == 0) {
-				objectName = selfNamingObj.getClass().getSimpleName();
+			if (beanName == null || beanName.length() == 0) {
+				beanName = selfNamingObj.getClass().getSimpleName();
 			}
 		}
-		return makeObjectName(domainName, objectName, selfNamingObj.getJmxFolderNames(), null);
+		return makeObjectName(domainName, beanName, selfNamingObj.getJmxFolderNames(), null);
 	}
 
 	/**
@@ -58,11 +58,11 @@ public class ObjectNameUtil {
 			throw new IllegalArgumentException(
 					"Could not create ObjectName because domain name not specified in @JmxResource");
 		}
-		String objectName = jmxResource.objectName();
-		if (objectName.length() == 0) {
-			objectName = obj.getClass().getSimpleName();
+		String beanName = getBeanName(jmxResource);
+		if (beanName == null) {
+			beanName = obj.getClass().getSimpleName();
 		}
-		return makeObjectName(domainName, objectName, null, jmxResource.folderNames());
+		return makeObjectName(domainName, beanName, null, jmxResource.folderNames());
 	}
 
 	/**
@@ -70,14 +70,14 @@ public class ObjectNameUtil {
 	 * 
 	 * @param domainName
 	 *            This is the top level folder name for the beans.
-	 * @param objectName
+	 * @param beanName
 	 *            This is the bean name in the lowest folder level.
 	 * @param folderNameStrings
 	 *            These can be used to setup folders inside of the top folder. Each of the entries in the array can
 	 *            either be in "value" or "name=value" format.
 	 */
-	public static ObjectName makeObjectName(String domainName, String objectName, String[] folderNameStrings) {
-		return makeObjectName(domainName, objectName, null, folderNameStrings);
+	public static ObjectName makeObjectName(String domainName, String beanName, String[] folderNameStrings) {
+		return makeObjectName(domainName, beanName, null, folderNameStrings);
 	}
 
 	/**
@@ -86,15 +86,15 @@ public class ObjectNameUtil {
 	 * @param domainName
 	 *            This corresponds to the {@link JmxResource#domainName()} and is the top level folder name for the
 	 *            beans.
-	 * @param objectName
+	 * @param beanName
 	 *            This corresponds to the {@link JmxResource#objectName()} and is the bean name in the lowest folder
 	 *            level.
 	 */
-	public static ObjectName makeObjectName(String domainName, String objectName) {
-		return makeObjectName(domainName, objectName, null, null);
+	public static ObjectName makeObjectName(String domainName, String beanName) {
+		return makeObjectName(domainName, beanName, null, null);
 	}
 
-	private static ObjectName makeObjectName(String domainName, String objectName, JmxFolderName[] folderNames,
+	private static ObjectName makeObjectName(String domainName, String beanName, JmxFolderName[] folderNames,
 			String[] folderNameStrings) {
 		// j256:00=clients,name=Foo
 		StringBuilder sb = new StringBuilder();
@@ -138,7 +138,7 @@ public class ObjectNameUtil {
 			sb.append(',');
 		}
 		sb.append("name=");
-		sb.append(objectName);
+		sb.append(beanName);
 		String objectNameString = sb.toString();
 		try {
 			return new ObjectName(objectNameString);
@@ -152,5 +152,20 @@ public class ObjectNameUtil {
 			sb.append('0');
 		}
 		sb.append(prefixC);
+	}
+
+	private static String getBeanName(JmxResource jmxResource) {
+		String beanName = jmxResource.beanName();
+		if (beanName.length() > 0) {
+			return beanName;
+		}
+		@SuppressWarnings("deprecation")
+		String deprecatedName = jmxResource.objectName();
+		beanName = deprecatedName;
+		if (beanName.length() > 0) {
+			return beanName;
+		} else {
+			return null;
+		}
 	}
 }

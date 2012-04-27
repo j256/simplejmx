@@ -57,14 +57,14 @@ public class ReflectionMbean implements DynamicMBean {
 	}
 
 	/**
-	 * @see {@link DynamicMBean#getMBeanInfo()}.
+	 * @see DynamicMBean#getMBeanInfo()
 	 */
 	public MBeanInfo getMBeanInfo() {
 		return mbeanInfo;
 	}
 
 	/**
-	 * @see {@link DynamicMBean#getAttribute(String)}.
+	 * @see DynamicMBean#getAttribute(String)
 	 */
 	public Object getAttribute(String attributeName) throws AttributeNotFoundException, ReflectionException {
 		AttributeMethodInfo methodInfo = attributeMethodMap.get(attributeName);
@@ -95,7 +95,7 @@ public class ReflectionMbean implements DynamicMBean {
 	}
 
 	/**
-	 * @see {@link DynamicMBean#getAttributes(String[])}.
+	 * @see DynamicMBean#getAttributes(String[])
 	 */
 	public AttributeList getAttributes(String[] attributeNames) {
 		AttributeList returnList = new AttributeList();
@@ -110,7 +110,7 @@ public class ReflectionMbean implements DynamicMBean {
 	}
 
 	/**
-	 * @see {@link DynamicMBean#setAttribute(Attribute)}.
+	 * @see DynamicMBean#setAttribute(Attribute)
 	 */
 	public void setAttribute(Attribute attribute) throws AttributeNotFoundException, ReflectionException {
 		AttributeMethodInfo methodInfo = attributeMethodMap.get(attribute.getName());
@@ -139,7 +139,7 @@ public class ReflectionMbean implements DynamicMBean {
 	}
 
 	/**
-	 * @see {@link DynamicMBean#setAttributes(AttributeList)}.
+	 * @see DynamicMBean#setAttributes(AttributeList)
 	 */
 	public AttributeList setAttributes(AttributeList attributes) {
 		AttributeList returnList = new AttributeList(attributes.size());
@@ -156,7 +156,7 @@ public class ReflectionMbean implements DynamicMBean {
 	}
 
 	/**
-	 * @see {@link DynamicMBean#invoke(String, Object[], String[])}.
+	 * @see DynamicMBean#invoke(String, Object[], String[])
 	 */
 	public Object invoke(String actionName, Object[] params, String[] signatureTypes) throws MBeanException,
 			ReflectionException {

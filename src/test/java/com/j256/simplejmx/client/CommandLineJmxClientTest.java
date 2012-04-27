@@ -25,7 +25,7 @@ public class CommandLineJmxClientTest {
 
 	private static JmxServer server;
 	private static CommandLineJmxClient client;
-	private static String objectName;
+	private static String objectNameString;
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
@@ -34,7 +34,7 @@ public class CommandLineJmxClientTest {
 		CommandLineJmxClientTestObject obj = new CommandLineJmxClientTestObject();
 		server.register(obj);
 		client = new CommandLineJmxClient("localhost", JMX_PORT);
-		objectName = JMX_DOMAIN + ":name=" + CommandLineJmxClientTestObject.class.getSimpleName();
+		objectNameString = JMX_DOMAIN + ":name=" + CommandLineJmxClientTestObject.class.getSimpleName();
 	}
 
 	@AfterClass
@@ -121,18 +121,18 @@ public class CommandLineJmxClientTest {
 	@Test
 	public void testListObjects() throws Exception {
 		String output = getClientOutput(client, "objects");
-		assertTrue(output, output.contains(objectName));
+		assertTrue(output, output.contains(objectNameString));
 	}
 
 	@Test
 	public void testListObjectsPattern() throws Exception {
 		String output = getClientOutput(client, "objects " + CommandLineJmxClientTestObject.class.getSimpleName());
-		assertTrue(output, output.contains(objectName));
+		assertTrue(output, output.contains(objectNameString));
 	}
 
 	@Test
 	public void testShowAttributes() throws Exception {
-		String output = getClientOutput(client, "attrs " + objectName);
+		String output = getClientOutput(client, "attrs " + objectNameString);
 		assertTrue(output.contains("x(get, set int)"));
 	}
 
@@ -150,7 +150,7 @@ public class CommandLineJmxClientTest {
 
 	@Test
 	public void testGetAllAttributes() throws Exception {
-		String output = getClientOutput(client, "get " + objectName);
+		String output = getClientOutput(client, "get " + objectNameString);
 		assertTrue(output, output.matches("(?s).*get 'x' in \\d+ms = 0.*"));
 	}
 
@@ -162,7 +162,7 @@ public class CommandLineJmxClientTest {
 
 	@Test
 	public void testGetAttribute() throws Exception {
-		String output = getClientOutput(client, "get " + objectName + " x");
+		String output = getClientOutput(client, "get " + objectNameString + " x");
 		assertTrue(output, output.matches("(?s).*get 'x' in \\d+ms = 0.*"));
 
 	}
@@ -175,15 +175,15 @@ public class CommandLineJmxClientTest {
 
 	@Test
 	public void testGetAllAttributesTooManyArgs() throws Exception {
-		String output = getClientOutput(client, "get " + objectName + " too many args");
+		String output = getClientOutput(client, "get " + objectNameString + " too many args");
 		assertTrue(output, output.matches("(?s).*Usage: get.*"));
 	}
 
 	@Test
 	public void testSetAttribute() throws Exception {
 		int val = 123;
-		String output = getClientOutput(client, "set " + objectName + " x " + val);
-		output = getClientOutput(client, "get " + objectName + " x");
+		String output = getClientOutput(client, "set " + objectNameString + " x " + val);
+		output = getClientOutput(client, "get " + objectNameString + " x");
 		assertTrue(output, output.matches("(?s).*get 'x' in \\d+ms = " + val + ".*"));
 	}
 
@@ -195,19 +195,19 @@ public class CommandLineJmxClientTest {
 
 	@Test
 	public void testSetAttributeNotEnoughArgs() throws Exception {
-		String output = getClientOutput(client, "set " + objectName + " x");
+		String output = getClientOutput(client, "set " + objectNameString + " x");
 		assertTrue(output, output.matches("(?s).*Usage: set.*"));
 	}
 
 	@Test
 	public void testSetAttributeWrongType() throws Exception {
-		String output = getClientOutput(client, "set " + objectName + " x 1 2 3");
+		String output = getClientOutput(client, "set " + objectNameString + " x 1 2 3");
 		assertTrue(output, output.matches("(?s).*Problems setting information.*"));
 	}
 
 	@Test
 	public void testListOperations() throws Exception {
-		String output = getClientOutput(client, "ops " + objectName);
+		String output = getClientOutput(client, "ops " + objectNameString);
 		assertTrue(output, output.matches("(?s).*int times\\(int, int\\).*"));
 	}
 
@@ -219,13 +219,13 @@ public class CommandLineJmxClientTest {
 
 	@Test
 	public void testListOperationsTooManyArgs() throws Exception {
-		String output = getClientOutput(client, "ops " + objectName + " 1 2 3");
+		String output = getClientOutput(client, "ops " + objectNameString + " 1 2 3");
 		assertTrue(output, output.matches("(?s).*Usage: ops.*"));
 	}
 
 	@Test
 	public void testListOperationsAlt() throws Exception {
-		String output = getClientOutput(client, "opers " + objectName);
+		String output = getClientOutput(client, "opers " + objectNameString);
 		assertTrue(output, output.matches("(?s).*int times\\(int, int\\).*"));
 	}
 
@@ -233,7 +233,7 @@ public class CommandLineJmxClientTest {
 	public void testDoOperation() throws Exception {
 		int x1 = 12;
 		int x2 = 654;
-		String output = getClientOutput(client, "do " + objectName + " times " + x1 + " " + x2);
+		String output = getClientOutput(client, "do " + objectNameString + " times " + x1 + " " + x2);
 		int times = x1 * x2;
 		assertTrue(output, output.matches("(?s).*do 'times' in \\d+ms = " + times + ".*"));
 	}
@@ -246,7 +246,7 @@ public class CommandLineJmxClientTest {
 
 	@Test
 	public void testDoOperationTooFewArgs() throws Exception {
-		String output = getClientOutput(client, "do " + objectName);
+		String output = getClientOutput(client, "do " + objectNameString);
 		assertTrue(output, output.matches("(?s).*Usage: do.*"));
 	}
 
@@ -254,7 +254,7 @@ public class CommandLineJmxClientTest {
 	public void testDoOperationByteArrayReturn() throws Exception {
 		byte x1 = 17;
 		byte x2 = 102;
-		String output = getClientOutput(client, "do " + objectName + " byteArray " + x1 + " " + x2);
+		String output = getClientOutput(client, "do " + objectNameString + " byteArray " + x1 + " " + x2);
 		assertTrue(output, output.contains("is a byte[] array:"));
 		assertTrue(output, output.contains("[0] = " + x1));
 		assertTrue(output, output.contains("[1] = " + x2));
@@ -264,7 +264,7 @@ public class CommandLineJmxClientTest {
 	public void testDoOperationShortArrayReturn() throws Exception {
 		short x1 = 12;
 		short x2 = 44;
-		String output = getClientOutput(client, "do " + objectName + " shortArray " + x1 + " " + x2);
+		String output = getClientOutput(client, "do " + objectNameString + " shortArray " + x1 + " " + x2);
 		assertTrue(output, output.contains("is a short[] array:"));
 		assertTrue(output, output.contains("[0] = " + x1));
 		assertTrue(output, output.contains("[1] = " + x2));
@@ -274,7 +274,7 @@ public class CommandLineJmxClientTest {
 	public void testDoOperationIntArrayReturn() throws Exception {
 		int x1 = 2312;
 		int x2 = 6544;
-		String output = getClientOutput(client, "do " + objectName + " intArray " + x1 + " " + x2);
+		String output = getClientOutput(client, "do " + objectNameString + " intArray " + x1 + " " + x2);
 		assertTrue(output, output.contains("is a int[] array:"));
 		assertTrue(output, output.contains("[0] = " + x1));
 		assertTrue(output, output.contains("[1] = " + x2));
@@ -284,7 +284,7 @@ public class CommandLineJmxClientTest {
 	public void testDoOperationLongArrayReturn() throws Exception {
 		long x1 = 231138242;
 		long x2 = 6572044;
-		String output = getClientOutput(client, "do " + objectName + " longArray " + x1 + " " + x2);
+		String output = getClientOutput(client, "do " + objectNameString + " longArray " + x1 + " " + x2);
 		assertTrue(output, output.contains("is a long[] array:"));
 		assertTrue(output, output.contains("[0] = " + x1));
 		assertTrue(output, output.contains("[1] = " + x2));
@@ -294,7 +294,7 @@ public class CommandLineJmxClientTest {
 	public void testDoOperationBooleanArrayReturn() throws Exception {
 		boolean x1 = true;
 		boolean x2 = false;
-		String output = getClientOutput(client, "do " + objectName + " booleanArray " + x1 + " " + x2);
+		String output = getClientOutput(client, "do " + objectNameString + " booleanArray " + x1 + " " + x2);
 		assertTrue(output, output.contains("is a boolean[] array:"));
 		assertTrue(output, output.contains("[0] = " + x1));
 		assertTrue(output, output.contains("[1] = " + x2));
@@ -304,7 +304,7 @@ public class CommandLineJmxClientTest {
 	public void testDoOperationCharArrayReturn() throws Exception {
 		char x1 = '4';
 		char x2 = '$';
-		String output = getClientOutput(client, "do " + objectName + " charArray " + x1 + " " + x2);
+		String output = getClientOutput(client, "do " + objectNameString + " charArray " + x1 + " " + x2);
 		assertTrue(output, output.contains("is a char[] array:"));
 		assertTrue(output, output.contains("[0] = " + x1));
 		assertTrue(output, output.contains("[1] = " + x2));
@@ -314,7 +314,7 @@ public class CommandLineJmxClientTest {
 	public void testDoOperationFloatArrayReturn() throws Exception {
 		float x1 = 23.12F;
 		float x2 = 65.44F;
-		String output = getClientOutput(client, "do " + objectName + " floatArray " + x1 + " " + x2);
+		String output = getClientOutput(client, "do " + objectNameString + " floatArray " + x1 + " " + x2);
 		assertTrue(output, output.contains("is a float[] array:"));
 		assertTrue(output, output.contains("[0] = " + x1));
 		assertTrue(output, output.contains("[1] = " + x2));
@@ -324,7 +324,7 @@ public class CommandLineJmxClientTest {
 	public void testDoOperationDoubleArrayReturn() throws Exception {
 		double x1 = 231.2;
 		double x2 = 654.4;
-		String output = getClientOutput(client, "do " + objectName + " doubleArray " + x1 + " " + x2);
+		String output = getClientOutput(client, "do " + objectNameString + " doubleArray " + x1 + " " + x2);
 		assertTrue(output, output.contains("is a double[] array:"));
 		assertTrue(output, output.contains("[0] = " + x1));
 		assertTrue(output, output.contains("[1] = " + x2));
@@ -334,7 +334,7 @@ public class CommandLineJmxClientTest {
 	public void testDoOperationObjectArrayReturn() throws Exception {
 		int x1 = 2312;
 		int x2 = 6544;
-		String output = getClientOutput(client, "do " + objectName + " objectArray " + x1 + " " + x2);
+		String output = getClientOutput(client, "do " + objectNameString + " objectArray " + x1 + " " + x2);
 		assertTrue(output, output.contains("is a Integer[] array:"));
 		assertTrue(output, output.contains("[0] = " + x1));
 		assertTrue(output, output.contains("[1] = " + x2));
@@ -342,13 +342,13 @@ public class CommandLineJmxClientTest {
 
 	@Test
 	public void testDoOperationNull() throws Exception {
-		String output = getClientOutput(client, "do " + objectName + " returnNull");
+		String output = getClientOutput(client, "do " + objectNameString + " returnNull");
 		assertTrue(output, output.matches("(?s).*do 'returnNull' in \\d+ms = null.*"));
 	}
 
 	@Test
 	public void testDoOperationThrow() throws Exception {
-		String output = getClientOutput(client, "do " + objectName + " doThrow");
+		String output = getClientOutput(client, "do " + objectNameString + " doThrow");
 		assertTrue(output, output.matches("(?s).*throw away.*"));
 	}
 
@@ -357,7 +357,7 @@ public class CommandLineJmxClientTest {
 		int x1 = 12;
 		int x2 = 654;
 		String output =
-				getClientOutput(client, "dolines " + objectName + " times", Integer.toString(x1), Integer.toString(x2));
+				getClientOutput(client, "dolines " + objectNameString + " times", Integer.toString(x1), Integer.toString(x2));
 		int times = x1 * x2;
 		assertTrue(output, output.matches("(?s).*dolines 'times' in \\d+ms = " + times + ".*"));
 	}
@@ -370,7 +370,7 @@ public class CommandLineJmxClientTest {
 
 	@Test
 	public void testDoLinesNoArg() throws Exception {
-		String output = getClientOutput(client, "dolines " + objectName);
+		String output = getClientOutput(client, "dolines " + objectNameString);
 		assertTrue(output, output.matches("(?s).*Usage: dolines.*"));
 	}
 

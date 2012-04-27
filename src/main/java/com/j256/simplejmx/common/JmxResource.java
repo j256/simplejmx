@@ -29,6 +29,12 @@ public @interface JmxResource {
 	public String domainName() default "";
 
 	/**
+	 * @deprecated Should use {@link #beanName()}
+	 */
+	@Deprecated
+	public String objectName() default "";
+
+	/**
 	 * Name of the object for the name= part of the ObjectName. This turns into the name of the JMX bean in the folder.
 	 * <p>
 	 * If the object implements {@link JmxSelfNaming} then this would be replaced by
@@ -36,7 +42,7 @@ public @interface JmxResource {
 	 * specified then the object class name is used.
 	 * </p>
 	 */
-	public String objectName() default "";
+	public String beanName() default "";
 
 	/**
 	 * Other strings which go before the <tt>name=</tt> line which translate into sub-folders below the domain-name that

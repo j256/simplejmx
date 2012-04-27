@@ -152,8 +152,8 @@ public class JmxClient {
 	/**
 	 * Return an array of the attributes associated with the bean name.
 	 */
-	public MBeanAttributeInfo[] getAttributesInfo(String domainName, String name) throws JMException {
-		return getAttributesInfo(ObjectNameUtil.makeObjectName(domainName, name));
+	public MBeanAttributeInfo[] getAttributesInfo(String domainName, String beanName) throws JMException {
+		return getAttributesInfo(ObjectNameUtil.makeObjectName(domainName, beanName));
 	}
 
 	/**
@@ -176,6 +176,13 @@ public class JmxClient {
 		checkClientConnected();
 
 		return getAttrInfo(name, attrName);
+	}
+
+	/**
+	 * Return an array of the operations associated with the bean name.
+	 */
+	public MBeanOperationInfo[] getOperationsInfo(String domainName, String beanName) throws JMException {
+		return getOperationsInfo(ObjectNameUtil.makeObjectName(domainName, beanName));
 	}
 
 	/**
@@ -214,8 +221,8 @@ public class JmxClient {
 	/**
 	 * Return the value of a JMX attribute.
 	 */
-	public Object getAttribute(String domain, String objectName, String attributeName) throws Exception {
-		return getAttribute(ObjectNameUtil.makeObjectName(domain, objectName), attributeName);
+	public Object getAttribute(String domain, String beanName, String attributeName) throws Exception {
+		return getAttribute(ObjectNameUtil.makeObjectName(domain, beanName), attributeName);
 	}
 
 	/**
@@ -229,8 +236,8 @@ public class JmxClient {
 	/**
 	 * Return the value of a JMX attribute as a String.
 	 */
-	public String getAttributeString(String domain, String objectName, String attributeName) throws Exception {
-		return getAttributeString(ObjectNameUtil.makeObjectName(domain, objectName), attributeName);
+	public String getAttributeString(String domain, String beanName, String attributeName) throws Exception {
+		return getAttributeString(ObjectNameUtil.makeObjectName(domain, beanName), attributeName);
 	}
 
 	/**
@@ -256,16 +263,16 @@ public class JmxClient {
 	/**
 	 * Get multiple attributes at once from the server.
 	 */
-	public List<Attribute> getAttributes(String domain, String objectName, String[] attributes) throws Exception {
+	public List<Attribute> getAttributes(String domain, String beanName, String[] attributes) throws Exception {
 		checkClientConnected();
-		return getAttributes(ObjectNameUtil.makeObjectName(domain, objectName), attributes);
+		return getAttributes(ObjectNameUtil.makeObjectName(domain, beanName), attributes);
 	}
 
 	/**
 	 * Set the JMX attribute to a particular value string.
 	 */
-	public void setAttribute(String domainName, String objectName, String attrName, String value) throws Exception {
-		setAttribute(ObjectNameUtil.makeObjectName(domainName, objectName), attrName, value);
+	public void setAttribute(String domainName, String beanName, String attrName, String value) throws Exception {
+		setAttribute(ObjectNameUtil.makeObjectName(domainName, beanName), attrName, value);
 	}
 
 	/**
@@ -279,8 +286,8 @@ public class JmxClient {
 	/**
 	 * Set the JMX attribute to a particular value string.
 	 */
-	public void setAttribute(String domainName, String objectName, String attrName, Object value) throws Exception {
-		setAttribute(ObjectNameUtil.makeObjectName(domainName, objectName), attrName, value);
+	public void setAttribute(String domainName, String beanName, String attrName, Object value) throws Exception {
+		setAttribute(ObjectNameUtil.makeObjectName(domainName, beanName), attrName, value);
 	}
 
 	/**
@@ -304,8 +311,8 @@ public class JmxClient {
 	/**
 	 * Set a multiple attributes at once on the server.
 	 */
-	public void setAttributes(String domainName, String objectName, List<Attribute> attributes) throws Exception {
-		setAttributes(ObjectNameUtil.makeObjectName(domainName, objectName), attributes);
+	public void setAttributes(String domainName, String beanName, List<Attribute> attributes) throws Exception {
+		setAttributes(ObjectNameUtil.makeObjectName(domainName, beanName), attributes);
 	}
 
 	/**
@@ -313,9 +320,9 @@ public class JmxClient {
 	 * 
 	 * @return The value returned by the method or null if none.
 	 */
-	public Object invokeOperation(String domain, String objectName, String operName, String... paramStrings)
+	public Object invokeOperation(String domain, String beanName, String operName, String... paramStrings)
 			throws Exception {
-		return invokeOperation(ObjectNameUtil.makeObjectName(domain, objectName), operName, paramStrings);
+		return invokeOperation(ObjectNameUtil.makeObjectName(domain, beanName), operName, paramStrings);
 	}
 
 	/**
@@ -351,8 +358,8 @@ public class JmxClient {
 	 * 
 	 * @return The value returned by the method or null if none.
 	 */
-	public Object invokeOperation(String domain, String objectName, String operName, Object... params) throws Exception {
-		return invokeOperation(ObjectNameUtil.makeObjectName(domain, objectName), operName, params);
+	public Object invokeOperation(String domain, String beanName, String operName, Object... params) throws Exception {
+		return invokeOperation(ObjectNameUtil.makeObjectName(domain, beanName), operName, params);
 	}
 
 	/**

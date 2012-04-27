@@ -30,7 +30,7 @@ public class JmxClientTest {
 	private static final String JMX_DOMAIN = "foo.com";
 
 	private static JmxServer server;
-	private static String objectNameName;
+	private static String beanName;
 	private static ObjectName objectName;
 	private static JmxClient client;
 	private static JmxClient closedClient;
@@ -41,8 +41,8 @@ public class JmxClientTest {
 		server.start();
 		JmxClientTestObject obj = new JmxClientTestObject();
 		server.register(obj);
-		objectNameName = JmxClientTestObject.class.getSimpleName();
-		objectName = ObjectNameUtil.makeObjectName(JMX_DOMAIN, objectNameName);
+		beanName = JmxClientTestObject.class.getSimpleName();
+		objectName = ObjectNameUtil.makeObjectName(JMX_DOMAIN, beanName);
 		client = new JmxClient(JMX_PORT);
 		closedClient = new JmxClient(JMX_PORT);
 		closedClient.closeThrow();
@@ -116,7 +116,7 @@ public class JmxClientTest {
 
 	@Test
 	public void testGetAttributesInfoStringString() throws Exception {
-		MBeanAttributeInfo[] infos = client.getAttributesInfo(JMX_DOMAIN, objectNameName);
+		MBeanAttributeInfo[] infos = client.getAttributesInfo(JMX_DOMAIN, beanName);
 		assertEquals(2, infos.length);
 		assertEquals("null", infos[0].getName());
 		assertEquals(String.class.getName(), infos[0].getType());
@@ -202,7 +202,7 @@ public class JmxClientTest {
 	public void testGetAttributeStringString() throws Exception {
 		int val = 13123;
 		client.setAttribute(objectName, "x", val);
-		Object result = client.getAttribute(JMX_DOMAIN, objectNameName, "x");
+		Object result = client.getAttribute(JMX_DOMAIN, beanName, "x");
 		assertEquals(val, result);
 	}
 
@@ -223,7 +223,7 @@ public class JmxClientTest {
 	public void testGetAttributeAsStringStringString() throws Exception {
 		int val = 13123;
 		client.setAttribute(objectName, "x", val);
-		String result = client.getAttributeString(JMX_DOMAIN, objectNameName, "x");
+		String result = client.getAttributeString(JMX_DOMAIN, beanName, "x");
 		assertEquals(Integer.toString(val), result);
 	}
 
@@ -249,7 +249,7 @@ public class JmxClientTest {
 	@Test
 	public void testSetAttributeStringString() throws Exception {
 		int val = 2131231231;
-		client.setAttribute(JMX_DOMAIN, objectNameName, "x", val);
+		client.setAttribute(JMX_DOMAIN, beanName, "x", val);
 		Object result = client.getAttribute(objectName, "x");
 		assertEquals(val, result);
 	}
@@ -257,7 +257,7 @@ public class JmxClientTest {
 	@Test
 	public void testSetAttributeStringStringToString() throws Exception {
 		int val = 2131231231;
-		client.setAttribute(JMX_DOMAIN, objectNameName, "x", Integer.toString(val));
+		client.setAttribute(JMX_DOMAIN, beanName, "x", Integer.toString(val));
 		Object result = client.getAttribute(objectName, "x");
 		assertEquals(val, result);
 	}
@@ -279,7 +279,7 @@ public class JmxClientTest {
 	public void testInvokeOperationStringString() throws Exception {
 		short val1 = 231;
 		int val2 = 524;
-		Object result = client.invokeOperation(JMX_DOMAIN, objectNameName, "times", val1, val2);
+		Object result = client.invokeOperation(JMX_DOMAIN, beanName, "times", val1, val2);
 		long times = val1 * val2;
 		assertEquals(times, result);
 	}
@@ -289,7 +289,7 @@ public class JmxClientTest {
 		short val1 = 231;
 		int val2 = 524;
 		Object result =
-				client.invokeOperation(JMX_DOMAIN, objectNameName, "times", Short.toString(val1),
+				client.invokeOperation(JMX_DOMAIN, beanName, "times", Short.toString(val1),
 						Integer.toString(val2));
 		long times = val1 * val2;
 		assertEquals(times, result);
