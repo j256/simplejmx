@@ -497,7 +497,7 @@ public class JmxClient {
 			Constructor<C> constructor = (Constructor<C>) clazz.getConstructor(new Class[] { String.class });
 			return constructor;
 		} catch (Exception e) {
-			throw new IllegalArgumentException("Could not find string constructor for " + clazz);
+			throw new IllegalArgumentException("Could not find constructor with single String argument for " + clazz);
 		}
 	}
 
