@@ -1,4 +1,4 @@
-0.6: 5/XX/2012 (svn rYYYY)
+0.6: 6/7/2012 (svn rYYYY)
 	* Fixed some javadocs around the beanName() change in 0.5.
 	* Added checking to make sure isXxx() method returns boolean or Boolean.
 
