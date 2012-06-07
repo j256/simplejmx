@@ -1,7 +1,5 @@
 package com.j256.simplejmx.server;
 
-import org.junit.Ignore;
-
 import com.j256.simplejmx.common.JmxAttributeField;
 import com.j256.simplejmx.common.JmxAttributeMethod;
 import com.j256.simplejmx.common.JmxOperation;
@@ -16,7 +14,6 @@ import com.j256.simplejmx.common.JmxResource;
  * 
  * @author graywatson
  */
-@Ignore("Just here as an example")
 public class ExampleTestProgram {
 
 	private static final int JMX_PORT = 8000;
