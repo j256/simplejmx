@@ -20,7 +20,7 @@ import com.j256.simplejmx.common.JmxSelfNaming;
 import com.j256.simplejmx.common.ObjectNameUtil;
 
 /**
- * JMX server which allows classes to easily publish and un-publish themselves.
+ * JMX server which allows classes to publish and un-publish themselves as JMX beans.
  * 
  * @author graywatson
  */
@@ -33,7 +33,8 @@ public class JmxServer {
 	private MBeanServer mbeanServer;
 
 	/**
-	 * Create a JMX server that will be set with the port using setters. Used with spring.
+	 * Create a JMX server that will be set with the port using setters. Used with spring. You must at least specify the
+	 * port number with {@link #setPort(int)}.
 	 */
 	public JmxServer() {
 		// for spring
@@ -42,13 +43,16 @@ public class JmxServer {
 	/**
 	 * Create a JMX server running on a particular port.
 	 */
-	public JmxServer(int port) {
-		this.registryPort = port;
+	public JmxServer(int registryPort) {
+		this.registryPort = registryPort;
 	}
 
 	/**
-	 * Start our JMX service. The port must have already been called either here on in the {@link #JmxServer(int)}
-	 * constructor before {@link #start()} is called.
+	 * Start our JMX service. The port must have already been called either in the {@link #JmxServer(int)} constructor
+	 * or the {@link #setRegistryPort(int)} method before this is called.
+	 * 
+	 * @throws IllegalStateException
+	 *             If the registry port has not already been set.
 	 */
 	public synchronized void start() throws JMException {
 		if (registryPort == 0) {
@@ -59,8 +63,7 @@ public class JmxServer {
 	}
 
 	/**
-	 * Stop the JMX server by closing the connector and unpublishing it from the RMI registry. This ignores any
-	 * exceptions.
+	 * Same as {@link #stopThrow()} but this ignores any exceptions.
 	 */
 	public synchronized void stop() {
 		try {
@@ -123,8 +126,7 @@ public class JmxServer {
 	}
 
 	/**
-	 * Un-register the object parameter from JMX. Use the {@link #unregisterThrow(Object)} if you want to see the
-	 * exceptions.
+	 * Same as {@link #unregisterThrow(Object)} except this ignores exceptions.
 	 */
 	public void unregister(Object obj) {
 		try {
@@ -152,7 +154,7 @@ public class JmxServer {
 
 	/**
 	 * Set our port number to listen for JMX connections. In JMX terms, this is the "RMI registry port" but it is the
-	 * port that you specify in jconsole to connect to the server. This must be set either here on in the
+	 * port that you specify in jconsole to connect to the server. This must be set either here or in the
 	 * {@link #JmxServer(int)} constructor before {@link #start()} is called.
 	 */
 	public void setRegistryPort(int registryPort) {
@@ -215,7 +217,7 @@ public class JmxServer {
 		} else {
 			if (jmxResource == null) {
 				throw new IllegalArgumentException(
-						"Registered class must implement JmxSelfNaming or have JmxResource annotation");
+						"Registered class must either implement JmxSelfNaming or have JmxResource annotation");
 			}
 			return ObjectNameUtil.makeObjectName(jmxResource, obj);
 		}

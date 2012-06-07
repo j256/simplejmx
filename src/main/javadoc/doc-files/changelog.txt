@@ -1,5 +1,6 @@
 0.6: 5/XX/2012 (svn rYYYY)
 	* Fixed some javadocs around the beanName() change in 0.5.
+	* Added checking to make sure isXxx() method returns boolean or Boolean.
 
 0.5: 4/27/2012 (svn r68)
 	* Removed all external usage of an objectName String which was being confused with the JMX ObjectName.

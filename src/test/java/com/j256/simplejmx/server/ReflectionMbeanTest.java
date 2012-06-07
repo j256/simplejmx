@@ -345,6 +345,12 @@ public class ReflectionMbeanTest {
 		}
 	}
 
+	@Test(expected = JMException.class)
+	public void testIsNotBoolean() throws Exception {
+		IsNotBoolean isNotBoolean = new IsNotBoolean();
+		server.register(isNotBoolean);
+	}
+
 	/* ======================================================================= */
 
 	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
@@ -488,5 +494,13 @@ public class ReflectionMbeanTest {
 		int x;
 		@JmxAttributeField(isWritable = true)
 		int y;
+	}
+
+	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
+	protected static class IsNotBoolean {
+		@JmxAttributeMethod
+		public String isFoo() {
+			return "";
+		}
 	}
 }

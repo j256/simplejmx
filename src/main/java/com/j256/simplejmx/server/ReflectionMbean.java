@@ -210,6 +210,10 @@ public class ReflectionMbean implements DynamicMBean {
 			String methodName = method.getName();
 			boolean isIs;
 			if (methodName.startsWith("is")) {
+				if (method.getReturnType() != boolean.class && method.getReturnType() != Boolean.class) {
+					throw new IllegalArgumentException("Method '" + method
+							+ "' starts with 'is' but does not return a boolean or Boolean class");
+				}
 				isIs = true;
 			} else {
 				isIs = false;

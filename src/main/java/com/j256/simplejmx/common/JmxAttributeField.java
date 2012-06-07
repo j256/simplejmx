@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * This identifies which fields you want to expose via JMX. This is done through reflection. If the field is not public
  * then it will try to open the accessibility on the field. Instead of annotating the fields, you can annotate your
- * <tt>getXxx()</tt> and <tt>setXxx()</tt> methods with {@link JmxAttributeMethod}.
+ * <tt>getXxx()</tt>, <tt>setXxx()</tt>, and <tt>isXxx()<tt> methods with {@link JmxAttributeMethod}.
  * 
  * <p>
  * 
