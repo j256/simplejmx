@@ -1,6 +1,8 @@
-0.5: 5/XX/2012 (svn rYYYY)
+0.6: 5/XX/2012 (svn rYYYY)
+
+0.5: 4/27/2012 (svn r68)
 	* Removed all external usage of an objectName String which was being confused with the JMX ObjectName.
-	* Deprecated JmxResource.objectName().  Folks should move to JmxResource.beanName().
+	* Deprecated JmxResource.objectName().  Folks should use instead JmxResource.beanName().
 
 0.4: 4/6/2012 (svn r63)
 	* Added set and get multiple attributed to JmxClient.
