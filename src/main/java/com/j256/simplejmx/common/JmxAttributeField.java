@@ -31,7 +31,7 @@ public @interface JmxAttributeField {
 	public String description() default "";
 
 	/**
-	 * Set to true if the field can be read through JMX. Default is true.
+	 * Set to false if the field should not be read through JMX. Default is true.
 	 */
 	public boolean isReadible() default true;
 

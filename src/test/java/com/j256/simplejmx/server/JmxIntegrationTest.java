@@ -34,7 +34,7 @@ public class JmxIntegrationTest {
 		}
 	}
 
-	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	public static class TestObject {
 
 		private final JmxServer jmxServer;
@@ -82,7 +82,7 @@ public class JmxIntegrationTest {
 		}
 	}
 
-	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	public static class TestSubObject implements JmxSelfNaming {
 
 		int value = 0;

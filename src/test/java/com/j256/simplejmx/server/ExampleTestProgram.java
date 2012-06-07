@@ -10,15 +10,19 @@ import com.j256.simplejmx.common.JmxResource;
 /**
  * Here's a little example program that was written to show off the basic features of SimpleJmx.
  * 
+ * <p>
+ * <b>NOTE:</b> This is posted on the http://256.com/sources/simplejmx/ website.
+ * </p>
+ * 
  * @author graywatson
  */
 @Ignore("Just here as an example")
-public class ExampleTest {
+public class ExampleTestProgram {
 
 	private static final int JMX_PORT = 8000;
 
 	public static void main(String[] args) throws Exception {
-		new ExampleTest().doMain(args);
+		new ExampleTestProgram().doMain(args);
 	}
 
 	private void doMain(String[] args) throws Exception {
@@ -60,7 +64,7 @@ public class ExampleTest {
 		// start our timer
 		private long startMillis = System.currentTimeMillis();
 
-		// we can annotate fields directly to be published inJMX, isReadible defaults to true
+		// we can annotate fields directly to be published in JMX, isReadible defaults to true
 		@JmxAttributeField(description = "Show runtime in seconds", isWritable = true)
 		private boolean showSeconds;
 

@@ -356,7 +356,7 @@ public class JmxServerTest {
 
 	/* ============================================================= */
 
-	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	protected static class TestObject {
 
 		private int foo = FOO_VALUE;
@@ -382,7 +382,7 @@ public class JmxServerTest {
 		}
 	}
 
-	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME, folderNames = { FOLDER_NAME })
+	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME, folderNames = { FOLDER_NAME })
 	protected static class TestObjectFolders {
 
 		@JmxAttributeMethod
@@ -391,7 +391,7 @@ public class JmxServerTest {
 		}
 	}
 
-	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	protected static class ShortAttributeMethodName {
 		@JmxAttributeMethod
 		public int x() {
@@ -399,7 +399,7 @@ public class JmxServerTest {
 		}
 	}
 
-	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	protected static class JustGet {
 		@JmxAttributeMethod
 		public int get() {
@@ -407,7 +407,7 @@ public class JmxServerTest {
 		}
 	}
 
-	@JmxResource(domainName = "not the domain name", objectName = "not the object name")
+	@JmxResource(domainName = "not the domain name", beanName = "not the object name")
 	protected static class SelfNaming implements JmxSelfNaming {
 		@JmxAttributeMethod
 		public int getFoo() {
@@ -424,7 +424,7 @@ public class JmxServerTest {
 		}
 	}
 
-	@JmxResource(domainName = "", objectName = OBJECT_NAME)
+	@JmxResource(domainName = "", beanName = OBJECT_NAME)
 	protected static class InvalidDomain {
 		@JmxAttributeMethod
 		public int getFoo() {
@@ -432,7 +432,7 @@ public class JmxServerTest {
 		}
 	}
 
-	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	protected static class NoDescriptions {
 		@JmxAttributeMethod
 		public int getFoo() {
@@ -443,7 +443,7 @@ public class JmxServerTest {
 		}
 	}
 
-	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	protected static class HasDescriptions {
 		@JmxAttributeMethod(description = "Foo value")
 		public int getFoo() {
@@ -451,7 +451,7 @@ public class JmxServerTest {
 		}
 	}
 
-	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	protected static class OperationParameters {
 		@JmxOperation(description = "A value", parameterNames = { "first" }, parameterDescriptions = { "First argument" })
 		public String doSomething(String first) {
@@ -459,7 +459,7 @@ public class JmxServerTest {
 		}
 	}
 
-	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	protected static class MisterThrow {
 		@JmxAttributeMethod
 		public int getFoo() {

@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  * {@link JmxAttributeField} to annotate the fields you want to expose.
  * 
  * <p>
- * Notice that although the field-name is <tt>fooBar</tt> with a lowercase 'f', the method name camelcases it and turns
+ * Notice that although the field-name is <tt>fooBar</tt> with a lowercase 'f', the method name camel-cases it and turns
  * it into <tt>getFooBar()</tt> with a capital 'F'. This class is similar to Spring's &#64;ManagedAttribute. In
  * addition, the "getXxx()" method must return void and must take a single argument. The "setXxx()" method must not
  * return void and must have no arguments.

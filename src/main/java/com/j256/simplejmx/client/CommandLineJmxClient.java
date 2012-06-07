@@ -23,6 +23,11 @@ import javax.management.ObjectName;
 /**
  * Command-line client that can be used to support interactive or batch-file JMX operations.
  * 
+ * <p>
+ * See the {@link CommandLineJmxClient#helpOutput()} and {@link CommandLineJmxClient#exampleOutput()} methods for
+ * extensive help/usage information.
+ * </p>
+ * 
  * @author graywatson
  */
 public class CommandLineJmxClient {

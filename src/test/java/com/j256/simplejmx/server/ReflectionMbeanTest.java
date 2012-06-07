@@ -347,7 +347,7 @@ public class ReflectionMbeanTest {
 
 	/* ======================================================================= */
 
-	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	protected static class TestObject {
 
 		private int foo = FOO_VALUE;
@@ -373,7 +373,7 @@ public class ReflectionMbeanTest {
 		}
 	}
 
-	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	protected static class BadGetName {
 		@JmxAttributeMethod(description = "A value")
 		public int notGet() {
@@ -381,14 +381,14 @@ public class ReflectionMbeanTest {
 		}
 	}
 
-	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	protected static class BadGetReturnsVoid {
 		@JmxAttributeMethod(description = "A value")
 		public void getFoo() {
 		}
 	}
 
-	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	protected static class BadGetHasArgs {
 		@JmxAttributeMethod(description = "A value")
 		public int getFoo(int x) {
@@ -396,14 +396,14 @@ public class ReflectionMbeanTest {
 		}
 	}
 
-	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	protected static class BadSetNoArg {
 		@JmxAttributeMethod(description = "A value")
 		public void setFoo() {
 		}
 	}
 
-	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	protected static class BadSetReturnsNotVoid {
 		@JmxAttributeMethod(description = "A value")
 		public int setFoo(int x) {
@@ -411,14 +411,14 @@ public class ReflectionMbeanTest {
 		}
 	}
 
-	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	protected static class BadOperationLooksLikeAttribute {
 		@JmxOperation(description = "A value")
 		public void setFoo(int x) {
 		}
 	}
 
-	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	protected static class MultiOperationSameName {
 		int x;
 		@JmxOperation(description = "Do stuff")
@@ -431,7 +431,7 @@ public class ReflectionMbeanTest {
 		}
 	}
 
-	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	protected static class IsMethod {
 		boolean flag;
 		@JmxAttributeMethod
@@ -444,7 +444,7 @@ public class ReflectionMbeanTest {
 		}
 	}
 
-	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	protected static class AttributeField {
 		@SuppressWarnings("unused")
 		@JmxAttributeField(description = "some thing")
@@ -468,7 +468,7 @@ public class ReflectionMbeanTest {
 		}
 	}
 
-	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	protected static class AttributeThrows {
 
 		@JmxAttributeMethod
@@ -482,7 +482,7 @@ public class ReflectionMbeanTest {
 		}
 	}
 
-	@JmxResource(domainName = DOMAIN_NAME, objectName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	protected static class MultipleAttributes {
 		@JmxAttributeField(isWritable = true)
 		int x;

@@ -87,7 +87,7 @@ public class ObjectNameUtil {
 	 *            This corresponds to the {@link JmxResource#domainName()} and is the top level folder name for the
 	 *            beans.
 	 * @param beanName
-	 *            This corresponds to the {@link JmxResource#objectName()} and is the bean name in the lowest folder
+	 *            This corresponds to the {@link JmxResource#beanName()} and is the bean name in the lowest folder
 	 *            level.
 	 */
 	public static ObjectName makeObjectName(String domainName, String beanName) {
