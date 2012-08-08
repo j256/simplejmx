@@ -45,6 +45,16 @@ public class ObjectNameUtil {
 	}
 
 	/**
+	 * Constructs an object-name from a self naming object only.
+	 * 
+	 * @param selfNamingObj
+	 *            Object that implements the self-naming interface.
+	 */
+	public static ObjectName makeObjectName(JmxSelfNaming selfNamingObj) {
+		return makeObjectName(null, selfNamingObj);
+	}
+
+	/**
 	 * Constructs an object-name from a jmx-resource and a object which is not self-naming.
 	 * 
 	 * @param jmxResource
@@ -92,6 +102,26 @@ public class ObjectNameUtil {
 	 */
 	public static ObjectName makeObjectName(String domainName, String beanName) {
 		return makeObjectName(domainName, beanName, null, null);
+	}
+
+	/**
+	 * Constructs an object-name from an object that is detected either having the {@link JmxResource} annotation or
+	 * implementing {@link JmxSelfNaming}.
+	 * 
+	 * @param obj
+	 *            Object for which we are creating our ObjectName
+	 */
+	public static ObjectName makeObjectName(Object obj) {
+		JmxResource jmxResource = obj.getClass().getAnnotation(JmxResource.class);
+		if (obj instanceof JmxSelfNaming) {
+			return makeObjectName(jmxResource, (JmxSelfNaming) obj);
+		} else {
+			if (jmxResource == null) {
+				throw new IllegalArgumentException(
+						"Registered class must either implement JmxSelfNaming or have JmxResource annotation");
+			}
+			return makeObjectName(jmxResource, obj);
+		}
 	}
 
 	private static ObjectName makeObjectName(String domainName, String beanName, JmxFolderName[] folderNames,

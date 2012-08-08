@@ -20,8 +20,11 @@ import javax.management.MBeanParameterInfo;
 import javax.management.ReflectionException;
 
 import com.j256.simplejmx.common.JmxAttributeField;
+import com.j256.simplejmx.common.JmxAttributeFieldInfo;
 import com.j256.simplejmx.common.JmxAttributeMethod;
+import com.j256.simplejmx.common.JmxAttributeMethodInfo;
 import com.j256.simplejmx.common.JmxOperation;
+import com.j256.simplejmx.common.JmxOperationInfo;
 import com.j256.simplejmx.common.JmxResource;
 import com.j256.simplejmx.common.JmxSelfNaming;
 
@@ -45,7 +48,7 @@ public class ReflectionMbean implements DynamicMBean {
 	 */
 	public ReflectionMbean(JmxSelfNaming delegate) {
 		this.delegate = delegate;
-		this.mbeanInfo = buildMbeanInfo();
+		this.mbeanInfo = buildMbeanInfo(null, null, null);
 	}
 
 	/**
@@ -53,7 +56,16 @@ public class ReflectionMbean implements DynamicMBean {
 	 */
 	public ReflectionMbean(Object delegate) {
 		this.delegate = delegate;
-		this.mbeanInfo = buildMbeanInfo();
+		this.mbeanInfo = buildMbeanInfo(null, null, null);
+	}
+
+	/**
+	 * Create a mbean associated with a delegate object with user provided attribute and operation information.
+	 */
+	public ReflectionMbean(Object delegate, JmxAttributeFieldInfo[] attributeFieldInfos,
+			JmxAttributeMethodInfo[] attributeMethodInfos, JmxOperationInfo[] operationInfos) {
+		this.delegate = delegate;
+		this.mbeanInfo = buildMbeanInfo(attributeFieldInfos, attributeMethodInfos, operationInfos);
 	}
 
 	/**
@@ -176,7 +188,8 @@ public class ReflectionMbean implements DynamicMBean {
 	/**
 	 * Build our JMX information object by using reflection.
 	 */
-	private MBeanInfo buildMbeanInfo() {
+	private MBeanInfo buildMbeanInfo(JmxAttributeFieldInfo[] attributeFieldInfos,
+			JmxAttributeMethodInfo[] attributeMethodInfos, JmxOperationInfo[] operationInfos) {
 		Class<?> clazz = delegate.getClass();
 		JmxResource jmxResource = clazz.getAnnotation(JmxResource.class);
 		String mbeanDescription;
@@ -186,11 +199,34 @@ public class ReflectionMbean implements DynamicMBean {
 			mbeanDescription = jmxResource.description();
 		}
 
+		Map<String, JmxAttributeFieldInfo> attributeFieldInfoMap = null;
+		if (attributeFieldInfos != null) {
+			attributeFieldInfoMap = new HashMap<String, JmxAttributeFieldInfo>();
+			for (JmxAttributeFieldInfo info : attributeFieldInfos) {
+				attributeFieldInfoMap.put(info.getName(), info);
+			}
+		}
+		Map<String, JmxAttributeMethodInfo> attributeMethodInfoMap = null;
+		if (attributeMethodInfos != null) {
+			attributeMethodInfoMap = new HashMap<String, JmxAttributeMethodInfo>();
+			for (JmxAttributeMethodInfo info : attributeMethodInfos) {
+				attributeMethodInfoMap.put(info.getMethodName(), info);
+			}
+		}
+		Map<String, JmxOperationInfo> attributeOperationInfoMap = null;
+		if (operationInfos != null) {
+			attributeOperationInfoMap = new HashMap<String, JmxOperationInfo>();
+			for (JmxOperationInfo info : operationInfos) {
+				attributeOperationInfoMap.put(info.getMethodName(), info);
+			}
+		}
+
 		Method[] methods = clazz.getMethods();
 		List<MBeanAttributeInfo> attributes = new ArrayList<MBeanAttributeInfo>();
-		discoverAttributeMethods(methods, attributes);
-		discoverAttributeFields(attributes);
-		List<MBeanOperationInfo> operations = discoverOperations(methods);
+		discoverAttributeMethods(methods, attributes, attributeMethodInfoMap);
+		// NOTE: fields override attribute methods
+		discoverAttributeFields(attributes, attributeFieldInfoMap);
+		List<MBeanOperationInfo> operations = discoverOperations(methods, attributeOperationInfoMap);
 
 		return new MBeanInfo(clazz.getName(), mbeanDescription,
 				attributes.toArray(new MBeanAttributeInfo[attributes.size()]), null,
@@ -198,15 +234,26 @@ public class ReflectionMbean implements DynamicMBean {
 	}
 
 	/**
-	 * Using reflection, find attribute methods from our object that will be exposed via JMX.
+	 * Find attribute methods from our object that will be exposed via JMX.
 	 */
-	private void discoverAttributeMethods(Method[] methods, List<MBeanAttributeInfo> attributes) {
+	private void discoverAttributeMethods(Method[] methods, List<MBeanAttributeInfo> attributes,
+			Map<String, JmxAttributeMethodInfo> attributeMethodInfoMap) {
 		for (Method method : methods) {
 			JmxAttributeMethod jmxAttribute = method.getAnnotation(JmxAttributeMethod.class);
+			JmxAttributeMethodInfo attributeMethodInfo = null;
 			if (jmxAttribute == null) {
 				// skip it if no annotation
-				continue;
+				if (attributeMethodInfoMap != null) {
+					attributeMethodInfo = attributeMethodInfoMap.get(method.getName());
+				}
+				if (attributeMethodInfo == null) {
+					continue;
+				}
+			} else {
+				attributeMethodInfo = new JmxAttributeMethodInfo(method.getName(), jmxAttribute);
+				jmxAttribute = null;
 			}
+
 			String methodName = method.getName();
 			boolean isIs;
 			if (methodName.startsWith("is")) {
@@ -229,8 +276,8 @@ public class ReflectionMbean implements DynamicMBean {
 							+ "' starts with 'get' but does not return anything");
 				}
 				if (methodInfo == null) {
-					attributeMethodMap.put(varName, new AttributeMethodInfo(varName, jmxAttribute.description(),
-							method, null));
+					attributeMethodMap.put(varName,
+							new AttributeMethodInfo(varName, attributeMethodInfo.getDescription(), method, null));
 				} else {
 					// setter must have already started our method-info, add the getter to it
 					methodInfo.getterMethod = method;
@@ -245,8 +292,8 @@ public class ReflectionMbean implements DynamicMBean {
 							+ "' starts with 'set' but does not return void");
 				}
 				if (methodInfo == null) {
-					attributeMethodMap.put(varName, new AttributeMethodInfo(varName, jmxAttribute.description(), null,
-							method));
+					attributeMethodMap.put(varName,
+							new AttributeMethodInfo(varName, attributeMethodInfo.getDescription(), null, method));
 				} else {
 					// getter must have already started our method-info, add the setter to it
 					methodInfo.setterMethod = method;
@@ -269,24 +316,34 @@ public class ReflectionMbean implements DynamicMBean {
 	}
 
 	/**
-	 * Using reflection, find attribute methods from our object that will be exposed via JMX.
+	 * Find attribute methods from our object that will be exposed via JMX.
 	 */
-	private void discoverAttributeFields(List<MBeanAttributeInfo> attributes) {
+	private void discoverAttributeFields(List<MBeanAttributeInfo> attributes,
+			Map<String, JmxAttributeFieldInfo> attributeFieldInfoMap) {
 		Class<?> clazz = delegate.getClass();
 		Field[] fields = clazz.getDeclaredFields();
 		for (Field field : fields) {
 			JmxAttributeField attributeField = field.getAnnotation(JmxAttributeField.class);
+			JmxAttributeFieldInfo attributeFieldInfo = null;
 			if (attributeField == null) {
-				continue;
+				if (attributeFieldInfoMap != null) {
+					attributeFieldInfo = attributeFieldInfoMap.get(field.getName());
+				}
+				if (attributeFieldInfo == null) {
+					continue;
+				}
+			} else {
+				attributeFieldInfo = new JmxAttributeFieldInfo(field.getName(), attributeField);
+				attributeField = null;
 			}
 
 			if (!field.isAccessible()) {
 				field.setAccessible(true);
 			}
-			attributeFieldMap.put(field.getName(), new AttributeFieldInfo(field, attributeField.isReadible(),
-					attributeField.isWritable()));
+			attributeFieldMap.put(field.getName(), new AttributeFieldInfo(field, attributeFieldInfo.isReadible(),
+					attributeFieldInfo.isWritable()));
 
-			String description = attributeField.description();
+			String description = attributeFieldInfo.getDescription();
 			if (isEmpty(description)) {
 				description = field.getName() + " attribute";
 			}
@@ -299,19 +356,29 @@ public class ReflectionMbean implements DynamicMBean {
 				isIs = false;
 			}
 			attributes.add(new MBeanAttributeInfo(field.getName(), field.getType().getName(), description,
-					attributeField.isReadible(), attributeField.isWritable(), isIs));
+					attributeFieldInfo.isReadible(), attributeFieldInfo.isWritable(), isIs));
 		}
 	}
 
 	/**
-	 * Using reflection, find operation methods from our object that will be exposed via JMX.
+	 * Find operation methods from our object that will be exposed via JMX.
 	 */
-	private List<MBeanOperationInfo> discoverOperations(Method[] methods) {
+	private List<MBeanOperationInfo> discoverOperations(Method[] methods,
+			Map<String, JmxOperationInfo> attributeOperationInfoMap) {
 		List<MBeanOperationInfo> operations = new ArrayList<MBeanOperationInfo>(operationMethodMap.size());
 		for (Method method : methods) {
 			JmxOperation jmxOperation = method.getAnnotation(JmxOperation.class);
+			JmxOperationInfo operationInfo = null;
 			if (jmxOperation == null) {
-				continue;
+				if (attributeOperationInfoMap != null) {
+					operationInfo = attributeOperationInfoMap.get(method.getName());
+				}
+				if (operationInfo == null) {
+					continue;
+				}
+			} else {
+				operationInfo = new JmxOperationInfo(method.getName(), jmxOperation);
+				jmxOperation = null;
 			}
 			String methodName = method.getName();
 			if (methodName.startsWith("get") || methodName.startsWith("is") || methodName.startsWith("set")) {
@@ -324,16 +391,16 @@ public class ReflectionMbean implements DynamicMBean {
 				stringTypes[i] = types[i].getName();
 			}
 			NameParams nameParams = new NameParams(methodName, stringTypes);
-			MBeanParameterInfo[] parameterInfos = buildOperationParameterInfo(method, jmxOperation);
+			MBeanParameterInfo[] parameterInfos = buildOperationParameterInfo(method, operationInfo);
 			operationMethodMap.put(nameParams, method);
 
-			String description = jmxOperation.description();
+			String description = operationInfo.getDescription();
 			if (isEmpty(description)) {
 				description = methodName + " attribute";
 			}
 
 			operations.add(new MBeanOperationInfo(methodName, description, parameterInfos, method.getReturnType()
-					.getName(), jmxOperation.action()));
+					.getName(), operationInfo.getAction().getJmxAction()));
 		}
 		return operations;
 	}
@@ -341,21 +408,21 @@ public class ReflectionMbean implements DynamicMBean {
 	/**
 	 * Build our parameter information for an operation.
 	 */
-	private MBeanParameterInfo[] buildOperationParameterInfo(Method method, JmxOperation jmxOperation) {
+	private MBeanParameterInfo[] buildOperationParameterInfo(Method method, JmxOperationInfo operationInfo) {
 		Class<?>[] types = method.getParameterTypes();
 		MBeanParameterInfo[] parameterInfos = new MBeanParameterInfo[types.length];
-		String[] parameterNames = jmxOperation.parameterNames();
-		String[] parameterDescriptions = jmxOperation.parameterDescriptions();
+		String[] parameterNames = operationInfo.getParameterNames();
+		String[] parameterDescriptions = operationInfo.getParameterDescriptions();
 		for (int i = 0; i < types.length; i++) {
 			String parameterName;
-			if (i >= parameterNames.length) {
+			if (parameterNames == null || i >= parameterNames.length) {
 				parameterName = "p" + (i + 1);
 			} else {
 				parameterName = parameterNames[i];
 			}
 			String typeName = types[i].getName();
 			String description;
-			if (i >= parameterDescriptions.length) {
+			if (parameterDescriptions == null || i >= parameterDescriptions.length) {
 				description = "parameter #" + (i + 1) + " of type: " + typeName;
 			} else {
 				description = parameterDescriptions[i];

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -48,10 +49,32 @@ public class JmxClient {
 	 * </p>
 	 */
 	public JmxClient(String jmxUrl) throws JMException {
+		this(jmxUrl, null, null);
+	}
+
+	/**
+	 * Connect the client to a JMX server using the full JMX URL format with username/password credentials. The URL
+	 * should look something like:
+	 * 
+	 * <p>
+	 * 
+	 * <pre>
+	 * service:jmx:rmi:///jndi/rmi://hostName:portNumber/jmxrmi
+	 * </pre>
+	 * 
+	 * </p>
+	 */
+	public JmxClient(String jmxUrl, String userName, String password) throws JMException {
 		if (jmxUrl == null) {
 			throw new IllegalArgumentException("Jmx URL cannot be null");
 		}
 
+		HashMap<String, Object> map = null;
+		if (userName != null || password != null) {
+			map = new HashMap<String, Object>();
+			String[] credentials = new String[] { userName, password };
+			map.put("jmx.remote.credentials", credentials);
+		}
 		try {
 			this.serviceUrl = new JMXServiceURL(jmxUrl);
 		} catch (MalformedURLException e) {
@@ -59,7 +82,7 @@ public class JmxClient {
 		}
 
 		try {
-			jmxConnector = JMXConnectorFactory.connect(serviceUrl, null);
+			jmxConnector = JMXConnectorFactory.connect(serviceUrl, map);
 			mbeanConn = jmxConnector.getMBeanServerConnection();
 		} catch (IOException e) {
 			if (jmxConnector != null) {

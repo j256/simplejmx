@@ -7,6 +7,8 @@ import java.lang.annotation.Target;
 
 import javax.management.MBeanOperationInfo;
 
+import com.j256.simplejmx.common.JmxOperationInfo.OperationAction;
+
 /**
  * This identifies which methods are operations. It is added to methods that are _not_ named "get..." or "set...". The
  * method can either return void or return an object. It is recommended that the method return a simple object that will
@@ -72,10 +74,13 @@ public @interface JmxOperation {
 	public String[] parameterDescriptions() default {};
 
 	/**
-	 * This is used by the JMX system to describe what sort of work is being done in this operation. Current choices
-	 * are: {@link MBeanOperationInfo#INFO} (read-like that returns information), {@link MBeanOperationInfo#ACTION}
-	 * (write-like that modified the bean in some way, {@link MBeanOperationInfo#ACTION_INFO} (both read-like and
-	 * write-like), and {@link MBeanOperationInfo#UNKNOWN} (the default which is no action specified).
+	 * This is used by the JMX system to describe what sort of work is being done in this operation.
 	 */
+	public OperationAction operationAction() default OperationAction.UNKNOWN;
+
+	/**
+	 * @deprecated Should use the enumerated {@link #operationAction()}.
+	 */
+	@Deprecated
 	public int action() default MBeanOperationInfo.UNKNOWN;
 }

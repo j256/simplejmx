@@ -8,14 +8,19 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 import javax.management.JMException;
+import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
 import org.junit.Test;
 
 import com.j256.simplejmx.client.JmxClient;
+import com.j256.simplejmx.common.JmxAttributeFieldInfo;
 import com.j256.simplejmx.common.JmxAttributeMethod;
+import com.j256.simplejmx.common.JmxAttributeMethodInfo;
 import com.j256.simplejmx.common.JmxFolderName;
 import com.j256.simplejmx.common.JmxOperation;
+import com.j256.simplejmx.common.JmxOperationInfo;
+import com.j256.simplejmx.common.JmxOperationInfo.OperationAction;
 import com.j256.simplejmx.common.JmxResource;
 import com.j256.simplejmx.common.JmxSelfNaming;
 import com.j256.simplejmx.common.ObjectNameUtil;
@@ -354,6 +359,76 @@ public class JmxServerTest {
 		}
 	}
 
+	@Test
+	public void testRegisterObjUserInfoFieldAttribute() throws Exception {
+		JmxServer server = new JmxServer(DEFAULT_PORT);
+		RandomObject obj = new RandomObject();
+		ObjectName objectName = ObjectNameUtil.makeObjectName(DOMAIN_NAME, OBJECT_NAME);
+		try {
+			server.start();
+			server.register(obj, objectName, new JmxAttributeFieldInfo[] { new JmxAttributeFieldInfo("foo", true,
+					false /* not writable */, "description") }, null, null);
+			JmxClient client = new JmxClient(DEFAULT_PORT);
+			int val = 4232431;
+			obj.setFoo(val);
+			assertEquals(val, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo"));
+			try {
+				client.setAttribute(DOMAIN_NAME, OBJECT_NAME, "foo", 1);
+				fail("Expected this to throw");
+			} catch (JMException e) {
+				// ignored
+			}
+		} finally {
+			server.unregister(objectName);
+			server.stop();
+		}
+	}
+
+	@Test
+	public void testRegisterObjUserInfoFieldMethod() throws Exception {
+		JmxServer server = new JmxServer(DEFAULT_PORT);
+		RandomObject obj = new RandomObject();
+		ObjectName objectName = ObjectNameUtil.makeObjectName(DOMAIN_NAME, OBJECT_NAME);
+		try {
+			server.start();
+			server.register(obj, objectName, null, new JmxAttributeMethodInfo[] {
+					new JmxAttributeMethodInfo("getFoo", "description"),
+					new JmxAttributeMethodInfo("setFoo", "description") }, null);
+			JmxClient client = new JmxClient(DEFAULT_PORT);
+			int val = 4232431;
+			client.setAttribute(DOMAIN_NAME, OBJECT_NAME, "foo", val);
+			assertEquals(val, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo"));
+		} finally {
+			server.unregister(objectName);
+			server.stop();
+		}
+	}
+
+	@Test
+	public void testRegisterObjUserInfoOperationOnly() throws Exception {
+		JmxServer server = new JmxServer(DEFAULT_PORT);
+		RandomObject obj = new RandomObject();
+		ObjectName objectName = ObjectNameUtil.makeObjectName(DOMAIN_NAME, OBJECT_NAME);
+		try {
+			server.start();
+			server.register(obj, objectName, null, null, new JmxOperationInfo[] { new JmxOperationInfo("resetFoo",
+					null, null, OperationAction.UNKNOWN, "description") });
+			JmxClient client = new JmxClient(DEFAULT_PORT);
+			obj.setFoo(1);
+			client.invokeOperation(DOMAIN_NAME, OBJECT_NAME, "resetFoo");
+			assertEquals(0, obj.getFoo());
+			try {
+				client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo");
+				fail("Expected this to throw");
+			} catch (JMException e) {
+				// ignored
+			}
+		} finally {
+			server.unregister(objectName);
+			server.stop();
+		}
+	}
+
 	/* ============================================================= */
 
 	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
@@ -472,6 +547,27 @@ public class JmxServerTest {
 		@JmxOperation
 		public void someCall() {
 			throw new IllegalStateException("because I can");
+		}
+	}
+
+	protected static class RandomObject {
+
+		private int foo = FOO_VALUE;
+
+		public int getFoo() {
+			return foo;
+		}
+
+		public void setFoo(int foo) {
+			this.foo = foo;
+		}
+
+		public void resetFoo() {
+			this.foo = 0;
+		}
+
+		public void resetFoo(int newValue) {
+			this.foo = newValue;
 		}
 	}
 }

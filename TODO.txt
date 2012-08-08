@@ -1,3 +1,15 @@
 ===================================================
 Used to maintain requested features or future work.
 ===================================================
+
+- Look into attributes on each of the operation parameters
+
+- look into a setting that secures the server-side connections
+	- password files?
+	- username/password map?
+
+- put together some documentation for Spring
+	- maybe a test program instead
+	- show the bean names
+	- show the naming strategy
+	- still need naming strategy
