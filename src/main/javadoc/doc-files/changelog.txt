@@ -1,5 +1,6 @@
 0.7: 8/XX/2012 (svn rYYYY)
 	* Added the ability to export _any_ object using user defined attribute-field, attribute-method, and operation info.
+	* Deprecated the JmxOperation.action field and replaced it with enumerated JmxOperation.operationAction field.
 
 0.6: 6/7/2012 (svn r78)
 	* Fixed some javadocs around the beanName() change in 0.5.

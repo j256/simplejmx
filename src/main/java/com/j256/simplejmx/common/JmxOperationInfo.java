@@ -3,9 +3,9 @@ package com.j256.simplejmx.common;
 import javax.management.MBeanOperationInfo;
 
 /**
- * This identifies a methods that is a JMX operation. It for methods that are _not_ named "get..." or "set...". The
- * method can either return void or return an object. It is recommended that the method return a simple object that will
- * be for sure in jconsole's classpath and also should not throw an unknown exception class either.
+ * This identifies a methods that is a JMX operation for methods that are _not_ named "get..." or "set...". The method
+ * can either return void or return an object. It is recommended that the method return a simple object that will be for
+ * sure in jconsole's classpath and also should not throw an unknown exception class either.
  * 
  * @author graywatson
  */
@@ -35,7 +35,7 @@ public class JmxOperationInfo {
 		if (actionVal == MBeanOperationInfo.UNKNOWN) {
 			this.action = jmxOperation.operationAction();
 		} else {
-			this.action = OperationAction.fromMbeanOperationInfo(actionVal);
+			this.action = OperationAction.fromActionValue(actionVal);
 		}
 		this.description = jmxOperation.description();
 	}
@@ -84,25 +84,25 @@ public class JmxOperationInfo {
 		// end
 		;
 
-		private final int jmxAction;
+		private final int actionValue;
 
-		private OperationAction(int jmxAction) {
-			this.jmxAction = jmxAction;
+		private OperationAction(int jmxActionValue) {
+			this.actionValue = jmxActionValue;
 		}
 
 		/**
-		 * Return the associated MBeanOperationInfo constant.
+		 * Return the associated MBeanOperationInfo int constant.
 		 */
-		public int getJmxAction() {
-			return jmxAction;
+		public int getActionValue() {
+			return actionValue;
 		}
 
 		/**
-		 * Return the enumerated action from the MBeanOperationInfo constant.
+		 * Return the enumerated action from the MBeanOperationInfo int constant.
 		 */
-		public static OperationAction fromMbeanOperationInfo(int jmxAction) {
+		public static OperationAction fromActionValue(int actionValue) {
 			for (OperationAction action : values()) {
-				if (action.jmxAction == jmxAction) {
+				if (action.actionValue == actionValue) {
 					return action;
 				}
 			}

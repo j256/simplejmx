@@ -36,21 +36,30 @@ public class RandomObjectTestProgram {
 			// start our server
 			jmxServer.start();
 
-			/*
-			 * Register our lookupCache object defined below but with specific field-attributes, method-attributes, and
-			 * method-operations defined.
-			 */
-			jmxServer.register(lookupCache, ObjectNameUtil.makeObjectName("j256", "RuntimeCounter"),
+			// attribute fields exposed through reflection
+			JmxAttributeFieldInfo[] attributeFieldInfos =
 					new JmxAttributeFieldInfo[] {
-							new JmxAttributeFieldInfo("startMillis", true, false, "When our timer started"),
-							new JmxAttributeFieldInfo("showSeconds", true, true, "Show runtime in seconds") },
+							new JmxAttributeFieldInfo("startMillis", true, false /* not writable */,
+									"When our timer started"),
+							new JmxAttributeFieldInfo("showSeconds", true, true, "Show runtime in seconds") };
+			// attribute get/set/is methods
+			JmxAttributeMethodInfo[] attributeMethodInfos =
 					new JmxAttributeMethodInfo[] { new JmxAttributeMethodInfo("getRunTime",
-							"Run time in seconds or milliseconds") }, new JmxOperationInfo[] {
+							"Run time in seconds or milliseconds") };
+			// method operations
+			JmxOperationInfo[] operationInfos =
+					new JmxOperationInfo[] {
 							new JmxOperationInfo("restartTimer", null, null, OperationAction.UNKNOWN,
 									"Restart the timer to the current time"),
 							new JmxOperationInfo("restartTimerToValue", new String[] { "startMillis" },
 									new String[] { "Milliseconds to set our start-time to" }, OperationAction.UNKNOWN,
-									"Restart the timer to the current time") });
+									"Set the timer as starting from a particular milliseconds value") };
+			/*
+			 * Register our lookupCache object defined below but with specific field-attributes, method-attributes, and
+			 * method-operations defined.
+			 */
+			jmxServer.register(lookupCache, ObjectNameUtil.makeObjectName("j256", "RuntimeCounter"), attributeFieldInfos,
+					attributeMethodInfos, operationInfos);
 			// we can register other objects here
 			// jmxServer.register(someOtherObject);
 
@@ -60,7 +69,7 @@ public class RandomObjectTestProgram {
 			Thread.sleep(1000000000);
 
 		} finally {
-			// we can do this but it is not necessary if we are stopping the server
+			// unregister is not necessary if we are stopping the server
 			jmxServer.unregister(lookupCache);
 			// stop our server
 			jmxServer.stop();

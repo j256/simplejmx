@@ -400,7 +400,7 @@ public class ReflectionMbean implements DynamicMBean {
 			}
 
 			operations.add(new MBeanOperationInfo(methodName, description, parameterInfos, method.getReturnType()
-					.getName(), operationInfo.getAction().getJmxAction()));
+					.getName(), operationInfo.getAction().getActionValue()));
 		}
 		return operations;
 	}

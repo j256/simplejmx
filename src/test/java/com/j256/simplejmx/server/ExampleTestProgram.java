@@ -44,7 +44,7 @@ public class ExampleTestProgram {
 			Thread.sleep(1000000000);
 
 		} finally {
-			// we can do this but it is not necessary if we are stopping the server
+			// unregister is not necessary if we are stopping the server
 			jmxServer.unregister(lookupCache);
 			// stop our server
 			jmxServer.stop();
