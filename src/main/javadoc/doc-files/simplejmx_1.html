@@ -11,10 +11,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <head>
-<title>SimpleJMX Package: 1. Getting Started</title>
+<title>SimpleJMX Package: 1. Using SimpleJMX</title>
 
-<meta name="description" content="SimpleJMX Package: 1. Getting Started">
-<meta name="keywords" content="SimpleJMX Package: 1. Getting Started">
+<meta name="description" content="SimpleJMX Package: 1. Using SimpleJMX">
+<meta name="keywords" content="SimpleJMX Package: 1. Using SimpleJMX">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="texi2html 1.70">
@@ -57,7 +57,7 @@ ul.toc {list-style: none}
 <td valign="middle" align="left">[<a href="simplejmx_4.html#SEC16" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="simplejmx_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
-<h1 class="chapter"> 1. Getting Started </h1>
+<h1 class="chapter"> 1. Using SimpleJMX </h1>
 
 <table class="menu" border="0" cellspacing="0">
 <tr><td align="left" valign="top"><a href="#SEC2">1.1 Downloading SimpleJMX Jar</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                Downloading the SimpleJMX jar.
@@ -70,9 +70,9 @@ ul.toc {list-style: none}
 </td></tr>
 <tr><td align="left" valign="top"><a href="#SEC8">1.5 Exposing Fields and Methods Over JMX</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">             How to expose fields and methods over JMX.
 </td></tr>
-<tr><td align="left" valign="top"><a href="#SEC12">1.9 Publishing Using Code Definitions</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">    How to define the name and exposed items programmatically.
+<tr><td align="left" valign="top"><a href="#SEC12">1.6 Publishing Using Code Definitions</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">    How to define the name and exposed items programmatically.
 </td></tr>
-<tr><td align="left" valign="top"><a href="#SEC13">1.10 Using the JMX Client</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">               Using the programmatic JMX client.
+<tr><td align="left" valign="top"><a href="#SEC13">1.7 Using the JMX Client</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">               Using the programmatic JMX client.
 </td></tr>
 </table>
 
@@ -97,8 +97,7 @@ ul.toc {list-style: none}
 </tr></table>
 <h2 class="section"> 1.1 Downloading SimpleJMX Jar </h2>
 
-<p>To get started with SimpleJMX, you will need to download the jar files.  The <a href="http://256.com/sources/simplejmx/">SimpleJMX release page</a>
-is the default repository but the jars are also available from the <a href="http://repo1.maven.org/maven2/com/j256/simplejmx/">central maven repository</a> and from <a href="http://sourceforge.net/projects/simplejmx/files/">Sourceforge</a>.
+<p>To get started with SimpleJMX, you will need to download the jar files.  The <a href="http://256.com/sources/simplejmx/releases/">SimpleJMX release page</a> is the default repository but the jars are also available from the <a href="http://repo1.maven.org/maven2/com/j256/simplejmx/">central maven repository</a> and from <a href="http://sourceforge.net/projects/simplejmx/files/">Sourceforge</a>.
 
 </p><p>The code works with Java 5 or later.
 
@@ -123,16 +122,15 @@ is the default repository but the jars are also available from the <a href="http
 </tr></table>
 <h2 class="section"> 1.2 Starting a JMX Server </h2>
 
-<p>The <code>JmxServer</code> class is used to publish a JMX server to which can be connected jconsole and other JMX clients.
-The basic way to do this is to choose a port to use and define the server and then start it is the following:
+<p>The <code>JmxServer</code> class is used to publish a JMX server that jconsole and other JMX clients can connect to.
+The easiest way to do this is to choose a port to use, define the server, and then start it:
 
 </p><table><tr><td>&nbsp;</td><td><pre class="example">// create a new JMX server listening on a port
 JmxServer jmxServer = new JmxServer(8000);
 // start our server
 jmxServer.start();
 </pre></td></tr></table>
-<p>When your program exits, it is better to stop the server so something like the following try/finally block is a good
-pattern to use:
+<p>Before your program exits, it is best to stop the server, so the following try/finally block is a good pattern to use:
 
 </p><table><tr><td>&nbsp;</td><td><pre class="example">// create a new JMX server listening on a port
 JmxServer jmxServer = new JmxServer(8000);
@@ -148,9 +146,7 @@ try {
    jmxServer.stop();
 }
 </pre></td></tr></table>
-<p>See the next manual section about object registration.
-
-</p><hr size="6">
+<hr size="6">
 <a name="NOD5"></a>
 <a name="SEC4"></a>
 <table cellpadding="1" cellspacing="1" border="0">
@@ -171,7 +167,7 @@ try {
 </tr></table>
 <h2 class="section"> 1.3 Registering Objects Using JMX </h2>
 
-<p>Registering objects is what you do to get them published via the server via JMX.  The basic way to do this is to call:
+<p>To published objects via the server via JMX you must register them with the <code>JmxServer</code>:
 
 </p><table><tr><td>&nbsp;</td><td><pre class="example">jmxServer.register(someObject);
 </pre></td></tr></table>
@@ -202,11 +198,11 @@ try {
 </tr></table>
 <h2 class="section"> 1.4 Naming Objects In JMX </h2>
 
-<p>When you publish your objects you need to tell JMX what it's name is and where it should be located in the various
+<p>When you publish an object you need to tell JMX what the object's <em>unique</em> name is and where it should be located in the various
 folders shown by jconsole.  There are a couple of different ways to do this with SimpleJMX:
 
 </p><table class="menu" border="0" cellspacing="0">
-<tr><td align="left" valign="top"><a href="#SEC6">1.4.1 SimpleJMX @JmxResource Annotation</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Using the SimpleJMX @JmxResource Annotation
+<tr><td align="left" valign="top"><a href="#SEC6">1.4.1 @JmxResource Annotation</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Using the SimpleJMX @JmxResource Annotation
 </td></tr>
 <tr><td align="left" valign="top"><a href="#SEC7">1.4.2 Self Naming Objects</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                   Allow the object to name itself
 </td></tr>
@@ -231,10 +227,9 @@ folders shown by jconsole.  There are a couple of different ways to do this with
 <td valign="middle" align="left">[<a href="simplejmx_4.html#SEC16" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="simplejmx_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
-<h3 class="subsection"> 1.4.1 SimpleJMX @JmxResource Annotation </h3>
+<h3 class="subsection"> 1.4.1 @JmxResource Annotation </h3>
 
-<p>SimpleJMX includes the <code>@JmxResource</code> annotation which is used to define that the resource is to be published
-via JMX and how it is to be named.
+<p>The <code>@JmxResource</code> annotation is used to define that the resource is to be published via JMX and how it is to be named.
 
 </p><a name="IDX5"></a>
 <a name="IDX6"></a>
@@ -243,7 +238,9 @@ public class RuntimeCounter {
    ...
 </pre></td></tr></table>
 <p>The above example shows that the <code>RunetimeCounter</code> object is to be published via JMX inside of the <code>j256</code> folder
-with a text description.  The fields in <code>@JmxResource</code> are:
+with a text description.
+
+</p><p>The fields in <code>@JmxResource</code> are:
 
 </p><dl compact="compact">
 <dd>
@@ -266,18 +263,18 @@ object is self-naming.  See section <a href="#SEC7">Self Naming Objects</a>.
 </dd>
 <dt><code> folderNames</code></dt>
 <dd>
-<p>Other strings which which translate into sub-folders below the domain-name that was specified above. Default is the
-object will show up at the top below the domain-name folder.  They can either be in <code>name=value</code> format in which case
-they should be in alphabetic order by name. They can also just be in <code>value</code> format in which case a <code>##</code> prefix
-(ex. <code>00=...</code>) will be added by the code.
+<p>Optional array of strings which translate into sub-folders below the domain-name that was specified above. Default is for
+the object to show up in the domain-name folder.  The folder names can either be in <code>name=value</code> format in which case
+they should be in alphabetic order by name. They can also just be in <code>value</code> format.
 
 </p><p>Folders are used when you have a large number of JMX objects being published and you want to group the objects so that
-you can find them faster than scrolling through a large list of objects.  For example, all of your database objects
+you can find them faster than scrolling through a large list.  For example, all of your database objects
 could go in the folder &quot;Database&quot; while the database connections could go into the sub-folder &quot;Database/Connections&quot;.
 
-</p><table><tr><td>&nbsp;</td><td><pre class="example">@JmxResource(domainName = &quot;j256&quot;, folderNames = { &quot;Counters&quot; },
-    description = &quot;Runtime counter&quot;)
-public class RuntimeCounter {
+</p><table><tr><td>&nbsp;</td><td><pre class="example">@JmxResource(domainName = &quot;j256&quot;,
+    folderNames = { &quot;Database&quot;, &quot;Connections&quot; },
+    description = &quot;MySql datatbase connection&quot;)
+public class MySqlDatabaseConnection {
 </pre></td></tr></table>
 <a name="IDX12"></a>
 <a name="IDX13"></a>
@@ -312,13 +309,13 @@ public class RuntimeCounter {
 
 <p>Instead of using the <code>@JmxResource</code> annotation to define the name/folders for your JMX object, you can have the
 object implement the <code>JmxSelfNaming</code> interface.  This allows the object to name itself and will override any settings
-from the <code>@JmxResource</code> annotation, if specified at all.
+from the <code>@JmxResource</code> annotation, if it is specified.
 
 </p><a name="IDX14"></a>
 <a name="IDX15"></a>
-<p>It is particularly useful and actually necessary to make your object <code>JmxSelfNaming</code> if there are to be multiple of 
-them published via JMX.  For example, if you have multiple database connections that you want to publish then they all
-can't have the same name in JMX.
+<p>It is particularly necessary to make your object <code>JmxSelfNaming</code> if there are to be multiple of them published via JMX.
+For example, if you have multiple database connections that you want to publish then to ensure that they have a <em>unique</em> name,
+each of the objects should be self-naming and should provide a unique name that identifies itself: 
 
 </p><table><tr><td>&nbsp;</td><td><pre class="example">// we only use this to set the domain name and the folders
 @JmxResource(domainName = &quot;j256&quot;, folderNames = { &quot;Database&quot;, &quot;Connections&quot; })
@@ -331,8 +328,8 @@ public class DatabaseConnection extends BaseJmxSelfNaming
     }
 }
 </pre></td></tr></table>
-<p>In the above example, we extend the <code>BaseJmxSelfNaming</code> which has default implementations for all of the
-<code>JmxSelfNaming</code> method so all we need to do is override what we want to change.
+<p>In the above example, we extend the <code>BaseJmxSelfNaming</code> abstract class which has default implementations for all of the
+<code>JmxSelfNaming</code> methods, so all we need to do is override what we want to change.
 
 </p><p>The methods in the <code>JmxSelfNaming</code> interface are:
 
@@ -380,18 +377,18 @@ folders in which case the bean will be at the top of the hierarchy in jconsole w
 what it calls attributes, operations, and notifications.  At this time, only attributes and operations are supported.
 
 </p><p>Attributes can be primitives or simple types such as <code>String</code> or <code>java.util.Date</code>.  With SimpleJMX you can expose them by using reflection
-on the objects fields directly using the <code>@JmxAttributeField</code> annotation or via the get/set/is methods using the <code>@JmxAttributeMethod</code>
-annotation.
+on the object's fields directly using the <code>@JmxAttributeField</code> annotation or instead via the get/set/is methods using the
+<code>@JmxAttributeMethod</code> annotation.
 
 </p><p>Operations are methods that do <em>not</em> start with get/set/is but which perform some function (ex: <code>resetTimer()</code>,
 <code>clearCache()</code>, etc.).  They can be exposed with the <code>@JmxOperation</code> annotation.
 
 </p><table class="menu" border="0" cellspacing="0">
-<tr><td align="left" valign="top"><a href="#SEC9">1.6 @JmxAttributeField Annotation</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Using the SimpleJMX @JmxAttributeField Annotation
+<tr><td align="left" valign="top"><a href="#SEC9">1.5.1 @JmxAttributeField Annotation</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Using the SimpleJMX @JmxAttributeField Annotation
 </td></tr>
-<tr><td align="left" valign="top"><a href="#SEC10">1.7 @JmxAttributeMethod Annotation</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">       Using the SimpleJMX @JmxAttributeMethod Annotation
+<tr><td align="left" valign="top"><a href="#SEC10">1.5.2 @JmxAttributeMethod Annotation</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">       Using the SimpleJMX @JmxAttributeMethod Annotation
 </td></tr>
-<tr><td align="left" valign="top"><a href="#SEC11">1.8 @JmxOperation Annotation</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">             Using the SimpleJMX @JmxOperation Annotation
+<tr><td align="left" valign="top"><a href="#SEC11">1.5.3 @JmxOperation Annotation</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">             Using the SimpleJMX @JmxOperation Annotation
 </td></tr>
 </table>
 
@@ -403,7 +400,7 @@ annotation.
 <td valign="middle" align="left">[<a href="#SEC10" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#SEC1" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
-<td valign="middle" align="left">[<a href="#SEC1" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC8" title="Up section"> Up </a>]</td>
 <td valign="middle" align="left">[<a href="simplejmx_2.html#SEC14" title="Next chapter"> &gt;&gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
@@ -414,19 +411,20 @@ annotation.
 <td valign="middle" align="left">[<a href="simplejmx_4.html#SEC16" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="simplejmx_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
-<h2 class="section"> 1.6 @JmxAttributeField Annotation </h2>
+<h3 class="subsection"> 1.5.1 @JmxAttributeField Annotation </h3>
 
 
 <p>SimpleJMX allows you to publish your primitive or simple types by annotating your fields with the <code>@JmxAttributeField</code>
 annotation.
 
-</p><table><tr><td>&nbsp;</td><td><pre class="example">@JmxAttributeField(description = &quot;Show runtime in seconds&quot;,
+</p><table><tr><td>&nbsp;</td><td><pre class="example">@JmxAttributeField(description = &quot;Start time in millis&quot;,
    isWritable = true)
-private boolean showSeconds;
+private long startTimeMillis;
 </pre></td></tr></table>
 <a name="IDX16"></a>
-<p>In the above example, the <code>showSeconds</code> boolean field will be visible via JMX.  It will show its value which can be
-changed because <code>isWriable</code> is set to true.  The description is available in jconsole when you hover over the attribute.
+<p>In the above example, the <code>startTimeMillis</code> long field will be visible via JMX.  It will show its value which can be
+changed because <code>isWriable</code> is set to true - <code>isReadable</code> is set to true by default.  The description is available
+in jconsole when you hover over the attribute.
 
 </p><p>The fields in the <code>@JmxAttributeField</code> annotation are:
 
@@ -457,7 +455,7 @@ changed because <code>isWriable</code> is set to true.  The description is avail
 <td valign="middle" align="left">[<a href="#SEC11" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#SEC1" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
-<td valign="middle" align="left">[<a href="#SEC1" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC8" title="Up section"> Up </a>]</td>
 <td valign="middle" align="left">[<a href="simplejmx_2.html#SEC14" title="Next chapter"> &gt;&gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
@@ -468,7 +466,7 @@ changed because <code>isWriable</code> is set to true.  The description is avail
 <td valign="middle" align="left">[<a href="simplejmx_4.html#SEC16" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="simplejmx_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
-<h2 class="section"> 1.7 @JmxAttributeMethod Annotation </h2>
+<h3 class="subsection"> 1.5.2 @JmxAttributeMethod Annotation </h3>
 
 
 <p>Instead of publishing the fields directly, SimpleJMX also allows you to publish your attributes by decorating the
@@ -490,7 +488,7 @@ to do data validation.
 </p><table><tr><td>&nbsp;</td><td><pre class="example">@JmxAttributeMethod(description = &quot;Run time in seconds or milliseconds&quot;)
 public long getRunTime() {
 </pre></td></tr></table>
-<p>The only field ins the <code>@JmxAttributeMethod</code> annotation is the description.  The annotation on the <code>get...</code> method shows that it
+<p>The only field in the <code>@JmxAttributeMethod</code> annotation is the description.  The annotation on the <code>get...</code> method shows that it
 is readable and the annotation on the <code>set...</code> method shows that it is writable.
 
 </p><hr size="6">
@@ -501,7 +499,7 @@ is readable and the annotation on the <code>set...</code> method shows that it i
 <td valign="middle" align="left">[<a href="#SEC12" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#SEC1" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
-<td valign="middle" align="left">[<a href="#SEC1" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC8" title="Up section"> Up </a>]</td>
 <td valign="middle" align="left">[<a href="simplejmx_2.html#SEC14" title="Next chapter"> &gt;&gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
@@ -512,13 +510,12 @@ is readable and the annotation on the <code>set...</code> method shows that it i
 <td valign="middle" align="left">[<a href="simplejmx_4.html#SEC16" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="simplejmx_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
-<h2 class="section"> 1.8 @JmxOperation Annotation </h2>
+<h3 class="subsection"> 1.5.3 @JmxOperation Annotation </h3>
 
 
 <p>Operations are methods that do <em>not</em> start with get/set/is but which perform some function.  They can be exposed with the
-<code>@JmxOperation</code> annotation.  It can be added only to methods that are <em>not</em> named <code>get...</code>, <code>set...</code>, or <code>is...</code>. The
-method can either return <code>void</code> or an object. It is recommended that the method return a primitive or a simple object that will
-be for sure in jconsole's classpath.  It also should not throw an unknown <code>Exception</code> class.
+<code>@JmxOperation</code> annotation.  The method can either return <code>void</code> or an object. It is recommended that the method return
+a primitive or a simple object that will be for sure in jconsole's classpath.  It also should not throw an unknown <code>Exception</code> class.
 
 </p><p>The fields in the <code>@JmxOperation</code> annotation are:
 
@@ -530,7 +527,7 @@ be for sure in jconsole's classpath.  It also should not throw an unknown <code>
 </p></dd>
 <dt><code> String[] parameterNames</code></dt>
 <dd>
-<p>Array of optional strings which gives the name of each of the method parameters.  The array should be the
+<p>Optional array of strings which gives the name of each of the method parameters.  The array should be the
 same length as the <code>parameterDescriptions</code> array. Default is something like &quot;p0&quot;.
 
 </p><table><tr><td>&nbsp;</td><td><pre class="example">@JmxOperation(parameterNames = { &quot;minValue&quot;, &quot;maxValue&quot; },
@@ -542,7 +539,7 @@ public void resetMaxMin(int minValue, int maxValue) {
 </dd>
 <dt><code> String[] parameterDescriptions</code></dt>
 <dd>
-<p>Array of optional strings which describes each of the method parameters. The array should be the same
+<p>Optional array of strings which describes each of the method parameters. The array should be the same
 length as the <code>parameterNames</code> array.
 
 </p></dd>
@@ -572,7 +569,7 @@ length as the <code>parameterNames</code> array.
 <td valign="middle" align="left">[<a href="simplejmx_4.html#SEC16" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="simplejmx_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
-<h2 class="section"> 1.9 Publishing Using Code Definitions </h2>
+<h2 class="section"> 1.6 Publishing Using Code Definitions </h2>
 
 <p>Sometimes, you want to expose a class using JMX but you don't control the source code or maybe you don't want to put the SimpleJMX
 annotations everywhere.  If this is the case then you also have the option to expose just about any object programmatically.
@@ -580,11 +577,7 @@ annotations everywhere.  If this is the case then you also have the option to ex
 </p><p>The <code>JmxServer</code> has a register function which takes just an <code>Object</code>, its <code>ObjectName</code>, and an array of
 attribute-fields, attribute-methods, and operations.
 
-</p><table><tr><td>&nbsp;</td><td><pre class="example">jmxServer.register(someObject,
-   ObjectNameUtil.makeObjectName(&quot;j256&quot;, &quot;SomeObject&quot;),
-   attributeFieldInfos, attributeMethodInfos, operationInfos);
-</pre></td></tr></table> 
-<p>The attribute-fields are specified as an array of <code>JmxAttributeFieldInfo</code> objects that are associated with fields that are
+</p><p>The attribute-fields are specified as an array of <code>JmxAttributeFieldInfo</code> objects that are associated with fields that are
 exposed through reflection:
 
 </p><table><tr><td>&nbsp;</td><td><pre class="example">JmxAttributeFieldInfo[] attributeFieldInfos =
@@ -612,6 +605,12 @@ exposed through get/set/is methods:
          &quot;Restart the timer&quot;),
    };
 </pre></td></tr></table>
+<p>To register the object you would then do:
+
+</p><table><tr><td>&nbsp;</td><td><pre class="example">jmxServer.register(someObject,
+   ObjectNameUtil.makeObjectName(&quot;j256&quot;, &quot;SomeObject&quot;),
+   attributeFieldInfos, attributeMethodInfos, operationInfos);
+</pre></td></tr></table>
 <p>Take a look at the random-object example test for a working example.  See <a href="simplejmx_2.html#ANC1">random object example</a>.
 
 </p><hr size="6">
@@ -633,7 +632,7 @@ exposed through get/set/is methods:
 <td valign="middle" align="left">[<a href="simplejmx_4.html#SEC16" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="simplejmx_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
-<h2 class="section"> 1.10 Using the JMX Client </h2>
+<h2 class="section"> 1.7 Using the JMX Client </h2>
 
 <p>SimpleJMX also includes a programmatic, simple JMX client which you can use to interrogate JMX servers.  You
 connect to the server by specifying the host/port of the server.

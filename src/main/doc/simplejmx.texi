@@ -34,7 +34,7 @@ notice and this permission notice are preserved on all copies.
 @end iftex
 
 @c ----------------------------------------------------------------
-@node Top, Getting Started, (dir), (dir)
+@node Top, Using, (dir), (dir)
 @top SimpleJMX
 @everyheading @thischapter @| @thispage @| @today{}
 
@@ -44,12 +44,12 @@ Version @value{simplejmx_version} -- @value{simplejmx_date}
 @cindex author
 @cindex simple jmx
 @cindex jconsole
-This package provides some simple classses to help with the publishing of objects using Java's Management EXtensions (JMX).
-These publish objects using JMX that can be investigated with jconsole (Sun's graphical JMX user interface application) or another
-JMX client.  Included is also a programmatic JMX client which you can use to connect to remote JMX servers.
+This package provides some simple classes to help with the publishing of objects using Java's Management Extensions (JMX).
+These published objects can be investigated with jconsole (Sun's graphical JMX user interface application) or another
+JMX client.  Included is also a programmatic JMX client which you can use to connect to and interrogate remote JMX servers.
 
-To get started quickly with SimpleJMX, @pxref{Getting Started}.  You can also take a look at the  the examples
-section of the document which has various working code packages. @xref{Examples}.
+To learn how to use SimpleJMX, @pxref{Using}.  You can also take a look at the  the examples section of the document which
+has various working code packages. @xref{Examples}.
 @ifhtml
 There is also a @uref{http://256.com/sources/simplejmx/docs/simplejmx.pdf, PDF version of this documentation}.
 @end ifhtml
@@ -60,15 +60,15 @@ There is also a @uref{http://256.com/sources/simplejmx/docs/simplejmx.html, HTML
 Gray Watson @uref{http://256.com/gray/}
 
 @menu
-* Getting Started::             Getting started with SimpleJMX.
-* Examples::                    Usage examples to help you get started.
-* License::                     Open Source license for the project.
-* Index of Concepts::           Index of concepts in the manual.
+* Using::                      Using SimpleJMX.
+* Examples::                   Usage examples to help you get started.
+* License::                    Open Source license for the project.
+* Index of Concepts::          Index of concepts in the manual.
 @end menu
 
 @c ----------------------------------------------------------------
-@node Getting Started, Downloading, Top, Top
-@chapter Getting Started
+@node Using, Downloading, Top, Top
+@chapter Using SimpleJMX
 
 @cindex getting started
 @cindex how to get started
@@ -83,23 +83,23 @@ Gray Watson @uref{http://256.com/gray/}
 @end menu
 
 @c ----------------------------------------------------------------
-@node Downloading, Starting Server, Getting Started, Getting Started
+@node Downloading, Starting Server, Using, Using
 @section Downloading SimpleJMX Jar
 
 @cindex how to download the jars
 @cindex where to get new jars
-To get started with SimpleJMX, you will need to download the jar files.  The @uref{http://256.com/sources/simplejmx/, SimpleJMX release page}
-is the default repository but the jars are also available from the @uref{http://repo1.maven.org/maven2/com/j256/simplejmx/,
+To get started with SimpleJMX, you will need to download the jar files.  The @uref{http://256.com/sources/simplejmx/releases/, SimpleJMX
+release page} is the default repository but the jars are also available from the @uref{http://repo1.maven.org/maven2/com/j256/simplejmx/,
 central maven repository} and from @uref{http://sourceforge.net/projects/simplejmx/files/, Sourceforge}.
 
 The code works with Java 5 or later.
 
 @c ----------------------------------------------------------------
-@node Starting Server, Registering Objects, Getting Started, Getting Started
+@node Starting Server, Registering Objects, Downloading, Using
 @section Starting a JMX Server
 
-The @code{JmxServer} class is used to publish a JMX server to which can be connected jconsole and other JMX clients.
-The basic way to do this is to choose a port to use and define the server and then start it is the following:
+The @code{JmxServer} class is used to publish a JMX server that jconsole and other JMX clients can connect to.
+The easiest way to do this is to choose a port to use, define the server, and then start it:
 
 @example
 // create a new JMX server listening on a port
@@ -108,8 +108,7 @@ JmxServer jmxServer = new JmxServer(8000);
 jmxServer.start();
 @end example
 
-When your program exits, it is better to stop the server so something like the following try/finally block is a good
-pattern to use:
+Before your program exits, it is best to stop the server, so the following try/finally block is a good pattern to use:
 
 @example
 // create a new JMX server listening on a port
@@ -127,15 +126,13 @@ try @{
 @}
 @end example
 
-See the next manual section about object registration.
-
 @c ----------------------------------------------------------------
-@node Registering Objects, Naming Objects, Starting Server, Getting Started
+@node Registering Objects, Naming Objects, Starting Server, Using
 @section Registering Objects Using JMX
 
 @cindex registering objects
 @cindex publishing objects
-Registering objects is what you do to get them published via the server via JMX.  The basic way to do this is to call:
+To published objects via the server via JMX you must register them with the @code{JmxServer}:
 
 @example
 jmxServer.register(someObject);
@@ -150,10 +147,10 @@ jmxServer.unregister(someObject);
 The objects that are registered must be named and the fields and methods that are to be exposed must be specified.
 
 @c ----------------------------------------------------------------
-@node Naming Objects, Naming Objects, Registering Objects, Getting Started
+@node Naming Objects, Naming Objects, Registering Objects, Using
 @section Naming Objects In JMX
 
-When you publish your objects you need to tell JMX what it's name is and where it should be located in the various
+When you publish an object you need to tell JMX what the object's @emph{unique} name is and where it should be located in the various
 folders shown by jconsole.  There are a couple of different ways to do this with SimpleJMX:
 
 @menu
@@ -163,10 +160,9 @@ folders shown by jconsole.  There are a couple of different ways to do this with
 
 @c ----------------------------------------------------------------
 @node JmxResource Annotation, Self Naming, Naming Objects, Naming Objects
-@subsection SimpleJMX @@JmxResource Annotation
+@subsection @@JmxResource Annotation
 
-SimpleJMX includes the @code{@@JmxResource} annotation which is used to define that the resource is to be published
-via JMX and how it is to be named.
+The @code{@@JmxResource} annotation is used to define that the resource is to be published via JMX and how it is to be named.
 
 @cindex JmxResource annotation
 @cindex @@JmxResource annotation
@@ -177,7 +173,9 @@ public class RuntimeCounter @{
 @end example
 
 The above example shows that the @code{RunetimeCounter} object is to be published via JMX inside of the @code{j256} folder
-with a text description.  The fields in @code{@@JmxResource} are:
+with a text description.
+
+The fields in @code{@@JmxResource} are:
 
 @table @code
 
@@ -197,19 +195,19 @@ Name of the JMX object in the jconsole folder.  The default is to use the class 
 @cindex directories in jconsole
 @item folderNames
 
-Other strings which which translate into sub-folders below the domain-name that was specified above. Default is the
-object will show up at the top below the domain-name folder.  They can either be in @code{name=value} format in which case
-they should be in alphabetic order by name. They can also just be in @code{value} format in which case a @code{##} prefix
-(ex. @code{00=...}) will be added by the code.
+Optional array of strings which translate into sub-folders below the domain-name that was specified above. Default is for
+the object to show up in the domain-name folder.  The folder names can either be in @code{name=value} format in which case
+they should be in alphabetic order by name. They can also just be in @code{value} format.
 
 Folders are used when you have a large number of JMX objects being published and you want to group the objects so that
-you can find them faster than scrolling through a large list of objects.  For example, all of your database objects
+you can find them faster than scrolling through a large list.  For example, all of your database objects
 could go in the folder "Database" while the database connections could go into the sub-folder "Database/Connections".
 
 @example
-@@JmxResource(domainName = "j256", folderNames = @{ "Counters" @},
-    description = "Runtime counter")
-public class RuntimeCounter @{
+@@JmxResource(domainName = "j256",
+    folderNames = @{ "Database", "Connections" @},
+    description = "MySql datatbase connection")
+public class MySqlDatabaseConnection @{
 @end example
 
 @cindex object description
@@ -227,13 +225,13 @@ Textual description of the class for jconsole or other JMX clients. Default is s
 @cindex self naming
 Instead of using the @code{@@JmxResource} annotation to define the name/folders for your JMX object, you can have the
 object implement the @code{JmxSelfNaming} interface.  This allows the object to name itself and will override any settings
-from the @code{@@JmxResource} annotation, if specified at all.
+from the @code{@@JmxResource} annotation, if it is specified.
 
 @cindex multiple objects
 @cindex objects with same name
-It is particularly useful and actually necessary to make your object @code{JmxSelfNaming} if there are to be multiple of 
-them published via JMX.  For example, if you have multiple database connections that you want to publish then they all
-can't have the same name in JMX.
+It is particularly necessary to make your object @code{JmxSelfNaming} if there are to be multiple of them published via JMX.
+For example, if you have multiple database connections that you want to publish then to ensure that they have a @emph{unique} name,
+each of the objects should be self-naming and should provide a unique name that identifies itself: 
 
 @example
 // we only use this to set the domain name and the folders
@@ -248,8 +246,8 @@ public class DatabaseConnection extends BaseJmxSelfNaming
 @}
 @end example
 
-In the above example, we extend the @code{BaseJmxSelfNaming} which has default implementations for all of the
-@code{JmxSelfNaming} method so all we need to do is override what we want to change.
+In the above example, we extend the @code{BaseJmxSelfNaming} abstract class which has default implementations for all of the
+@code{JmxSelfNaming} methods, so all we need to do is override what we want to change.
 
 The methods in the @code{JmxSelfNaming} interface are:
 
@@ -271,7 +269,7 @@ folders in which case the bean will be at the top of the hierarchy in jconsole w
 @end table
 
 @c ----------------------------------------------------------------
-@node Exposing Items, Programmatic Publishing, Self Naming, Getting Started
+@node Exposing Items, Programmatic Publishing, Self Naming, Using
 @section Exposing Fields and Methods Over JMX
 
 @cindex notifications, not supported
@@ -279,8 +277,8 @@ Once we have named our object, we need to tell the JMX server which fields and m
 what it calls attributes, operations, and notifications.  At this time, only attributes and operations are supported.
 
 Attributes can be primitives or simple types such as @code{String} or @code{java.util.Date}.  With SimpleJMX you can expose them by using reflection
-on the objects fields directly using the @code{@@JmxAttributeField} annotation or via the get/set/is methods using the @code{@@JmxAttributeMethod}
-annotation.
+on the object's fields directly using the @code{@@JmxAttributeField} annotation or instead via the get/set/is methods using the
+@code{@@JmxAttributeMethod} annotation.
 
 Operations are methods that do @emph{not} start with get/set/is but which perform some function (ex: @code{resetTimer()},
 @code{clearCache()}, etc.).  They can be exposed with the @code{@@JmxOperation} annotation.
@@ -293,7 +291,7 @@ Operations are methods that do @emph{not} start with get/set/is but which perfor
 
 @c ----------------------------------------------------------------
 @node JmxAttributeField Annotation, JmxAttributeMethod Annotation, Exposing Items, Exposing Items
-@section @@JmxAttributeField Annotation
+@subsection @@JmxAttributeField Annotation
 
 @cindex exposing fields
 @cindex publishing fields
@@ -305,14 +303,15 @@ SimpleJMX allows you to publish your primitive or simple types by annotating you
 annotation.
 
 @example
-@@JmxAttributeField(description = "Show runtime in seconds",
+@@JmxAttributeField(description = "Start time in millis",
    isWritable = true)
-private boolean showSeconds;
+private long startTimeMillis;
 @end example
 
 @cindex writable attributes
-In the above example, the @code{showSeconds} boolean field will be visible via JMX.  It will show its value which can be
-changed because @code{isWriable} is set to true.  The description is available in jconsole when you hover over the attribute.
+In the above example, the @code{startTimeMillis} long field will be visible via JMX.  It will show its value which can be
+changed because @code{isWriable} is set to true -- @code{isReadable} is set to true by default.  The description is available
+in jconsole when you hover over the attribute.
 
 The fields in the @code{@@JmxAttributeField} annotation are:
 
@@ -335,7 +334,7 @@ Set to true if the field can be written by JMX. Default is false.
 
 @c ----------------------------------------------------------------
 @node JmxAttributeMethod Annotation, JmxOperation Annotation, JmxAttributeField Annotation, Exposing Items
-@section @@JmxAttributeMethod Annotation
+@subsection @@JmxAttributeMethod Annotation
 
 @cindex exposing get/set/is methods
 @cindex get methods
@@ -367,12 +366,12 @@ to do data validation.
 public long getRunTime() @{
 @end example
 
-The only field ins the @code{@@JmxAttributeMethod} annotation is the description.  The annotation on the @code{get...} method shows that it
+The only field in the @code{@@JmxAttributeMethod} annotation is the description.  The annotation on the @code{get...} method shows that it
 is readable and the annotation on the @code{set...} method shows that it is writable.
 
 @c ----------------------------------------------------------------
 @node JmxOperation Annotation, Programmatic Publishing, JmxAttributeMethod Annotation, Exposing Items
-@section @@JmxOperation Annotation
+@subsection @@JmxOperation Annotation
 
 @cindex exposing methods
 @cindex publishing methods
@@ -382,9 +381,8 @@ is readable and the annotation on the @code{set...} method shows that it is writ
 @cindex JmxOperation annotation
 
 Operations are methods that do @emph{not} start with get/set/is but which perform some function.  They can be exposed with the
-@code{@@JmxOperation} annotation.  It can be added only to methods that are @emph{not} named @code{get...}, @code{set...}, or @code{is...}. The
-method can either return @code{void} or an object. It is recommended that the method return a primitive or a simple object that will
-be for sure in jconsole's classpath.  It also should not throw an unknown @code{Exception} class.
+@code{@@JmxOperation} annotation.  The method can either return @code{void} or an object. It is recommended that the method return
+a primitive or a simple object that will be for sure in jconsole's classpath.  It also should not throw an unknown @code{Exception} class.
 
 The fields in the @code{@@JmxOperation} annotation are:
 
@@ -396,7 +394,7 @@ Description of the attribute for jconsole. Default is something like "someMethod
 
 @item String[] parameterNames
 
-Array of optional strings which gives the name of each of the method parameters.  The array should be the
+Optional array of strings which gives the name of each of the method parameters.  The array should be the
 same length as the @code{parameterDescriptions} array. Default is something like "p0".
 
 @example
@@ -409,7 +407,7 @@ public void resetMaxMin(int minValue, int maxValue) @{
 
 @item String[] parameterDescriptions
 
-Array of optional strings which describes each of the method parameters. The array should be the same
+Optional array of strings which describes each of the method parameters. The array should be the same
 length as the @code{parameterNames} array.
 
 @item OperationAction operationAction
@@ -419,7 +417,7 @@ This optional field is used by the JMX system to describe what sort of work is b
 @end table
 
 @c ----------------------------------------------------------------
-@node Programmatic Publishing, Using Client, JmxOperation Annotation, Getting Started
+@node Programmatic Publishing, Using Client, JmxOperation Annotation, Using
 @section Publishing Using Code Definitions
 
 Sometimes, you want to expose a class using JMX but you don't control the source code or maybe you don't want to put the SimpleJMX
@@ -428,12 +426,6 @@ annotations everywhere.  If this is the case then you also have the option to ex
 The @code{JmxServer} has a register function which takes just an @code{Object}, its @code{ObjectName}, and an array of
 attribute-fields, attribute-methods, and operations.
 
-@example
-jmxServer.register(someObject,
-   ObjectNameUtil.makeObjectName("j256", "SomeObject"),
-   attributeFieldInfos, attributeMethodInfos, operationInfos);
-@end example
- 
 The attribute-fields are specified as an array of @code{JmxAttributeFieldInfo} objects that are associated with fields that are
 exposed through reflection:
 
@@ -467,10 +459,18 @@ JmxOperationInfo[] operationInfos =
    @};
 @end example
 
+To register the object you would then do:
+
+@example
+jmxServer.register(someObject,
+   ObjectNameUtil.makeObjectName("j256", "SomeObject"),
+   attributeFieldInfos, attributeMethodInfos, operationInfos);
+@end example
+
 Take a look at the random-object example test for a working example.  @xref{random object example}.
 
 @c ----------------------------------------------------------------
-@node Using Client, Examples, Programmatic Publishing, Getting Started
+@node Using Client, Examples, Programmatic Publishing, Using
 @section Using the JMX Client
 
 SimpleJMX also includes a programmatic, simple JMX client which you can use to interrogate JMX servers.  You

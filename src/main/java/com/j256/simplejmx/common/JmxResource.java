@@ -45,9 +45,10 @@ public @interface JmxResource {
 	public String beanName() default "";
 
 	/**
-	 * Other strings which which translate into sub-folders below the domain-name that was specified above. They can
-	 * either be in <tt>name=value</tt> format in which case they should be in alphabetic order by name. They can also
-	 * just be in <tt>value</tt> format in which case a ## prefix (ex. 00=...) will be added by the code.
+	 * Optional array of strings which translate into sub-folders below the domain-name that was specified above.
+	 * Default is for the object to show up in the domain-name folder. The folder names can either be in
+	 * <tt>name=value</tt> format in which case they should be in alphabetic order by name. They can also just be in
+	 * <tt>value</tt> format in which case a ## prefix (ex. 00=...) will be added by the code.
 	 * 
 	 * <p>
 	 * The following are basically synonymous:
