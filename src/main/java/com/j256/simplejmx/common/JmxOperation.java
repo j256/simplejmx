@@ -10,9 +10,9 @@ import javax.management.MBeanOperationInfo;
 import com.j256.simplejmx.common.JmxOperationInfo.OperationAction;
 
 /**
- * This identifies which methods are operations. It is added to methods that are _not_ named "get..." or "set...". The
- * method can either return void or return an object. It is recommended that the method return a simple object that will
- * be for sure in jconsole's classpath and also should not throw an unknown exception class either. This class is
+ * This identifies which methods are operations. It is added to methods that are _not_ named "get...", "set...", or
+ * "is...". The method can either return void or an object. It is recommended that the method return a simple object
+ * that will be for sure in jconsole's classpath. It also should not throw an unknown exception class. This class is
  * similar to Spring's &#64;ManagedOperation.
  * 
  * <p>
@@ -39,8 +39,8 @@ public @interface JmxOperation {
 	public String description() default "";
 
 	/**
-	 * Array of strings which gives the name each of the parameters to the operation method. This array should be the
-	 * same length as the {@link #parameterDescriptions()} array. Default is something like "p0". For example:
+	 * Optional array of strings which gives the name of each of the method parameters. The array should be the same
+	 * length as the {@link #parameterDescriptions()} array. Default is something like "p0". For example:
 	 * 
 	 * <p>
 	 * 
@@ -56,9 +56,9 @@ public @interface JmxOperation {
 	public String[] parameterNames() default {};
 
 	/**
-	 * Array of strings which describes each of the parameters to the operation method. This array should be the same
-	 * length as the {@link #parameterNames()} array. If not specified then it will create one with the parameter number
-	 * and type -- something like "parameter #0 of type: int".
+	 * Optional array of strings which describes each of the method parameters. The array should be the same length as
+	 * the {@link #parameterNames()} array. If not specified then it will create one with the parameter number and type
+	 * -- something like "parameter #0 of type: int".
 	 * 
 	 * <p>
 	 * 
@@ -74,7 +74,7 @@ public @interface JmxOperation {
 	public String[] parameterDescriptions() default {};
 
 	/**
-	 * This is used by the JMX system to describe what sort of work is being done in this operation.
+	 * This optional is used by the JMX system to describe what sort of work is being done in this operation.
 	 */
 	public OperationAction operationAction() default OperationAction.UNKNOWN;
 

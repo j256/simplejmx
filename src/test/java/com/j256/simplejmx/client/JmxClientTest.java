@@ -289,8 +289,7 @@ public class JmxClientTest {
 		short val1 = 231;
 		int val2 = 524;
 		Object result =
-				client.invokeOperation(JMX_DOMAIN, beanName, "times", Short.toString(val1),
-						Integer.toString(val2));
+				client.invokeOperation(JMX_DOMAIN, beanName, "times", Short.toString(val1), Integer.toString(val2));
 		long times = val1 * val2;
 		assertEquals(times, result);
 	}
@@ -397,6 +396,13 @@ public class JmxClientTest {
 	public void testInvokeOperationStringsObject() throws Exception {
 		testThingtoString("dateToString", new Date());
 	}
+
+	@Test
+	public void testSystem() throws Exception {
+		client.getAttribute(ObjectName.getInstance("java.lang:type=OperatingSystem"), "AvailableProcessors");
+	}
+
+	/* ======================================================================= */
 
 	private void testThingtoString(String methodName, Object arg) throws Exception {
 		String argString = arg.toString();

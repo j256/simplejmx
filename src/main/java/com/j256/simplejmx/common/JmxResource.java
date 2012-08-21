@@ -35,7 +35,7 @@ public @interface JmxResource {
 	public String objectName() default "";
 
 	/**
-	 * Name of the object for the name= part of the ObjectName. This turns into the name of the JMX bean in the folder.
+	 * Name of the JMX bean in the jconsole folder it is in.
 	 * <p>
 	 * If the object implements {@link JmxSelfNaming} then this would be replaced by
 	 * {@link JmxSelfNaming#getJmxNameOfObject()}. If the object doesn't implement {@link JmxSelfNaming} and this is not
@@ -45,10 +45,9 @@ public @interface JmxResource {
 	public String beanName() default "";
 
 	/**
-	 * Other strings which go before the <tt>name=</tt> line which translate into sub-folders below the domain-name that
-	 * was specified above. They can either be in <tt>name=value</tt> format in which case they should be in alphabetic
-	 * order by name. They can also just be in <tt>value</tt> format in which case a ## prefix will be added by the
-	 * code.
+	 * Other strings which which translate into sub-folders below the domain-name that was specified above. They can
+	 * either be in <tt>name=value</tt> format in which case they should be in alphabetic order by name. They can also
+	 * just be in <tt>value</tt> format in which case a ## prefix (ex. 00=...) will be added by the code.
 	 * 
 	 * <p>
 	 * The following are basically synonymous:
