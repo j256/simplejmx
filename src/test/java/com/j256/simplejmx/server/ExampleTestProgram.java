@@ -25,7 +25,7 @@ public class ExampleTestProgram {
 	private void doMain(String[] args) throws Exception {
 
 		// create the object we will be exposing with JMX
-		RuntimeCounter lookupCache = new RuntimeCounter();
+		RuntimeCounter counter = new RuntimeCounter();
 
 		// create a new JMX server listening on a port
 		JmxServer jmxServer = new JmxServer(JMX_PORT);
@@ -33,8 +33,8 @@ public class ExampleTestProgram {
 			// start our server
 			jmxServer.start();
 
-			// register our lookupCache object defined below
-			jmxServer.register(lookupCache);
+			// register our object
+			jmxServer.register(counter);
 			// we can register other objects here
 			// jmxServer.register(someOtherObject);
 
@@ -45,7 +45,7 @@ public class ExampleTestProgram {
 
 		} finally {
 			// unregister is not necessary if we are stopping the server
-			jmxServer.unregister(lookupCache);
+			jmxServer.unregister(counter);
 			// stop our server
 			jmxServer.stop();
 		}
@@ -84,10 +84,10 @@ public class ExampleTestProgram {
 		 */
 
 		// this is an operation that shows up in the operations tab in jconsole.
-		@JmxOperation(description = "Restart our timer")
-		public String restartTimer() {
+		@JmxOperation(description = "Reset our start time to the current millis")
+		public String resetStartTime() {
 			startMillis = System.currentTimeMillis();
-			return "Timer has been restarted";
+			return "Timer has been reset to current millis";
 		}
 	}
 }
