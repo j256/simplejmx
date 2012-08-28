@@ -58,8 +58,8 @@ public class RandomObjectTestProgram {
 			 * Register our lookupCache object defined below but with specific field-attributes, method-attributes, and
 			 * method-operations defined.
 			 */
-			jmxServer.register(lookupCache, ObjectNameUtil.makeObjectName("j256", "RuntimeCounter"), attributeFieldInfos,
-					attributeMethodInfos, operationInfos);
+			jmxServer.register(lookupCache, ObjectNameUtil.makeObjectName("j256", "RuntimeCounter"),
+					attributeFieldInfos, attributeMethodInfos, operationInfos);
 			// we can register other objects here
 			// jmxServer.register(someOtherObject);
 
@@ -77,7 +77,7 @@ public class RandomObjectTestProgram {
 	}
 
 	/**
-	 * Here is our little bean that we are exposing via JMX but not with annotations. It can be in another class. It's
+	 * Here is our little bean that we are exposing via JMX but without annotations. It can be in another class. It's
 	 * just an inner class here for convenience.
 	 */
 	public static class RuntimeCounter {
@@ -85,10 +85,10 @@ public class RandomObjectTestProgram {
 		// start our timer
 		private long startMillis = System.currentTimeMillis();
 
-		// we can annotate fields directly to be published in JMX, isReadible defaults to true
+		// this field is exposed using JmxAttributeFieldInfo code above
 		private boolean showSeconds;
 
-		// we can annotate getter methods
+		// this get method is exposed using JmxAttributeMethodInfo code above
 		public long getRunTime() {
 			// show how long we are running
 			long diffMillis = System.currentTimeMillis() - startMillis;
@@ -101,13 +101,13 @@ public class RandomObjectTestProgram {
 			}
 		}
 
-		// this is an operation that shows up in the operations tab in jconsole.
+		// this method is exposed using JmxOperationInfo code above
 		public String restartTimer() {
 			startMillis = System.currentTimeMillis();
 			return "Timer has been restarted to " + startMillis;
 		}
 
-		// this is an operation that shows up in the operations tab in jconsole.
+		// this method is exposed using JmxOperationInfo code above
 		public String restartTimerToValue(long startMillis) {
 			this.startMillis = startMillis;
 			return "Timer has been restarted to " + startMillis;
