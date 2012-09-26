@@ -151,7 +151,6 @@ public class JmxClient {
 	 */
 	public String[] getBeanDomains() throws JMException {
 		checkClientConnected();
-
 		try {
 			return mbeanConn.getDomains();
 		} catch (IOException e) {
@@ -160,13 +159,24 @@ public class JmxClient {
 	}
 
 	/**
-	 * Return a set of the various bean names associated with the Jmx server.
+	 * Return a set of the various bean ObjectName objects associated with the Jmx server.
 	 */
 	public Set<ObjectName> getBeanNames() throws JMException {
 		checkClientConnected();
-
 		try {
 			return mbeanConn.queryNames(null, null);
+		} catch (IOException e) {
+			throw createJmException("Problems querying for jmx bean names: " + e, e);
+		}
+	}
+
+	/**
+	 * Return a set of the various bean ObjectName objects associated with the Jmx server.
+	 */
+	public Set<ObjectName> getBeanNames(String domain) throws JMException {
+		checkClientConnected();
+		try {
+			return mbeanConn.queryNames(ObjectName.getInstance(domain + ":*"), null);
 		} catch (IOException e) {
 			throw createJmException("Problems querying for jmx bean names: " + e, e);
 		}
@@ -184,7 +194,6 @@ public class JmxClient {
 	 */
 	public MBeanAttributeInfo[] getAttributesInfo(ObjectName name) throws JMException {
 		checkClientConnected();
-
 		try {
 			return mbeanConn.getMBeanInfo(name).getAttributes();
 		} catch (Exception e) {
@@ -197,7 +206,6 @@ public class JmxClient {
 	 */
 	public MBeanAttributeInfo getAttributeInfo(ObjectName name, String attrName) throws JMException {
 		checkClientConnected();
-
 		return getAttrInfo(name, attrName);
 	}
 
@@ -213,7 +221,6 @@ public class JmxClient {
 	 */
 	public MBeanOperationInfo[] getOperationsInfo(ObjectName name) throws JMException {
 		checkClientConnected();
-
 		try {
 			return mbeanConn.getMBeanInfo(name).getOperations();
 		} catch (Exception e) {
@@ -226,7 +233,6 @@ public class JmxClient {
 	 */
 	public MBeanOperationInfo getOperationInfo(ObjectName name, String oper) throws JMException {
 		checkClientConnected();
-
 		MBeanInfo mbeanInfo;
 		try {
 			mbeanInfo = mbeanConn.getMBeanInfo(name);
@@ -318,7 +324,6 @@ public class JmxClient {
 	 */
 	public void setAttribute(ObjectName name, String attrName, Object value) throws Exception {
 		checkClientConnected();
-
 		Attribute attribute = new Attribute(attrName, value);
 		mbeanConn.setAttribute(name, attribute);
 	}
@@ -405,7 +410,6 @@ public class JmxClient {
 
 	private String[] lookupParamTypes(ObjectName objectName, String operName, Object[] params) throws JMException {
 		checkClientConnected();
-
 		if (operations == null) {
 			try {
 				operations = mbeanConn.getMBeanInfo(objectName).getOperations();

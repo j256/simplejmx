@@ -402,6 +402,22 @@ public class JmxClientTest {
 		client.getAttribute(ObjectName.getInstance("java.lang:type=OperatingSystem"), "AvailableProcessors");
 	}
 
+	@Test
+	public void testGetBeansForDomain() throws Exception {
+		String domainName = "java.lang";
+		Set<ObjectName> beans = client.getBeanNames(domainName);
+		boolean found = false;
+		String beanName = domainName + ":type=OperatingSystem";
+		for (ObjectName objectName : beans) {
+			String nameString = objectName.getCanonicalName();
+			assertTrue(nameString.startsWith(domainName + ":"));
+			if (beanName.equals(nameString)) {
+				found = true;
+			}
+		}
+		assertTrue("Found bean " + beanName, found);
+	}
+
 	/* ======================================================================= */
 
 	private void testThingtoString(String methodName, Object arg) throws Exception {

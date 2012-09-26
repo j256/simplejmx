@@ -74,7 +74,7 @@ Gray Watson @uref{http://256.com/gray/}
 @cindex getting started
 @cindex how to get started
 @cindex quick start
-To use SimpleJMX you need to do the following steps.  For more information see, @pxref{Using}.
+To use SimpleJMX you need to do the following steps.  For more information, @pxref{Using}.
 
 @enumerate
 
@@ -129,6 +129,8 @@ jmxServer.register(someOtherObject);
 
 @end enumerate
 
+For more extensive instructions, @pxref{Using}.
+
 @c ----------------------------------------------------------------
 @node Using, Downloading, Quick Start, Top
 @chapter Using SimpleJMX
@@ -152,7 +154,7 @@ jmxServer.register(someOtherObject);
 @cindex how to download the jars
 @cindex downloading the jars
 @cindex where to get new jars
-To get started with SimpleJMX, you will need to download the jar files.  The @uref{http://256.com/sources/simplejmx/releases/, SimpleJMX
+To get started with SimpleJMX, you will need to download the jar file.  The @uref{http://256.com/sources/simplejmx/releases/, SimpleJMX
 release page} is the default repository but the jars are also available from the @uref{http://repo1.maven.org/maven2/com/j256/simplejmx/,
 central maven repository} and from @uref{http://sourceforge.net/projects/simplejmx/files/, Sourceforge}.
 
@@ -208,17 +210,17 @@ Name of the JMX object in the jconsole folder.  The default is to use the class 
 @cindex directories in jconsole
 @item folderNames
 
-Optional array of strings which translate into sub-folders below the domain-name that was specified above. Default is for
+Optional array of strings which translate into sub-folders below the domain-name folder. Default is for
 the object to show up in the domain-name folder.  The folder names can either be in @code{name=value} format in which case
 they should be in alphabetic order by name. They can also just be in @code{value} format.
 
 Folders are used when you have a large number of JMX objects being published and you want to group the objects so that
 you can find them faster than scrolling through a large list.  For example, all of your database objects
-could go in the folder "Database" while the database connections could go into the sub-folder "Database/Connections".
+could go in the folder "database" while the database connections could go into the sub-folder "database/connections".
 
 @example
 @@JmxResource(domainName = "your.domain",
-    folderNames = @{ "Database", "Connections" @})
+    folderNames = @{ "database", "connections" @})
 public class MySqlDatabaseConnection @{
 @end example
 
@@ -249,7 +251,7 @@ each of the objects should be self-naming and should provide a unique name that 
 @example
 // we only use this to set the domain name and the folders
 @@JmxResource(domainName = "your.domain",
-   folderNames = @{ "Database", "Connections" @})
+   folderNames = @{ "database", "connections" @})
 public class DatabaseConnection extends BaseJmxSelfNaming
       implements JmxSelfNaming @{
    @@Override
@@ -324,7 +326,7 @@ private long startTimeMillis;
 
 @cindex writable attributes
 In the above example, the @code{startTimeMillis} long field will be visible via JMX.  It will show its value which can be
-changed because @code{isWriable} is set to true -- @code{isReadable} is set to true by default.  The description is available
+changed because @code{isWriable} is set to true.  @code{isReadable} is set to true by default.  The description is available
 in jconsole when you hover over the attribute.
 
 The fields in the @code{@@JmxAttributeField} annotation are:
@@ -372,7 +374,7 @@ it into @code{getFooBar()} with a capital 'F'.  In addition, the @code{getXxx()}
 The @code{setXxx(...)} method must return @code{void} and must take a single argument.  The @code{isXxx()} method is allowed if it
 returns boolean or Boolean and the method has no arguments.
 
-Exposing a get method also allows you to do some data conversion when the value is published.  Exposing a set method allows you
+Exposing a get method allows you to do some data conversion when the value is published.  Exposing a set method allows you
 to do data validation.
 
 @example
@@ -396,12 +398,28 @@ is readable and the annotation on the @code{set...} method shows that it is writ
 
 Operations are methods that do @emph{not} start with get/set/is but which perform some function.  They can be exposed with the
 @code{@@JmxOperation} annotation.  The method can either return @code{void} or an object. It is recommended that the method return
-a primitive or a simple object that will be for sure in jconsole's classpath.  It also should not throw an unknown @code{Exception} class.
+a primitive or a simple object that is in Jconsole's classpath already.  Otherwise Jconsole will be unable to display it.
+It also should not throw an unknown @code{Exception} class.
 
 @example
 @@JmxOperation(description = "clear the cache")
 public void clearCache() @{
    ...
+@end example
+
+A pattern that is common is to return a @code{String} from the method to provide some feedback to the remote user and to catch
+and return any exceptions as a @code{String}.
+
+@example
+@@JmxOperation(description = "clear the cache")
+public void clearCache() @{
+   try @{
+      // do the cache clearing here
+      return "Cache cleared";
+   @} catch (Exception e) @{
+      return "Threw exception: " + e;
+   @}
+@}
 @end example
 
 The fields in the @code{@@JmxOperation} annotation are:
@@ -441,8 +459,8 @@ This optional field is used by the JMX system to describe what sort of work is b
 @section Starting a JMX Server
 
 @cindex start a JMX server
-The @code{JmxServer} class is used to publish a JMX server that jconsole and other JMX clients can connect to.
-The easiest way to do this is to choose a port to use, define the server, and then start it:
+The @code{JmxServer} class proves a server that jconsole and other JMX clients can connect to.  The easiest way to do this is
+to choose a port to use, define the server, and then start it:
 
 @example
 // create a new JMX server listening on a port
@@ -460,7 +478,7 @@ try @{
    // start our server
    jmxServer.start();
    ...
-   // register objects with the server anddo other stuff here
+   // register objects with the server and do other stuff here
    ...
 @} finally @{
    // un-register objects
@@ -497,8 +515,8 @@ The objects that are registered must be named and the fields and methods that ar
 Sometimes, you want to expose a class using JMX but you don't control the source code or maybe you don't want to put the SimpleJMX
 annotations everywhere.  If this is the case then you also have the option to expose just about any object programmatically.
 
-The @code{JmxServer} has a register function which takes just an @code{Object}, its @code{ObjectName}, and an array of
-attribute-fields, attribute-methods, and operations.
+The @code{JmxServer} has a register function which takes just an @code{Object}, an @code{ObjectName} which can be generated with
+the use of the @code{ObjectNameUtil} class, and an array of attribute-fields, attribute-methods, and operations.
 
 The attribute-fields are specified as an array of @code{JmxAttributeFieldInfo} objects that are associated with fields that are
 exposed through reflection:
@@ -550,21 +568,47 @@ Take a look at the random-object example test for a working example.  @xref{rand
 @cindex jmx client
 @cindex client, JMX
 SimpleJMX also includes a programmatic, simple JMX client which you can use to interrogate JMX servers.  You
-connect to the server by specifying the host/port of the server.
+connect to the server by specifying the host and port.
 
 @example
-JmxClient = client = new JmxClient("server1", 8000);
+JmxClient client = new JmxClient("server1", 8000);
 @end example
 
-You can then get attributes:
+To get a list of the available beans use the 
+
+@example
+Set<ObjectName> beanNames = jmxClient.getBeanNames();
+@end example
+
+Then you can get the attributes and operations associated with an @code{ObjectName}: 
+
+@example
+MBeanAttributeInfo[] attributeInfos =
+   jmxClient.getAttributesInfo(objectName);
+MBeanOperationInfo[] operationInfos =
+   jmxClient.getOperationsInfo(objectName);
+@end example
+
+You can then get an attribute from the info or invoke an operation:
 
 @example
 boolean showSeconds =
-    jmxClient.getAttribute("your.domain", "RuntimeCounter",
-       "showSeconds");
+    jmxClient.getAttribute(objectName, attributeInfo.getName());
+client.invokeOperation(objectName, operationInfo.getName());
 @end example
 
-If you need to construct the object name directly then you can use @code{ObjectName} static methods:
+You can also get attributes by strings instead of @code{ObjectName}s:
+
+@example
+boolean showSeconds =
+   jmxClient.getAttribute("your.domain", "RuntimeCounter",
+      "showSeconds");
+@end example
+
+@cindex jconsole
+If you need to construct the object name directly then you can use @code{ObjectName} static methods.  This is
+particularly useful if you use Jconsole to find a bean that you want to operate on via the @code{JmxClient}.  Just
+copy the @code{ObjectName} field associaed to a bean from Jconsole and then do something like the following:  
 
 @example
 int availableProcessors = 
@@ -573,16 +617,14 @@ int availableProcessors =
       "AvailableProcessors");
 @end example
 
-You can also call operations:
+You can also call operations with string arguments:
 
 @example
-client.invokeOperation(
-   ObjectName.getInstance("java.lang:type=Memory"),
+client.invokeOperation(ObjectName.getInstance("java.lang:type=Memory"),
    "gc");
 @end example
 
-You can also list the available attributes and operations and do a number of other things.  See the @code{JmxClient}
-javadocs for more information
+See the @code{JmxClient} javadocs for more information
 
 @c ----------------------------------------------------------------
 @node Examples, License, Using Client, Top
