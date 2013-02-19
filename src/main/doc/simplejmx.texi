@@ -22,7 +22,7 @@
 @page
 This manual is licensed by Gray Watson under the Creative Commons Attribution-Share Alike 3.0 License.
 
-Permission is granted to make and distribute verbatim copies of this manual provided the previous license
+Permission is granted to make and distribute verbatim copies of this manual provided this license
 notice and this permission notice are preserved on all copies.
 @end titlepage
 
