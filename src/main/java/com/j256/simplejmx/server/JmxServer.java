@@ -102,14 +102,6 @@ public class JmxServer {
 	}
 
 	/**
-	 * Register the object parameter for exposure with JMX that implements self-naming. This calls through to
-	 * {@link #register(Object)}.
-	 */
-	public void register(JmxSelfNaming selfNaming) throws JMException {
-		register((Object) selfNaming);
-	}
-
-	/**
 	 * Register the object parameter for exposure with JMX. The object passed in must have a {@link JmxResource}
 	 * annotation or must implement {@link JmxSelfNaming}.
 	 */
