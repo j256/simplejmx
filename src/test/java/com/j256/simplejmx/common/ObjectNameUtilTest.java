@@ -10,10 +10,10 @@ public class ObjectNameUtilTest {
 
 	private static final String DOMAIN_NAME = "foo.com";
 	private static final String OBJECT_NAME = "someObj";
-	private static final String FIELD1 = "a";
-	private static final String FOLDER1 = "foo";
-	private static final String FIELD2 = "b";
-	private static final String FOLDER2 = "bar";
+	private static final String FIELD_NAME1 = "a";
+	private static final String FOLDER_NAME1 = "folder1";
+	private static final String FIELD_NAME2 = "b";
+	private static final String FOLDER_NAME2 = "folder2";
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testSelfNamingNoDescription() {
@@ -48,32 +48,32 @@ public class ObjectNameUtilTest {
 	public void testStringFolderField() {
 		StringFolderField obj = new StringFolderField();
 		ObjectName name = ObjectNameUtil.makeObjectName(obj.getClass().getAnnotation(JmxResource.class), obj);
-		assertEquals(
-				DOMAIN_NAME + ":" + FIELD1 + "=" + FOLDER1 + "," + FIELD2 + "=" + FOLDER2 + ",name=" + OBJECT_NAME,
-				name.toString());
+		assertEquals(DOMAIN_NAME + ":" + FIELD_NAME1 + "=" + FOLDER_NAME1 + "," + FIELD_NAME2 + "=" + FOLDER_NAME2
+				+ ",name=" + OBJECT_NAME, name.toString());
 	}
 
 	@Test
 	public void testNoStringFolderField() {
 		NoStringFolderField obj = new NoStringFolderField();
 		ObjectName name = ObjectNameUtil.makeObjectName(obj.getClass().getAnnotation(JmxResource.class), obj);
-		assertEquals(DOMAIN_NAME + ":00=" + FOLDER1 + ",01=" + FOLDER2 + ",name=" + OBJECT_NAME, name.toString());
+		assertEquals(DOMAIN_NAME + ":00=" + FOLDER_NAME1 + ",01=" + FOLDER_NAME2 + ",name=" + OBJECT_NAME,
+				name.toString());
 	}
 
 	@Test
 	public void testJmxFolderNameField() {
 		JmxFolderNameField obj = new JmxFolderNameField();
 		ObjectName name = ObjectNameUtil.makeObjectName(obj.getClass().getAnnotation(JmxResource.class), obj);
-		assertEquals(
-				DOMAIN_NAME + ":" + FIELD1 + "=" + FOLDER1 + "," + FIELD2 + "=" + FOLDER2 + ",name=" + OBJECT_NAME,
-				name.toString());
+		assertEquals(DOMAIN_NAME + ":" + FIELD_NAME1 + "=" + FOLDER_NAME1 + "," + FIELD_NAME2 + "=" + FOLDER_NAME2
+				+ ",name=" + OBJECT_NAME, name.toString());
 	}
 
 	@Test
 	public void testNoJmxFolderNameField() {
 		NoJmxFolderNameField obj = new NoJmxFolderNameField();
 		ObjectName name = ObjectNameUtil.makeObjectName(obj.getClass().getAnnotation(JmxResource.class), obj);
-		assertEquals(DOMAIN_NAME + ":00=" + FOLDER1 + ",01=" + FOLDER2 + ",name=" + OBJECT_NAME, name.toString());
+		assertEquals(DOMAIN_NAME + ":00=" + FOLDER_NAME1 + ",01=" + FOLDER_NAME2 + ",name=" + OBJECT_NAME,
+				name.toString());
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -100,6 +100,22 @@ public class ObjectNameUtilTest {
 		NoObjectNameInfo obj = new NoObjectNameInfo();
 		ObjectName name = ObjectNameUtil.makeObjectName(null, obj);
 		assertEquals(obj.getClass().getSimpleName(), name.getKeyProperty("name"));
+	}
+
+	@Test
+	public void testFolderNamesFromAnnoationWithSelfNaming() {
+		FoldersFromAnnotationWithSelfNaming obj = new FoldersFromAnnotationWithSelfNaming();
+		ObjectName name = ObjectNameUtil.makeObjectName(obj);
+		assertEquals(obj.getJmxNameOfObject(), name.getKeyProperty("name"));
+		assertEquals(FOLDER_NAME1, name.getKeyProperty("00"));
+	}
+
+	@Test
+	public void testFolderNamesFromSelfNameingWithAnnoation() {
+		FoldersFromSelfNaming obj = new FoldersFromSelfNaming();
+		ObjectName name = ObjectNameUtil.makeObjectName(obj);
+		assertEquals(obj.getJmxNameOfObject(), name.getKeyProperty("name"));
+		assertEquals(FOLDER_NAME2, name.getKeyProperty("00"));
 	}
 
 	/* ================================================================== */
@@ -147,12 +163,12 @@ public class ObjectNameUtilTest {
 		}
 	}
 
-	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME, folderNames = { FIELD1 + "=" + FOLDER1,
-			FIELD2 + "=" + FOLDER2 })
+	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME, folderNames = { FIELD_NAME1 + "=" + FOLDER_NAME1,
+			FIELD_NAME2 + "=" + FOLDER_NAME2 })
 	protected static class StringFolderField {
 	}
 
-	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME, folderNames = { FOLDER1, FOLDER2 })
+	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME, folderNames = { FOLDER_NAME1, FOLDER_NAME2 })
 	protected static class NoStringFolderField {
 	}
 
@@ -165,7 +181,8 @@ public class ObjectNameUtilTest {
 			return null;
 		}
 		public JmxFolderName[] getJmxFolderNames() {
-			return new JmxFolderName[] { new JmxFolderName(FIELD1, FOLDER1), new JmxFolderName(FIELD2, FOLDER2) };
+			return new JmxFolderName[] { new JmxFolderName(FIELD_NAME1, FOLDER_NAME1),
+					new JmxFolderName(FIELD_NAME2, FOLDER_NAME2) };
 		}
 	}
 
@@ -178,7 +195,34 @@ public class ObjectNameUtilTest {
 			return null;
 		}
 		public JmxFolderName[] getJmxFolderNames() {
-			return new JmxFolderName[] { new JmxFolderName(FOLDER1), new JmxFolderName(FOLDER2) };
+			return new JmxFolderName[] { new JmxFolderName(FOLDER_NAME1), new JmxFolderName(FOLDER_NAME2) };
+		}
+	}
+
+	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME, folderNames = { FOLDER_NAME1 })
+	protected static class FoldersFromAnnotationWithSelfNaming implements JmxSelfNaming {
+		public String getJmxDomainName() {
+			return null;
+		}
+		public String getJmxNameOfObject() {
+			return "FoldersFromAnnotationWithSelfNaming";
+		}
+		public JmxFolderName[] getJmxFolderNames() {
+			return null;
+		}
+	}
+
+	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME, folderNames = { FOLDER_NAME1 })
+	protected static class FoldersFromSelfNaming implements JmxSelfNaming {
+		public String getJmxDomainName() {
+			return null;
+		}
+		public String getJmxNameOfObject() {
+			return "FoldersFromSelfNaming";
+		}
+		// NOTE: this overrides the folders in the @JmxResource
+		public JmxFolderName[] getJmxFolderNames() {
+			return new JmxFolderName[] { new JmxFolderName(FOLDER_NAME2) };
 		}
 	}
 
@@ -205,7 +249,7 @@ public class ObjectNameUtilTest {
 
 	protected static class NoObjectNameInfo implements JmxSelfNaming {
 		public String getJmxDomainName() {
-			return "foo";
+			return "NoObjectNameInfo";
 		}
 		public String getJmxNameOfObject() {
 			return null;

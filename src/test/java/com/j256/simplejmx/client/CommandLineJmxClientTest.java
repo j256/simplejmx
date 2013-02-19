@@ -357,7 +357,8 @@ public class CommandLineJmxClientTest {
 		int x1 = 12;
 		int x2 = 654;
 		String output =
-				getClientOutput(client, "dolines " + objectNameString + " times", Integer.toString(x1), Integer.toString(x2));
+				getClientOutput(client, "dolines " + objectNameString + " times", Integer.toString(x1),
+						Integer.toString(x2));
 		int times = x1 * x2;
 		assertTrue(output, output.matches("(?s).*dolines 'times' in \\d+ms = " + times + ".*"));
 	}

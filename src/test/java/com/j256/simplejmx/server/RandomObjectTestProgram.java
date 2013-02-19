@@ -58,7 +58,7 @@ public class RandomObjectTestProgram {
 			 * Register our lookupCache object defined below but with specific field-attributes, method-attributes, and
 			 * method-operations defined.
 			 */
-			jmxServer.register(lookupCache, ObjectNameUtil.makeObjectName("j256", "RuntimeCounter"),
+			jmxServer.register(lookupCache, ObjectNameUtil.makeObjectName("j256.simplejmx", "RuntimeCounter"),
 					attributeFieldInfos, attributeMethodInfos, operationInfos);
 			// we can register other objects here
 			// jmxServer.register(someOtherObject);

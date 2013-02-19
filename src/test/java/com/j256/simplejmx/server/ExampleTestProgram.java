@@ -55,7 +55,7 @@ public class ExampleTestProgram {
 	 * Here is our little bean that we are exposing via JMX. It can be in another class. It's just an inner class here
 	 * for convenience.
 	 */
-	@JmxResource(description = "Runtime counter", domainName = "j256", beanName = "RuntimeCounter")
+	@JmxResource(description = "Runtime counter", domainName = "j256.simplejmx", beanName = "RuntimeCounter")
 	public static class RuntimeCounter {
 
 		// start our timer
