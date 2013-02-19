@@ -137,6 +137,9 @@ public class ObjectNameUtil {
 		sb.append(':');
 		boolean first = true;
 		int prefixC = 0;
+		/*
+		 * Self-naming takes precedence over the @JmxResource folder-name strings.
+		 */
 		if (folderNames != null) {
 			for (JmxFolderName folderName : folderNames) {
 				if (first) {
@@ -153,8 +156,7 @@ public class ObjectNameUtil {
 				sb.append('=');
 				sb.append(folderName.getValue());
 			}
-		}
-		if (folderNameStrings != null) {
+		} else if (folderNameStrings != null) {
 			for (String folderNameString : folderNameStrings) {
 				if (first) {
 					first = false;

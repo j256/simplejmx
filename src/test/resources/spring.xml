@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- test spring file for optional support for the Spring Framework -->
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<!-- allow classes to self-name -->
+	<!-- test spring file for optional support for the Spring Framework -->
+
+	<!-- publishes classes that have @JmxResource or implement JmxSelfNaming to jmxServer automagically -->
 	<bean id="beanPublisher" class="com.j256.simplejmx.spring.BeanPublisher">
 		<property name="jmxServer" ref="jmxServer" />
 	</bean>
 
-	<!-- mBean Exporter which exposes register/unregister functions to package classes -->
+	<!-- our JmxServer which publishes our beans via JMX -->
 	<bean id="jmxServer" class="com.j256.simplejmx.server.JmxServer" init-method="start" destroy-method="stop">
 		<!-- the port should probably come from a configured property -->
 		<property name="registryPort" value="8000" />

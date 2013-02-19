@@ -6,9 +6,9 @@
 @c %**end of header
 
 @c ----------------------------------------------------------------
-@set simplejmx_version 1.0
-@set simplejmx_year 2012
-@set simplejmx_date August @value{simplejmx_year}
+@set simplejmx_version 1.1
+@set simplejmx_year 2013
+@set simplejmx_date February @value{simplejmx_year}
 @set package SimpleJMX
 @c ----------------------------------------------------------------
 
@@ -44,9 +44,9 @@ Version @value{simplejmx_version} -- @value{simplejmx_date}
 @cindex author
 @cindex simple jmx
 @cindex jconsole
-This package provides some simple classes to help with the publishing of objects using Java's Management Extensions (JMX).
-These published objects can be investigated with jconsole (Sun's graphical JMX user interface application) or another
-JMX client.  Included is also a programmatic JMX client which you can use to connect to and interrogate remote JMX servers.
+This package provides some classes that publish object using Java's Management Extensions (JMX).   These published objects
+can be investigated with jconsole (Sun's graphical JMX user interface application) or another JMX client.  Included is also
+a programmatic JMX client which you can use to connect to and interrogate remote JMX servers.
 
 To get started quickly using SimpleJMX, @pxref{Quick Start}.  You can also take a look at the  the examples section of the
 document which has various working code packages. @xref{Examples}.
@@ -145,6 +145,7 @@ For more extensive instructions, @pxref{Using}.
 * Registering Objects ::        Registering objects for publishing.
 * Programmatic Publishing ::    How to define the name and exposed items programmatically.
 * Using Client ::               Using the programmatic JMX client.
+* Using With Spring ::          Using SimpleJMX with the Spring framework.
 @end menu
 
 @c ----------------------------------------------------------------
@@ -559,10 +560,10 @@ jmxServer.register(someObject,
    attributeFieldInfos, attributeMethodInfos, operationInfos);
 @end example
 
-Take a look at the random-object example test for a working example.  @xref{random object example}.
+Take a look at the random-object example program for a working example.  @xref{random object example}.
 
 @c ----------------------------------------------------------------
-@node Using Client, Examples, Programmatic Publishing, Using
+@node Using Client, Using With Spring, Programmatic Publishing, Using
 @section Using the JMX Client
 
 @cindex jmx client
@@ -627,7 +628,38 @@ client.invokeOperation(ObjectName.getInstance("java.lang:type=Memory"),
 See the @code{JmxClient} javadocs for more information
 
 @c ----------------------------------------------------------------
-@node Examples, License, Using Client, Top
+@node Using With Spring, Examples, Using Client, Using
+@section Using With the Spring Framework
+
+@cindex Spring framework
+@cindex using with Spring
+SimpleJMX has an optional dependency on the Spring Framework jar(s).  This means that if you have the Spring framework
+included in your project, you can make use of the @code{BeanPublisher} class which will automagically register the beans
+from your spring XML configuration files to the @code{JmxServer} class.  The @code{BeanPublisher} class will register
+classes that have the @code{@@JmxResource} annotation and the classes that implement the @code{JmxSelfNaming} interface.
+
+Here's a sample bean configuration:
+
+@example
+<!-- registers @@JmxResource and JmxSelfNaming classes with the server -->
+<bean id="beanPublisher" class="com.j256.simplejmx.spring.BeanPublisher">
+   <property name="jmxServer" ref="jmxServer" />
+</bean>
+
+<!-- our JMX server which publishes our JMX beans -->
+<bean id="jmxServer" class="com.j256.simplejmx.server."
+     init-method="start" destroy-method="stop">
+   <property name="registryPort" value="8000" />
+</bean>
+@end example
+
+Notice that the @code{JmxServer} is configured with an @code{init-method} and @code{destroy-method} which cause the JMX
+server to be started and stopped when the application context is loaded and closed.
+
+For a working example, take a look at the spring example program.  @xref{spring framework example}.
+
+@c ----------------------------------------------------------------
+@node Examples, License, Using With Spring, Top
 @chapter Example Code
 
 @cindex examples of code
@@ -649,6 +681,12 @@ This is a simple application which publishes a single object.  See the
 
 This is an example showing how to programmatically expose using JMX a random object without SimpleJMX annotations:
 See the @uref{http://256.com/sources/simplejmx/docs/example-random, source code in SVN}.
+
+@anchor{spring framework example}
+@item Spring Framework example
+
+This is an example showing how you can use SimpleJMX with the Spring Framework.
+See the @uref{http://256.com/sources/simplejmx/docs/example-spring, source code in SVN}.
 
 @end table
 
