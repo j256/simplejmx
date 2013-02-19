@@ -27,7 +27,7 @@ public class ObjectNameUtil {
 			if (jmxResource != null) {
 				domainName = jmxResource.domainName();
 			}
-			if (domainName == null || domainName.length() == 0) {
+			if (isEmpty(domainName)) {
 				throw new IllegalArgumentException(
 						"Could not create ObjectName because domain name not specified in getJmxDomainName() nor @JmxResource");
 			}
@@ -37,11 +37,15 @@ public class ObjectNameUtil {
 			if (jmxResource != null) {
 				beanName = getBeanName(jmxResource);
 			}
-			if (beanName == null || beanName.length() == 0) {
+			if (isEmpty(beanName)) {
 				beanName = selfNamingObj.getClass().getSimpleName();
 			}
 		}
-		return makeObjectName(domainName, beanName, selfNamingObj.getJmxFolderNames(), null);
+		String[] jmxResourceFolders = null;
+		if (jmxResource != null) {
+			jmxResourceFolders = jmxResource.folderNames();
+		}
+		return makeObjectName(domainName, beanName, selfNamingObj.getJmxFolderNames(), jmxResourceFolders);
 	}
 
 	/**
@@ -51,7 +55,8 @@ public class ObjectNameUtil {
 	 *            Object that implements the self-naming interface.
 	 */
 	public static ObjectName makeObjectName(JmxSelfNaming selfNamingObj) {
-		return makeObjectName(null, selfNamingObj);
+		JmxResource jmxResource = selfNamingObj.getClass().getAnnotation(JmxResource.class);
+		return makeObjectName(jmxResource, selfNamingObj);
 	}
 
 	/**
@@ -64,7 +69,7 @@ public class ObjectNameUtil {
 	 */
 	public static ObjectName makeObjectName(JmxResource jmxResource, Object obj) {
 		String domainName = jmxResource.domainName();
-		if (domainName.length() == 0) {
+		if (isEmpty(domainName)) {
 			throw new IllegalArgumentException(
 					"Could not create ObjectName because domain name not specified in @JmxResource");
 		}
@@ -141,7 +146,7 @@ public class ObjectNameUtil {
 				}
 				String fieldName = folderName.getField();
 				if (fieldName == null) {
-					appendPrefix(sb, prefixC++);
+					appendNumericalPrefix(sb, prefixC++);
 				} else {
 					sb.append(fieldName);
 				}
@@ -158,7 +163,7 @@ public class ObjectNameUtil {
 				}
 				// if we have no = then prepend a number
 				if (folderNameString.indexOf('=') == -1) {
-					appendPrefix(sb, prefixC++);
+					appendNumericalPrefix(sb, prefixC++);
 					sb.append('=');
 				}
 				sb.append(folderNameString);
@@ -177,7 +182,7 @@ public class ObjectNameUtil {
 		}
 	}
 
-	private static void appendPrefix(StringBuilder sb, int prefixC) {
+	private static void appendNumericalPrefix(StringBuilder sb, int prefixC) {
 		if (prefixC < 10) {
 			sb.append('0');
 		}
@@ -186,16 +191,19 @@ public class ObjectNameUtil {
 
 	private static String getBeanName(JmxResource jmxResource) {
 		String beanName = jmxResource.beanName();
-		if (beanName.length() > 0) {
+		if (!isEmpty(beanName)) {
 			return beanName;
 		}
 		@SuppressWarnings("deprecation")
 		String deprecatedName = jmxResource.objectName();
-		beanName = deprecatedName;
-		if (beanName.length() > 0) {
-			return beanName;
-		} else {
+		if (isEmpty(deprecatedName)) {
 			return null;
+		} else {
+			return deprecatedName;
 		}
+	}
+
+	private static boolean isEmpty(String str) {
+		return (str == null || str.length() == 0);
 	}
 }
