@@ -16,6 +16,10 @@ The git repository is at:
 
 	https://github.com/graywatson/simplejmx
 
+Maven packages are published at:
+
+	http://repo1.maven.org/maven2/com/j256/simplejmx/simplejmx/
+
 Enjoy,
 Gray Watson
 
