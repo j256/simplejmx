@@ -88,7 +88,7 @@ public class RuntimeCounter @{
 @end example
 
 @item Add @code{@@JmxAttributeField} annotation to each of the attribute fields that you want to expose via reflection over JMX.
-@xref{Exposing Items}.
+@xref{Expose Items}.
 
 @example
 @@JmxAttributeField(description = "Start time in millis",
@@ -112,7 +112,7 @@ public long getRunTime() @{
 public void clearCache() @{
 @end example
 
-@item Start your JMX server. @xref{Starting Server}.
+@item Start your JMX server. @xref{Start Server}.
 
 @example
 // create a new JMX server listening on a port
@@ -140,9 +140,9 @@ For more extensive instructions, @pxref{Using}.
 @menu
 * Downloading ::                Downloading the SimpleJMX jar.
 * Naming Objects ::             How to name the objects.
-* Exposing Items ::             How to expose fields and methods.
-* Starting Server ::            Starting a JMX server.
-* Registering Objects ::        Registering objects for publishing.
+* Expose Items ::               How to expose fields and methods.
+* Start Server ::               Starting a JMX server.
+* Register Objects ::           Registering objects for publishing.
 * Programmatic Publishing ::    How to define the name and exposed items programmatically.
 * Using Client ::               Using the programmatic JMX client.
 * Using With Spring ::          Using SimpleJMX with the Spring framework.
@@ -234,7 +234,7 @@ Textual description of the class for jconsole or other JMX clients. Default is s
 @end table
 
 @c ----------------------------------------------------------------
-@node Self Naming, Exposing Items, JmxResource Annotation, Naming Objects
+@node Self Naming, Expose Items, JmxResource Annotation, Naming Objects
 @subsection Self Naming Objects
 
 @cindex self naming objects
@@ -286,7 +286,7 @@ folders in which case the bean will be at the top of the hierarchy in jconsole w
 @end table
 
 @c ----------------------------------------------------------------
-@node Exposing Items, JmxAttributeField Annotation, Self Naming, Using
+@node Expose Items, JmxAttributeField Annotation, Self Naming, Using
 @section Exposing Fields and Methods
 
 @cindex notifications, not supported
@@ -307,7 +307,7 @@ Operations are methods that do @emph{not} start with get/set/is but which perfor
 @end menu
 
 @c ----------------------------------------------------------------
-@node JmxAttributeField Annotation, JmxAttributeMethod Annotation, Exposing Items, Exposing Items
+@node JmxAttributeField Annotation, JmxAttributeMethod Annotation, Expose Items, Expose Items
 @subsection @@JmxAttributeField Annotation
 
 @cindex exposing fields
@@ -350,7 +350,7 @@ Set to true if the field can be written by JMX. Default is false.
 @end table
 
 @c ----------------------------------------------------------------
-@node JmxAttributeMethod Annotation, JmxOperation Annotation, JmxAttributeField Annotation, Exposing Items
+@node JmxAttributeMethod Annotation, JmxOperation Annotation, JmxAttributeField Annotation, Expose Items
 @subsection @@JmxAttributeMethod Annotation
 
 @cindex exposing get/set/is methods
@@ -387,7 +387,7 @@ The only field in the @code{@@JmxAttributeMethod} annotation is the description.
 is readable and the annotation on the @code{set...} method shows that it is writable.
 
 @c ----------------------------------------------------------------
-@node JmxOperation Annotation, Starting Server, JmxAttributeMethod Annotation, Exposing Items
+@node JmxOperation Annotation, Start Server, JmxAttributeMethod Annotation, Expose Items
 @subsection @@JmxOperation Annotation
 
 @cindex exposing methods
@@ -456,7 +456,7 @@ This optional field is used by the JMX system to describe what sort of work is b
 @end table
 
 @c ----------------------------------------------------------------
-@node Starting Server, Registering Objects, JmxOperation Annotation, Using
+@node Start Server, Register Objects, JmxOperation Annotation, Using
 @section Starting a JMX Server
 
 @cindex start a JMX server
@@ -489,17 +489,20 @@ try @{
 @end example
 
 @c ----------------------------------------------------------------
-@node Registering Objects, Programmatic Publishing, Starting Server, Using
-@section Registering Objects
+@node Register Objects, Programmatic Publishing, Start Server, Using
+@section Register Objects
 
-@cindex registering objects
-@cindex publishing objects
+@cindex register objects
+@cindex publish objects
 To published objects via the server via JMX you must register them with the @code{JmxServer}:
 
 @example
 jmxServer.register(someObject);
 @end example
 
+@cindex deregister objects
+@cindex remove objects
+@cindex unpublish objects
 There also is an @code{unregister(...)} method which will un-publish from the server:
 
 @example
@@ -508,8 +511,36 @@ jmxServer.unregister(someObject);
 
 The objects that are registered must be named and the fields and methods that are to be exposed must be specified.
 
+@cindex dynamic objects
+@cindex transient objects
+@cindex register transient objects
+@cindex publish transient objects
+The @code{register(...)} and @code{unregister(...)} methods allow you to publish JMX information about dynamic objects
+that get created and destroyed at runtime.  For example, if you want to see details about an attached client connection,
+you could do something like the following:
+
+@example
+// accept a connection
+Socket socket = serverSocet.accept();
+ClientHandler handler = null;
+try {
+   // create our handler
+   handler = new ClientHandler(socket);
+   // register it via jmx
+   jmxServer.register(handler);
+   // handle the connection
+   handler.handle();
+} finally {
+   socket.close();
+   if (handler != null) {
+      // unregister it from JMX
+      jmxServer.unregister(handler);
+   }
+}
+@end example
+
 @c ----------------------------------------------------------------
-@node Programmatic Publishing, Using Client, Registering Objects, Using
+@node Programmatic Publishing, Using Client, Register Objects, Using
 @section Publishing Using Code Definitions
 
 @cindex programmatic publishing
@@ -674,19 +705,19 @@ are welcome as long as you don't get piqued if we don't chose your's.
 @item Simple, basic
 
 This is a simple application which publishes a single object.  See the
-@uref{http://256.com/sources/simplejmx/docs/example-simple, source code in SVN}.
+@uref{http://256.com/sources/simplejmx/docs/example-simple, source code on github}.
 
 @anchor{random object example}
 @item Random object example
 
 This is an example showing how to programmatically expose using JMX a random object without SimpleJMX annotations:
-See the @uref{http://256.com/sources/simplejmx/docs/example-random, source code in SVN}.
+See the @uref{http://256.com/sources/simplejmx/docs/example-random, source code on github}.
 
 @anchor{spring framework example}
 @item Spring Framework example
 
 This is an example showing how you can use SimpleJMX with the Spring Framework.
-See the @uref{http://256.com/sources/simplejmx/docs/example-spring, source code in SVN}.
+See the @uref{http://256.com/sources/simplejmx/docs/example-spring, source code on github}.
 
 @end table
 

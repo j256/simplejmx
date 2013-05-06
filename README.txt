@@ -7,10 +7,13 @@ Online documentation can be found off the home page:
 	http://256.com/sources/simplejmx/javadoc/simplejmx/doc-files/simplejmx.html
 
 The git repository is:
-	https://github.com/graywatson/simplejmx
+	https://github.com/j256/simplejmx
 
 Maven packages are published via the central repo:
 	http://repo1.maven.org/maven2/com/j256/simplejmx/simplejmx/
+
+Little sample working example program:
+	https://github.com/graywatson/simplejmx/blob/master/src/test/java/com/j256/simplejmx/server/ExampleTestProgram.java
 
 Enjoy,
 Gray Watson
