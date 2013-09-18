@@ -47,7 +47,8 @@ public class JmxSelfNamingTest {
 		}
 	}
 
-	@JmxResource(domainName = JMX_RESOURCE_DOMAIN_NAME, beanName = JMX_RESOURCE_BEAN_NAME, folderNames = { "foo", "bar" })
+	@JmxResource(domainName = JMX_RESOURCE_DOMAIN_NAME, beanName = JMX_RESOURCE_BEAN_NAME,
+			folderNames = { "foo", "bar" })
 	private static class OurJmxObject implements JmxSelfNaming {
 
 		@JmxAttributeField

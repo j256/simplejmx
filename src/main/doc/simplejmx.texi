@@ -291,7 +291,7 @@ folders in which case the bean will be at the top of the hierarchy in jconsole w
 
 @cindex notifications, not supported
 Once we have named our object, we need to tell the JMX server which fields and methods should be exposed to the outside world.  JMX can expose
-what it calls attributes, operations, and notifications.  At this time, only attributes and operations are supported.
+what it calls attributes, operations, and notifications.  At this time, only attributes and operations are supported by SimpleJmx.
 
 Attributes can be primitives or simple types such as @code{String} or @code{java.util.Date}.  With SimpleJMX you can expose them by using reflection
 on the object's fields directly using the @code{@@JmxAttributeField} annotation or instead via the get/set/is methods using the

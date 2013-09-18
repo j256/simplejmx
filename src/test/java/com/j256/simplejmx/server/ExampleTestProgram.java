@@ -39,7 +39,7 @@ public class ExampleTestProgram {
 			// jmxServer.register(someOtherObject);
 
 			// do your other code here...
-			// we just sleep forever to let the server do its stuff
+			// we just sleep forever to let the jmx server do its stuff
 			System.out.println("Sleeping for a while to let the server do its stuff");
 			Thread.sleep(1000000000);
 
@@ -55,7 +55,7 @@ public class ExampleTestProgram {
 	 * Here is our little bean that we are exposing via JMX. It can be in another class. It's just an inner class here
 	 * for convenience.
 	 */
-	@JmxResource(description = "Runtime counter", domainName = "j256.simplejmx", beanName = "RuntimeCounter")
+	@JmxResource(description = "Runtime counter", domainName = "j256.simplejmx", beanName = "\"RuntimeCounter\"")
 	public static class RuntimeCounter {
 
 		// start our timer
@@ -88,6 +88,15 @@ public class ExampleTestProgram {
 		public String resetStartTime() {
 			startMillis = System.currentTimeMillis();
 			return "Timer has been reset to current millis";
+		}
+
+		// this is an operation that shows up in the operations tab in jconsole.
+		@JmxOperation(description = "Add a positive or negative offset to the start millis",
+				parameterNames = { "long offset" }, parameterDescriptions = { "offset value to add" })
+		public String addToStartTime(long offset) {
+			long old = startMillis;
+			startMillis += offset;
+			return "Timer value changed from " + old + " to " + startMillis;
 		}
 	}
 }

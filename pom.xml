@@ -21,9 +21,9 @@
 		<version>5</version>
 	</parent>
 	<scm>
-		<url>http://svn.code.sf.net/p/simplejmx/code/trunk/</url>
-		<connection>scm:svn:https://svn.code.sf.net/p/simplejmx/code/trunk</connection>
-		<developerConnection>scm:svn:https://svn.code.sf.net/p/simplejmx/code/trunk</developerConnection>
+		<url>https://github.com/j256/simplejmx</url>
+		<connection>scm:git:ssh://git@github.com/j256/simplejmx.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/j256/simplejmx.git</developerConnection>
 	</scm>
 	<developers>
 		<developer>

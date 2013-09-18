@@ -59,13 +59,14 @@ public class JmxIntegrationTest {
 			this.foo = 0;
 		}
 
-		@JmxOperation(description = "Set Foo to be a particular value as an operation", parameterNames = { "newValue" }, parameterDescriptions = { "new value to set to foo" })
+		@JmxOperation(description = "Set Foo to be a particular value as an operation",
+				parameterNames = { "newValue" }, parameterDescriptions = { "new value to set to foo" })
 		public void resetFoo(int newValue) {
 			this.foo = newValue;
 		}
 
-		@JmxOperation(description = "Add the two params", parameterNames = { "first", "second" }, parameterDescriptions = {
-				"First one", "Second one" })
+		@JmxOperation(description = "Add the two params", parameterNames = { "first", "second" },
+				parameterDescriptions = { "First one", "Second one" })
 		public String twoArguments(int first, int second) {
 			return first + " + " + second + " = " + (first + second);
 		}

@@ -528,7 +528,8 @@ public class JmxServerTest {
 
 	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	protected static class OperationParameters {
-		@JmxOperation(description = "A value", parameterNames = { "first" }, parameterDescriptions = { "First argument" })
+		@JmxOperation(description = "A value", parameterNames = { "first" },
+				parameterDescriptions = { "First argument" })
 		public String doSomething(String first) {
 			return first;
 		}
