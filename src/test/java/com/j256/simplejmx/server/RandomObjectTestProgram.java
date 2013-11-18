@@ -7,9 +7,8 @@ import com.j256.simplejmx.common.JmxOperationInfo.OperationAction;
 import com.j256.simplejmx.common.ObjectNameUtil;
 
 /**
- * Here's a little example program that was written to show how you can expose any object -- even those without
- * annotations. This allows you to expose objects that you don't have code access to without writing your own wrapper
- * class.
+ * Little example program that shows how to expose any object via JMX -- even those without annotations. This allows you
+ * to expose objects that you don't have code access to without having to write your own wrapper class.
  * 
  * <p>
  * <b>NOTE:</b> This is posted on the http://256.com/sources/simplejmx/ website.
