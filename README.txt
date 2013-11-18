@@ -1,4 +1,4 @@
-This package provides some simple classes to help with the publishing of objects using JMX.
+This package provides some classes to help with the publishing of objects using JMX.
 
 For more information, visit the home page:
 	http://256.com/sources/simplejmx/
@@ -13,7 +13,7 @@ Maven packages are published via the central repo:
 	http://repo1.maven.org/maven2/com/j256/simplejmx/simplejmx/
 
 Little sample working example program:
-	https://github.com/graywatson/simplejmx/blob/master/src/test/java/com/j256/simplejmx/server/ExampleTestProgram.java
+	https://github.com/j256/simplejmx/blob/master/src/test/java/com/j256/simplejmx/server/ExampleTestProgram.java
 
 Enjoy,
 Gray Watson
