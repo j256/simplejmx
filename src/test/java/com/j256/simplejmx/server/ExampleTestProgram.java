@@ -27,8 +27,14 @@ public class ExampleTestProgram {
 		// create the object we will be exposing with JMX
 		RuntimeCounter counter = new RuntimeCounter();
 
-		// create a new JMX server listening on a port
+		// create a new JMX server listening on a specific port
 		JmxServer jmxServer = new JmxServer(JMX_PORT);
+		/*
+		 * NOTE: you could also do:
+		 * 
+		 * JmxServer jmxServer = new JmxServer(ManagementFactory.getPlatformMBeanServer());
+		 */
+
 		try {
 			// start our server
 			jmxServer.start();
@@ -55,7 +61,7 @@ public class ExampleTestProgram {
 	 * Here is our little bean that we are exposing via JMX. It can be in another class. It's just an inner class here
 	 * for convenience.
 	 */
-	@JmxResource(description = "Runtime counter", domainName = "j256.simplejmx", beanName = "\"RuntimeCounter\"")
+	@JmxResource(description = "Runtime counter", domainName = "j256.simplejmx", beanName = "RuntimeCounter")
 	public static class RuntimeCounter {
 
 		// start our timer

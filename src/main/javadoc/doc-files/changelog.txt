@@ -1,4 +1,7 @@
-1.1: 02/19/2013 (svn r??)
+1.2: 11/18/2013
+	* Added more constructors for JmxServer to be able to use existing MBeanServer.
+
+1.1: 02/19/2013
 	* Added support for Spring framework with a BeanPublisher class which looks for and registers beans to the JmxServer.
 	* Fixed a bug with the handling of objects that have folders in the @JmxResource annotation but are JmxSelfNaming.
 
