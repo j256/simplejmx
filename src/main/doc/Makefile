@@ -7,7 +7,7 @@ REMOTE_DIR = remote_texi
 all : $(DOCS)
 
 install : $(DOCS)
-	cp $(PKG)/* $(PKG).pdf ../javadoc/doc-files
+	cp $(PKG)*.html $(PKG).pdf ../javadoc/doc-files
 
 clean :
 	rm -rf $(DOCS)

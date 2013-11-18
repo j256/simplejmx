@@ -6,9 +6,9 @@
 @c %**end of header
 
 @c ----------------------------------------------------------------
-@set simplejmx_version 1.1
+@set simplejmx_version 1.2
 @set simplejmx_year 2013
-@set simplejmx_date February @value{simplejmx_year}
+@set simplejmx_date November @value{simplejmx_year}
 @set package SimpleJMX
 @c ----------------------------------------------------------------
 
@@ -120,7 +120,7 @@ JmxServer jmxServer = new JmxServer(8000);
 jmxServer.start();
 @end example
 
-@item Register the objects you want to publish via JMX.  @xref{Registering Objects}.
+@item Register the objects you want to publish via JMX.  @xref{Register Objects}.
 
 @example
 jmxServer.register(someObject);
@@ -523,20 +523,20 @@ you could do something like the following:
 // accept a connection
 Socket socket = serverSocet.accept();
 ClientHandler handler = null;
-try {
+try @{
    // create our handler
    handler = new ClientHandler(socket);
    // register it via jmx
    jmxServer.register(handler);
    // handle the connection
    handler.handle();
-} finally {
+@} finally @{
    socket.close();
-   if (handler != null) {
+   if (handler != null) @{
       // unregister it from JMX
       jmxServer.unregister(handler);
-   }
-}
+   @}
+@}
 @end example
 
 @c ----------------------------------------------------------------
