@@ -10,7 +10,7 @@ install : $(DOCS)
 	cp $(PKG)*.html $(PKG).pdf ../javadoc/doc-files
 
 clean :
-	rm -rf $(DOCS)
+	rm -rf $(DOCS) *.html
 
 $(PKG).html : $(TEXI)
 	rm -f $@
