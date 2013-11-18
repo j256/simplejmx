@@ -25,18 +25,18 @@ mvn test || exit 1
 
 release=`grep version pom.xml | grep SNAPSHOT | head -1 | cut -f2 -d\> | cut -f1 -d\-`
 
-echo ""
-echo ""
-echo ""
-echo "------------------------------------------------------- "
-echo -n "Enter release number [$release]: "
+/bin/echo ""
+/bin/echo ""
+/bin/echo ""
+/bin/echo "------------------------------------------------------- "
+/bin/echo -n "Enter release number [$release]: "
 read rel
 if [ "$rel" != "" ]; then
 	release=$rel
 fi
 
-echo ""
-echo -n "Enter the GPG pass-phrase: "
+/bin/echo ""
+/bin/echo -n "Enter the GPG pass-phrase: "
 read gpgpass
 
 GPG_ARGS="-Darguments=-Dgpg.passphrase=$gpgpass -Dgpg.passphrase=$gpgpass"
@@ -52,9 +52,9 @@ rm -f $tmp*
 
 #############################################################
 
-echo ""
-echo "------------------------------------------------------- "
-echo "Releasing version '$release'"
+/bin/echo ""
+/bin/echo "------------------------------------------------------- "
+/bin/echo "Releasing version '$release'"
 sleep 3
 
 #############################################################
@@ -71,9 +71,9 @@ fi
 #############################################################
 # releasing to sonatype
 
-echo ""
-echo ""
-echo -n "Should we release to sonatype [y]: "
+/bin/echo ""
+/bin/echo ""
+/bin/echo -n "Should we release to sonatype [y]: "
 read cont
 if [ "$cont" = "" -o "$cont" = "y" ]; then
     cd $LOCAL_DIR
@@ -89,9 +89,9 @@ fi
 #############################################################
 # releasing to sourceforge
 
-echo ""
-echo ""
-echo -n "Should we release to sourceforge [y]: "
+/bin/echo ""
+/bin/echo ""
+/bin/echo -n "Should we release to sourceforge [y]: "
 read cont
 if [ "$cont" = "" -o "$cont" = "y" ]; then
     cd $LOCAL_DIR/target/checkout
