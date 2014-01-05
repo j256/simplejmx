@@ -62,6 +62,12 @@ public class MainTest {
 		new Main().doMain(new String[] { "localhost:18080" }, true);
 	}
 
+	@Test(expected = JMException.class)
+	public void testConnectToNoServerBatchFile() throws Exception {
+		System.setErr(new PrintStream(new File("target/ignored")));
+		new Main().doMain(new String[] { "localhost:18080", "batch-file" }, true);
+	}
+
 	@Test(expected = IllegalArgumentException.class)
 	public void testTooManyArgs() throws Exception {
 		System.setErr(new PrintStream(new File("target/ignored")));
@@ -73,6 +79,8 @@ public class MainTest {
 		new Main().doMain(new String[] { "localhost:18080", "2", "3" }, false);
 		new Main().doMain(new String[] { "localhost:18080:2" }, false);
 		new Main().doMain(new String[] { "localhost:foo" }, false);
+		new Main().doMain(new String[] { "--usage" }, false);
+		new Main().doMain(new String[] { "--help" }, false);
 	}
 
 	@Test

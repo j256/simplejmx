@@ -34,6 +34,12 @@ public class Main {
 			return;
 		}
 
+		// check for --usage or --help
+		if (args.length == 1 && ("--usage".equals(args[0]) || "--help".equals(args[0]))) {
+			usage(throwOnError, null);
+			return;
+		}
+
 		CommandLineJmxClient jmxClient;
 		if (args[0].indexOf('/') >= 0) {
 			jmxClient = new CommandLineJmxClient(args[0]);
@@ -67,12 +73,12 @@ public class Main {
 			System.err.println(label);
 			System.err.println();
 		}
-		System.err.println("Usage: java -jar simplejmx.jar host/port/url [script]");
+		System.err.println("Usage: java -jar simplejmx.jar host/port/url [batch-script]");
 		System.err.println("host/port/url can be one of:");
 		System.err.println("       hostname:port");
 		System.err.println("or");
 		System.err.println("       jmx-url      (ex. service:jmx:rmi:///jndi/rmi://localhost:8000/jmxrmi)");
-		System.err.println("The optional [script] will read the commands from the file else stdin.");
+		System.err.println("The optional [batch-script] will read the commands from the file otherwise stdin.");
 		if (throwOnError) {
 			throw new IllegalArgumentException("Usage problems: " + label);
 		}
