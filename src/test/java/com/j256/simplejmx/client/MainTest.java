@@ -69,6 +69,13 @@ public class MainTest {
 	}
 
 	@Test
+	public void testCoverage() throws Exception {
+		new Main().doMain(new String[] { "localhost:18080", "2", "3" }, false);
+		new Main().doMain(new String[] { "localhost:18080:2" }, false);
+		new Main().doMain(new String[] { "localhost:foo" }, false);
+	}
+
+	@Test
 	public void testConnectToServer() throws Exception {
 		int port = 8000;
 		JmxServer server = new JmxServer(port);
