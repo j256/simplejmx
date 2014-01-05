@@ -26,8 +26,8 @@ public interface JmxSelfNaming {
 	public String getJmxNameOfObject();
 
 	/**
-	 * Return the appropriate array of folder names used to built the associated {@link ObjectName}. Return null for no
-	 * folders in which case the bean will be at the top of the hierarchy in jconsole without any sub-folders.
+	 * Return the appropriate array of folder names used to built the associated {@link ObjectName}. Return null to use
+	 * the folder names specified in the {@link JmxResource#folderNames()} annotation instead.
 	 */
 	public JmxFolderName[] getJmxFolderNames();
 }

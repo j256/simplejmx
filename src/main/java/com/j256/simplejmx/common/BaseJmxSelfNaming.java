@@ -1,7 +1,8 @@
 package com.j256.simplejmx.common;
 
 /**
- * Base class which has default implementations of all of the {@link JmxSelfNaming} methods.
+ * Base class which has default implementations of all of the {@link JmxSelfNaming} methods. This is designed to allow a
+ * subclass to extend it and only override the methods to affect the object-name that they want.
  * 
  * @author graywatson
  */

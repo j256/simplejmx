@@ -15,9 +15,8 @@ public class Main {
 	 * Standard main method that can be called from the command line.
 	 */
 	public static void main(String[] args) throws Exception {
-		// turn into an instance various quickly
-		Main main = new Main();
-		main.doMain(args, false);
+		// turn into an instance variable quickly
+		new Main().doMain(args, false);
 	}
 
 	/**
@@ -44,6 +43,7 @@ public class Main {
 				usage(throwOnError, "argument should be in 'hostname:port' format, not: " + args[0]);
 				return;
 			}
+			String hostName = parts[0];
 			int port = 0;
 			try {
 				port = Integer.parseInt(parts[1]);
@@ -51,7 +51,7 @@ public class Main {
 				usage(throwOnError, "port number not in the right format: " + parts[1]);
 				return;
 			}
-			jmxClient = new CommandLineJmxClient(parts[0], port);
+			jmxClient = new CommandLineJmxClient(hostName, port);
 		}
 
 		if (args.length == 1) {

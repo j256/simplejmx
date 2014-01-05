@@ -139,7 +139,7 @@ public class JmxClient {
 				jmxConnector.close();
 				jmxConnector = null;
 			}
-			// NOTE: doesn't seem to be close method on mbsc
+			// NOTE: doesn't seem to be close method on MBeanServerConnection
 			mbeanConn = null;
 		} catch (IOException e) {
 			throw createJmException("Could not close the jmx connector", e);
@@ -365,9 +365,9 @@ public class JmxClient {
 			paramObjs = null;
 		} else {
 			paramObjs = new Object[paramStrings.length];
-		}
-		for (int i = 0; i < paramStrings.length; i++) {
-			paramObjs[i] = stringToObject(paramStrings[i], paramTypes[i]);
+			for (int i = 0; i < paramStrings.length; i++) {
+				paramObjs[i] = stringToObject(paramStrings[i], paramTypes[i]);
+			}
 		}
 		return invokeOperation(name, operName, paramTypes, paramObjs);
 	}

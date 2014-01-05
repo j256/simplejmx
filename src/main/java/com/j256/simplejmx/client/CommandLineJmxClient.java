@@ -114,7 +114,7 @@ public class CommandLineJmxClient {
 			System.out.println("Running jmx client interface.  Type '" + HELP_COMMAND + "' for help.");
 			doLines(0, new LineReader() {
 				public String getNextLine(String prompt) throws IOException {
-					System.out.println(prompt);
+					System.out.print(prompt);
 					System.out.flush();
 					return reader.readLine();
 				}
@@ -125,7 +125,7 @@ public class CommandLineJmxClient {
 	}
 
 	/**
-	 * Close the associated Jmx client
+	 * Close the associated Jmx client.
 	 */
 	public void close() {
 		if (jmxClient != null) {
