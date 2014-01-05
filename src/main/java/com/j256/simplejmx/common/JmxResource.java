@@ -29,12 +29,6 @@ public @interface JmxResource {
 	public String domainName() default "";
 
 	/**
-	 * @deprecated Should use {@link #beanName()}
-	 */
-	@Deprecated
-	public String objectName() default "";
-
-	/**
 	 * Name of the JMX bean in the jconsole folder it is in.
 	 * <p>
 	 * If the object implements {@link JmxSelfNaming} then this would be replaced by
@@ -47,8 +41,8 @@ public @interface JmxResource {
 	/**
 	 * Optional array of strings which translate into sub-folders below the domain-name that was specified above.
 	 * Default is for the object to show up in the domain-name folder. The folder names can either be in
-	 * <tt>name=value</tt> format in which case they should be in alphabetic order by name. They can also just be in
-	 * <tt>value</tt> format in which case a ## prefix (ex. 00=...) will be added by the code.
+	 * {@code name=value} format in which case they should be in alphabetic order by name. They can also just be in
+	 * {@code value} format in which case a ## prefix (ex. 00=...) will be added by the code.
 	 * 
 	 * <p>
 	 * The following are basically synonymous:

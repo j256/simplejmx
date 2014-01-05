@@ -193,15 +193,10 @@ public class ObjectNameUtil {
 
 	private static String getBeanName(JmxResource jmxResource) {
 		String beanName = jmxResource.beanName();
-		if (!isEmpty(beanName)) {
-			return beanName;
-		}
-		@SuppressWarnings("deprecation")
-		String deprecatedName = jmxResource.objectName();
-		if (isEmpty(deprecatedName)) {
+		if (isEmpty(beanName)) {
 			return null;
 		} else {
-			return deprecatedName;
+			return beanName;
 		}
 	}
 
