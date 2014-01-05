@@ -30,13 +30,7 @@ public class JmxOperationInfo {
 		this.methodName = methodName;
 		this.parameterNames = jmxOperation.parameterNames();
 		this.parameterDescriptions = jmxOperation.parameterDescriptions();
-		@SuppressWarnings("deprecation")
-		int actionVal = jmxOperation.action();
-		if (actionVal == MBeanOperationInfo.UNKNOWN) {
-			this.action = jmxOperation.operationAction();
-		} else {
-			this.action = OperationAction.fromActionValue(actionVal);
-		}
+		this.action = jmxOperation.operationAction();
 		this.description = jmxOperation.description();
 	}
 
@@ -95,18 +89,6 @@ public class JmxOperationInfo {
 		 */
 		public int getActionValue() {
 			return actionValue;
-		}
-
-		/**
-		 * Return the enumerated action from the MBeanOperationInfo int constant.
-		 */
-		public static OperationAction fromActionValue(int actionValue) {
-			for (OperationAction action : values()) {
-				if (action.actionValue == actionValue) {
-					return action;
-				}
-			}
-			return UNKNOWN;
 		}
 	}
 }

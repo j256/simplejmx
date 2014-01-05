@@ -5,8 +5,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import javax.management.MBeanOperationInfo;
-
 import com.j256.simplejmx.common.JmxOperationInfo.OperationAction;
 
 /**
@@ -58,7 +56,7 @@ public @interface JmxOperation {
 	/**
 	 * Optional array of strings which describes each of the method parameters. The array should be the same length as
 	 * the {@link #parameterNames()} array. If not specified then it will create one with the parameter number and type
-	 * -- something like "parameter #0 of type: int".
+	 * -- something like "parameter #xf0 of type: int".
 	 * 
 	 * <p>
 	 * 
@@ -77,10 +75,4 @@ public @interface JmxOperation {
 	 * This optional is used by the JMX system to describe what sort of work is being done in this operation.
 	 */
 	public OperationAction operationAction() default OperationAction.UNKNOWN;
-
-	/**
-	 * @deprecated Should use the enumerated {@link #operationAction()}.
-	 */
-	@Deprecated
-	public int action() default MBeanOperationInfo.UNKNOWN;
 }
