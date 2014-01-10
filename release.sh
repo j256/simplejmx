@@ -9,9 +9,10 @@ LOCAL_DIR="$HOME/svn/local/simplejmx"
 # check for not commited files:
 
 cd $LOCAL_DIR
-if [ "`svn stat`" != "" ]; then
-	echo "Files not checked-in inside -core"
-	svn stat
+git status | grep 'nothing to commit'
+if [ $? -ne 0 ]; then
+	/bin/echo "Files not checked-in"
+	git status
 	exit 1
 fi
 
