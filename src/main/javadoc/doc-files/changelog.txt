@@ -1,6 +1,7 @@
-1.3: 1/??/2014
+1.3: 1/10/2014
 	* Removed the deprecated @JmxResource.objectName and @JmxOperation.action fields.
-	* Added some more Spring support with the JmxBean to spring wire JMX.  Also added JmxResourceInfo for spring wiring.
+	* Added some more Spring support with the JmxBean to spring wire JMX.
+	* Added JmxResourceInfo for easier programmatic or Spring resource wiring.
 
 1.2: 11/18/2013
 	* Added more constructors for JmxServer to be able to use existing MBeanServer.
