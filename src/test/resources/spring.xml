@@ -15,6 +15,21 @@
 		<property name="registryPort" value="8000" />
 	</bean>
 
+	<!-- -->
+
+	<!-- our JMX bean for monitoring and shutting down our main application -->
+	<bean id="mainJmx" class="com.j256.simplejmx.spring.MainJmx" />
+
+	<!-- a random JMX class -->
+	<bean id="runtimeCounter" class="com.j256.simplejmx.server.ExampleTestProgram$RuntimeCounter" />
+
+	<!-- our dynamic register/unregister JMX class -->
+	<bean id="dynamicJmx" class="com.j256.simplejmx.spring.DynamicJmx">
+		<!-- we need this to register/unregister dynamic objects -->
+		<property name="jmxServer" ref="jmxServer" />
+	</bean>
+
+	<!-- expose information about the jmx-server which doesn't do so on its own -->
 	<bean id="jmxServerJmx" class="com.j256.simplejmx.spring.JmxBean">
 		<property name="jmxResourceInfo">
 			<bean class="com.j256.simplejmx.common.JmxResourceInfo">
@@ -44,20 +59,6 @@
 			</array>
 		</property>
 		<property name="target" ref="jmxServer" />
-	</bean>
-
-	<!-- -->
-
-	<!-- our JMX bean for monitoring and shutting down our main application -->
-	<bean id="mainJmx" class="com.j256.simplejmx.spring.MainJmx" />
-
-	<!-- a random JMX class -->
-	<bean id="runtimeCounter" class="com.j256.simplejmx.server.ExampleTestProgram$RuntimeCounter" />
-
-	<!-- our dynamic register/unregister JMX class -->
-	<bean id="dynamicJmx" class="com.j256.simplejmx.spring.DynamicJmx">
-		<!-- we need this to register/unregister dynamic objects -->
-		<property name="jmxServer" ref="jmxServer" />
 	</bean>
 
 </beans>

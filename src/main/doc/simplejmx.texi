@@ -6,9 +6,9 @@
 @c %**end of header
 
 @c ----------------------------------------------------------------
-@set simplejmx_version 1.2
-@set simplejmx_year 2013
-@set simplejmx_date November @value{simplejmx_year}
+@set simplejmx_version 1.3
+@set simplejmx_year 2014
+@set simplejmx_date January @value{simplejmx_year}
 @set package SimpleJMX
 @c ----------------------------------------------------------------
 
@@ -550,6 +550,16 @@ annotations everywhere.  If this is the case then you also have the option to ex
 The @code{JmxServer} has a register function which takes just an @code{Object}, an @code{ObjectName} which can be generated with
 the use of the @code{ObjectNameUtil} class, and an array of attribute-fields, attribute-methods, and operations.
 
+The object-name can also be defined using the @code{JmxResourceInfo} object that defines the fields in the @code{@@JmxResource}
+programmatically.
+
+@example
+JmxResourceInfo resourceInfo =
+   new JmxResourceInfo("your.domain", "beanName",
+      new String[] @{ "database", "connections" @},
+      "your resource desription"),
+@end example   
+
 The attribute-fields are specified as an array of @code{JmxAttributeFieldInfo} objects that are associated with fields that are
 exposed through reflection:
 
@@ -687,6 +697,48 @@ Here's a sample bean configuration:
 Notice that the @code{JmxServer} is configured with an @code{init-method} and @code{destroy-method} which cause the JMX
 server to be started and stopped when the application context is loaded and closed.
 
+You can also wire a JMX bean for another bean that is not using the @code{@@JmxResource} annotation and does not implement
+the @code{JmxSelfNaming} interface with the help of the @code{JmxBean} class:
+
+@example
+<!-- some random bean defined in your spring files -->
+<bean id="someBean" class="your.domain.SomeBean">
+   ...
+</bean>
+
+<!-- publish information about that bean via JMX -->
+<bean id="jmxServerJmx" class="com.j256.simplejmx.spring.JmxBean">
+   <property name="jmxResourceInfo">
+      <bean class="com.j256.simplejmx.common.JmxResourceInfo">
+         <property name="jmxDomainName" value="your.domain" />
+         <property name="jmxNameOfObject" value="SomeBean" />
+      </bean>
+   </property>
+   <property name="attributeFieldInfos">
+      <array>
+         <bean class="com.j256.simplejmx.common.JmxAttributeFieldInfo">
+            <property name="name" value="someCounter" />
+         </bean>
+      </array>
+   </property>
+   <property name="attributeMethodInfos">
+      <array>
+         <bean class="com.j256.simplejmx.common.JmxAttributeMethodInfo">
+            <property name="methodName" value="getSomeValue" />
+         </bean>
+      </array>
+   </property>
+   <property name="operationInfos">
+      <array>
+         <bean class="com.j256.simplejmx.common.JmxOperationInfo">
+            <property name="methodName" value="someMethod" />
+         </bean>
+      </array>
+   </property>
+   <property name="target" ref="jmxServer" />
+</bean>
+@end example
+
 For a working example, take a look at the spring example program.  @xref{spring framework example}.
 
 @c ----------------------------------------------------------------
@@ -717,7 +769,9 @@ See the @uref{http://256.com/sources/simplejmx/docs/example-random, source code 
 @item Spring Framework example
 
 This is an example showing how you can use SimpleJMX with the Spring Framework.
-See the @uref{http://256.com/sources/simplejmx/docs/example-spring, source code on github}.
+See the @uref{http://256.com/sources/simplejmx/docs/example-spring, source code on github}.  The
+@uref{http://256.com/sources/simplejmx/docs/example-spring-config, example spring
+config file} is also available.
 
 @end table
 

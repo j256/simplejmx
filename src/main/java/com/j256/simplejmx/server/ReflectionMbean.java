@@ -25,7 +25,6 @@ import com.j256.simplejmx.common.JmxAttributeMethod;
 import com.j256.simplejmx.common.JmxAttributeMethodInfo;
 import com.j256.simplejmx.common.JmxOperation;
 import com.j256.simplejmx.common.JmxOperationInfo;
-import com.j256.simplejmx.common.JmxOperationInfo.OperationAction;
 import com.j256.simplejmx.common.JmxResource;
 
 /**
@@ -395,12 +394,8 @@ public class ReflectionMbean implements DynamicMBean {
 				description = methodName + " attribute";
 			}
 
-			OperationAction action = operationInfo.getAction();
-			if (action == null) {
-				action = OperationAction.UNKNOWN;
-			}
 			operations.add(new MBeanOperationInfo(methodName, description, parameterInfos, method.getReturnType()
-					.getName(), action.getActionValue()));
+					.getName(), operationInfo.getAction().getActionValue()));
 		}
 		return operations;
 	}

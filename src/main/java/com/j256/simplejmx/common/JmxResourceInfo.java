@@ -24,6 +24,17 @@ public class JmxResourceInfo implements JmxSelfNaming {
 		this.jmxDescription = jmxDescription;
 	}
 
+	public JmxResourceInfo(String jmxDomainName, String jmxNameOfObject, String[] jmxFolderNameStrings,
+			String jmxDescription) {
+		this.jmxDomainName = jmxDomainName;
+		this.jmxNameOfObject = jmxNameOfObject;
+		this.jmxFolderNames = new JmxFolderName[jmxFolderNameStrings.length];
+		for (int i = 0; i < jmxFolderNameStrings.length; i++) {
+			this.jmxFolderNames[i] = new JmxFolderName(jmxFolderNameStrings[i]);
+		}
+		this.jmxDescription = jmxDescription;
+	}
+
 	public String getJmxDomainName() {
 		return jmxDomainName;
 	}
