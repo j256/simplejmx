@@ -14,8 +14,12 @@ public class JmxOperationInfo {
 	public String methodName;
 	public String[] parameterNames;
 	public String[] parameterDescriptions;
-	public OperationAction action;
+	public OperationAction action = OperationAction.UNKNOWN;
 	public String description;
+
+	public JmxOperationInfo() {
+		// for spring
+	}
 
 	public JmxOperationInfo(String methodName, String[] parameterNames, String[] parameterDescriptions,
 			OperationAction action, String description) {
@@ -38,20 +42,55 @@ public class JmxOperationInfo {
 		return methodName;
 	}
 
+	/**
+	 * Required.
+	 */
+	public void setMethodName(String methodName) {
+		this.methodName = methodName;
+	}
+
 	public String[] getParameterNames() {
 		return parameterNames;
+	}
+
+	/**
+	 * Not required. Default is none.
+	 */
+	public void setParameterNames(String[] parameterNames) {
+		this.parameterNames = parameterNames;
 	}
 
 	public String[] getParameterDescriptions() {
 		return parameterDescriptions;
 	}
 
+	/**
+	 * Not required. Default is none.
+	 */
+	public void setParameterDescriptions(String[] parameterDescriptions) {
+		this.parameterDescriptions = parameterDescriptions;
+	}
+
 	public OperationAction getAction() {
 		return action;
 	}
 
+	/**
+	 * Not required. Default is UNKNOWN.
+	 */
+	public void setAction(OperationAction action) {
+		this.action = action;
+	}
+
 	public String getDescription() {
 		return description;
+	}
+
+	/**
+	 * Not required. Default is "Information about class".
+	 */
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	/**

@@ -7,10 +7,14 @@ package com.j256.simplejmx.common;
  */
 public class JmxAttributeFieldInfo {
 
-	public final String name;
-	public final boolean isReadible;
-	public final boolean isWritable;
-	public final String description;
+	public String name;
+	public boolean isReadible = true;
+	public boolean isWritable;
+	public String description;
+
+	public JmxAttributeFieldInfo() {
+		// for spring
+	}
 
 	public JmxAttributeFieldInfo(String name, boolean isReadible, boolean isWritable, String description) {
 		this.name = name;
@@ -30,15 +34,43 @@ public class JmxAttributeFieldInfo {
 		return name;
 	}
 
+	/**
+	 * Required.
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	public boolean isReadible() {
 		return isReadible;
+	}
+
+	/**
+	 * Not required. Default is true.
+	 */
+	public void setReadible(boolean isReadible) {
+		this.isReadible = isReadible;
 	}
 
 	public boolean isWritable() {
 		return isWritable;
 	}
 
+	/**
+	 * Not required. Default is false.
+	 */
+	public void setWritable(boolean isWritable) {
+		this.isWritable = isWritable;
+	}
+
 	public String getDescription() {
 		return description;
+	}
+
+	/**
+	 * Not required.
+	 */
+	public void setDescription(String description) {
+		this.description = description;
 	}
 }

@@ -15,6 +15,37 @@
 		<property name="registryPort" value="8000" />
 	</bean>
 
+	<bean id="jmxServerJmx" class="com.j256.simplejmx.spring.JmxBean">
+		<property name="jmxResourceInfo">
+			<bean class="com.j256.simplejmx.common.JmxResourceInfo">
+				<property name="jmxDomainName" value="j256.simplejmx" />
+				<property name="jmxNameOfObject" value="JmxServer" />
+			</bean>
+		</property>
+		<property name="attributeFieldInfos">
+			<array>
+				<bean class="com.j256.simplejmx.common.JmxAttributeFieldInfo">
+					<property name="name" value="serverPort" />
+				</bean>
+			</array>
+		</property>
+		<property name="attributeMethodInfos">
+			<array>
+				<bean class="com.j256.simplejmx.common.JmxAttributeMethodInfo">
+					<property name="methodName" value="getRegisteredCount" />
+				</bean>
+			</array>
+		</property>
+		<property name="operationInfos">
+			<array>
+				<bean class="com.j256.simplejmx.common.JmxOperationInfo">
+					<property name="methodName" value="stop" />
+				</bean>
+			</array>
+		</property>
+		<property name="target" ref="jmxServer" />
+	</bean>
+
 	<!-- -->
 
 	<!-- our JMX bean for monitoring and shutting down our main application -->

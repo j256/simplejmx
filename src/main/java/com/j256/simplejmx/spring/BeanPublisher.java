@@ -13,9 +13,13 @@ import com.j256.simplejmx.common.JmxSelfNaming;
 import com.j256.simplejmx.server.JmxServer;
 
 /**
- * Runs through and discovers any beans that need to be registered with the JmxServer. This will only compile if
- * com.springframework jar(s) are available to the application. Otherwise it will throw ClassNotFound exceptions if
- * used.
+ * Runs through and discovers any beans that need to be registered with the JmxServer. This looks for beans annotated
+ * with {@link JmxResource}, that extend {@link JmxSelfNaming}, or beans of type {@link JmxBean}.
+ * 
+ * <p>
+ * <b>NOTE:</b> This will only compile if com.springframework jar(s) are available to the application. Otherwise it will
+ * throw ClassNotFound exceptions if used.
+ * </p>
  * 
  * @author graywatson
  */
@@ -28,9 +32,13 @@ public class BeanPublisher implements InitializingBean, ApplicationContextAware 
 		// do the annotations
 		Map<String, Object> beans = applicationContext.getBeansOfType(null);
 		for (Object bean : beans.values()) {
-			// we handle @JmxResource annotations of JmxSelfNaming
+			// we handle @JmxResource annotations or JmxSelfNaming
 			if (bean.getClass().isAnnotationPresent(JmxResource.class) || bean instanceof JmxSelfNaming) {
 				jmxServer.register(bean);
+			} else if (bean instanceof JmxBean) {
+				JmxBean jmxBean = (JmxBean) bean;
+				jmxServer.register(jmxBean.getTarget(), jmxBean.getJmxResourceInfo(), jmxBean.getAttributeFieldInfos(),
+						jmxBean.getAttributeMethodInfos(), jmxBean.getOperationInfos());
 			}
 		}
 	}

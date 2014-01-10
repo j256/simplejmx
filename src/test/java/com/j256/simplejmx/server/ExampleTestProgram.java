@@ -61,7 +61,7 @@ public class ExampleTestProgram {
 	 * Here is our little bean that we are exposing via JMX. It can be in another class. It's just an inner class here
 	 * for convenience. We could also specify folderNames array here to locate the inside of a folder for jconsole.
 	 */
-	@JmxResource(description = "Runtime counter", domainName = "foo.com", beanName = "RuntimeCounter")
+	@JmxResource(description = "Runtime counter", domainName = "j256.simplejmx", beanName = "RuntimeCounter")
 	public static class RuntimeCounter {
 
 		// start our timer

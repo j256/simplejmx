@@ -25,8 +25,8 @@ import com.j256.simplejmx.common.JmxAttributeMethod;
 import com.j256.simplejmx.common.JmxAttributeMethodInfo;
 import com.j256.simplejmx.common.JmxOperation;
 import com.j256.simplejmx.common.JmxOperationInfo;
+import com.j256.simplejmx.common.JmxOperationInfo.OperationAction;
 import com.j256.simplejmx.common.JmxResource;
-import com.j256.simplejmx.common.JmxSelfNaming;
 
 /**
  * This wraps an object that has been registered in the server using {@link JmxServer#register(Object)}. We wrap the
@@ -38,33 +38,28 @@ import com.j256.simplejmx.common.JmxSelfNaming;
 public class ReflectionMbean implements DynamicMBean {
 
 	private final Object delegate;
+	private final String description;
 	private final Map<String, AttributeMethodInfo> attributeMethodMap = new HashMap<String, AttributeMethodInfo>();
 	private final Map<NameParams, Method> operationMethodMap = new HashMap<NameParams, Method>();
 	private final Map<String, AttributeFieldInfo> attributeFieldMap = new HashMap<String, AttributeFieldInfo>();
 	private final MBeanInfo mbeanInfo;
 
 	/**
-	 * Create a mbean associated with a delegate object that implements self-naming.
-	 */
-	public ReflectionMbean(JmxSelfNaming delegate) {
-		this.delegate = delegate;
-		this.mbeanInfo = buildMbeanInfo(null, null, null);
-	}
-
-	/**
 	 * Create a mbean associated with a delegate object that must have a {@link JmxResource} annotation.
 	 */
-	public ReflectionMbean(Object delegate) {
+	public ReflectionMbean(Object delegate, String description) {
 		this.delegate = delegate;
+		this.description = preprocessDescription(delegate, description);
 		this.mbeanInfo = buildMbeanInfo(null, null, null);
 	}
 
 	/**
 	 * Create a mbean associated with a delegate object with user provided attribute and operation information.
 	 */
-	public ReflectionMbean(Object delegate, JmxAttributeFieldInfo[] attributeFieldInfos,
+	public ReflectionMbean(Object delegate, String description, JmxAttributeFieldInfo[] attributeFieldInfos,
 			JmxAttributeMethodInfo[] attributeMethodInfos, JmxOperationInfo[] operationInfos) {
 		this.delegate = delegate;
+		this.description = preprocessDescription(delegate, description);
 		this.mbeanInfo = buildMbeanInfo(attributeFieldInfos, attributeMethodInfos, operationInfos);
 	}
 
@@ -185,19 +180,19 @@ public class ReflectionMbean implements DynamicMBean {
 		}
 	}
 
+	private static String preprocessDescription(Object delegate, String description) {
+		if (description == null) {
+			return "Information about " + delegate.getClass();
+		} else {
+			return description;
+		}
+	}
+
 	/**
 	 * Build our JMX information object by using reflection.
 	 */
 	private MBeanInfo buildMbeanInfo(JmxAttributeFieldInfo[] attributeFieldInfos,
 			JmxAttributeMethodInfo[] attributeMethodInfos, JmxOperationInfo[] operationInfos) {
-		Class<?> clazz = delegate.getClass();
-		JmxResource jmxResource = clazz.getAnnotation(JmxResource.class);
-		String mbeanDescription;
-		if (jmxResource == null || jmxResource.description() == null || jmxResource.description().length() == 0) {
-			mbeanDescription = "Information about " + clazz;
-		} else {
-			mbeanDescription = jmxResource.description();
-		}
 
 		Map<String, JmxAttributeFieldInfo> attributeFieldInfoMap = null;
 		if (attributeFieldInfos != null) {
@@ -221,6 +216,7 @@ public class ReflectionMbean implements DynamicMBean {
 			}
 		}
 
+		Class<?> clazz = delegate.getClass();
 		Method[] methods = clazz.getMethods();
 		List<MBeanAttributeInfo> attributes = new ArrayList<MBeanAttributeInfo>();
 		discoverAttributeMethods(methods, attributes, attributeMethodInfoMap);
@@ -228,7 +224,7 @@ public class ReflectionMbean implements DynamicMBean {
 		discoverAttributeFields(attributes, attributeFieldInfoMap);
 		List<MBeanOperationInfo> operations = discoverOperations(methods, attributeOperationInfoMap);
 
-		return new MBeanInfo(clazz.getName(), mbeanDescription,
+		return new MBeanInfo(clazz.getName(), description,
 				attributes.toArray(new MBeanAttributeInfo[attributes.size()]), null,
 				operations.toArray(new MBeanOperationInfo[operations.size()]), null);
 	}
@@ -399,8 +395,12 @@ public class ReflectionMbean implements DynamicMBean {
 				description = methodName + " attribute";
 			}
 
+			OperationAction action = operationInfo.getAction();
+			if (action == null) {
+				action = OperationAction.UNKNOWN;
+			}
 			operations.add(new MBeanOperationInfo(methodName, description, parameterInfos, method.getReturnType()
-					.getName(), operationInfo.getAction().getActionValue()));
+					.getName(), action.getActionValue()));
 		}
 		return operations;
 	}

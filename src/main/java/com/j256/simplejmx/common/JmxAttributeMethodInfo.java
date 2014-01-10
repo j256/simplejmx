@@ -10,6 +10,10 @@ public class JmxAttributeMethodInfo {
 	public String methodName;
 	public String description;
 
+	public JmxAttributeMethodInfo() {
+		// for spring
+	}
+
 	public JmxAttributeMethodInfo(String methodName, String description) {
 		this.methodName = methodName;
 		this.description = description;
@@ -24,7 +28,21 @@ public class JmxAttributeMethodInfo {
 		return methodName;
 	}
 
+	/**
+	 * Required.
+	 */
+	public void setMethodName(String methodName) {
+		this.methodName = methodName;
+	}
+
 	public String getDescription() {
 		return description;
+	}
+
+	/**
+	 * Not required.
+	 */
+	public void setDescription(String description) {
+		this.description = description;
 	}
 }
