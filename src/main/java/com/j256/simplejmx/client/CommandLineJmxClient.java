@@ -21,7 +21,8 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
 /**
- * Command-line client that can be used to support interactive or batch-file JMX operations.
+ * Command-line client that can be used to support interactive or batch-file JMX operations. It can be used with the
+ * {@link Main} class as a jmx client out of the SimpleJMX jar directly.
  * 
  * <p>
  * See the {@link CommandLineJmxClient#helpOutput()} and {@link CommandLineJmxClient#exampleOutput()} methods for

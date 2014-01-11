@@ -9,8 +9,8 @@ import com.j256.simplejmx.server.JmxServer;
 
 /**
  * This is used to identify an object which is going to be exported using JMX. Objects that are passed to
- * {@link JmxServer#register(Object)} must either have this annotation or must implement {@link JmxSelfNaming}. This
- * class is similar to Spring's &#64;ManagedResource.
+ * {@link JmxServer#register(Object)} must either have this annotation, must implement {@link JmxSelfNaming}, or must be
+ * defined programmatically with {@link JmxResourceInfo}. This class is similar to Spring's &#64;ManagedResource.
  * 
  * @author graywatson
  */

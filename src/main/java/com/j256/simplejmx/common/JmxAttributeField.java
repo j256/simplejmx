@@ -6,9 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This identifies which fields you want to expose via JMX. This is done through reflection. If the field is not public
- * then it will try to open the accessibility on the field. Instead of annotating the fields, you can annotate your
- * {@code getXxx()}, {@code setXxx()}, and {@code isXxx()} methods with {@link JmxAttributeMethod}.
+ * This identifies which fields you want to expose via JMX via reflection. If the field is not public then it will try
+ * to open the accessibility on the field. Instead of annotating the fields, you can annotate your {@code getXxx()},
+ * {@code setXxx()}, and {@code isXxx()} methods with {@link JmxAttributeMethod}.
  * 
  * <p>
  * 

@@ -1,7 +1,8 @@
 package com.j256.simplejmx.common;
 
 /**
- * This identifies a field that you want to expose via JMX.
+ * This is used programmatically to identify a field that you want to expose via JMX. This is used when you are wiring
+ * using code or Spring another object that does not use the {@link JmxResource} annotation or {@link JmxSelfNaming}.
  * 
  * @author graywatson
  */

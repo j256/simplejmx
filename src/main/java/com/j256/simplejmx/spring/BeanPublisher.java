@@ -13,8 +13,9 @@ import com.j256.simplejmx.common.JmxSelfNaming;
 import com.j256.simplejmx.server.JmxServer;
 
 /**
- * Runs through and discovers any beans that need to be registered with the JmxServer. This looks for beans annotated
- * with {@link JmxResource}, that extend {@link JmxSelfNaming}, or beans of type {@link JmxBean}.
+ * Utility class designed to be used with Spring which runs through and discovers any beans that need to be registered
+ * with the JmxServer. This looks for beans annotated with {@link JmxResource}, that extend {@link JmxSelfNaming}, or
+ * that are of type {@link JmxBean}.
  * 
  * <p>
  * <b>NOTE:</b> This will only compile if com.springframework jar(s) are available to the application. Otherwise it will

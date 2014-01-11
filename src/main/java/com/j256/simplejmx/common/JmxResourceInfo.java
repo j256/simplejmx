@@ -1,7 +1,8 @@
 package com.j256.simplejmx.common;
 
 /**
- * This is used programmically to register another class for JMX exposure.
+ * This is used programmatically to register another class for JMX exposure. This is used when you are wiring using code
+ * or Spring another object that does not use the {@link JmxResource} annotation or {@link JmxSelfNaming}.
  * 
  * @author graywatson
  */

@@ -3,9 +3,11 @@ package com.j256.simplejmx.common;
 import javax.management.MBeanOperationInfo;
 
 /**
- * This identifies a methods that is a JMX operation for methods that are _not_ named "get..." or "set...". The method
- * can either return void or return an object. It is recommended that the method return a simple object that will be for
- * sure in jconsole's classpath and also should not throw an unknown exception class either.
+ * This identifies a method that is _not_ named "get...", "is...", or "set..." to be a JMX operation. The method can
+ * either return void or return an object. It is recommended that the method return a simple object that will be for
+ * sure in jconsole's classpath and also should not throw an unknown exception class either. This is used when you are
+ * wiring using code or Spring another object that does not use the {@link JmxResource} annotation or
+ * {@link JmxSelfNaming}.
  * 
  * @author graywatson
  */

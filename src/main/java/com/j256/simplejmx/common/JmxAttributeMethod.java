@@ -7,8 +7,8 @@ import java.lang.annotation.Target;
 
 /**
  * This identifies which getter and setter methods you want exposed via JMX. This is added to methods that are in the
- * form {@code setXxx()}, {@code getXxx()}, or {@code isXxx()} for the {@code xxx} field. The {@code Xxx} should match
- * precisely to line up the get and set JMX features. For example, if you are getting and setting the {@code fooBar}
+ * form {@code getXxx()}, {@code isXxx()}, or {@code setXxx()} for the {@code xxx} field. The {@code Xxx} should match
+ * precisely to associate the get and set JMX features. For example, if you are getting and setting the {@code fooBar}
  * field then it should be {@code getFooBar()} and {@code setFooBar()}. {@code isFooBar()} is also allowed if
  * {@code foobar} is a boolean or Boolean field. Instead of annotating the methods, you can use the
  * {@link JmxAttributeField} to annotate the fields you want to expose.
