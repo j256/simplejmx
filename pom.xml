@@ -7,7 +7,7 @@
 	<version>1.4-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Simple JMX</name>
-	<url>http://sourceforge.net/projects/simplejmx/</url>
+	<url>http://256.com/sources/simplejmx/</url>
 	<description>Simple JMX Classes</description>
 	<licenses>
 		<license>
@@ -40,21 +40,6 @@
 		</developer>
 	</developers>
 	<profiles>
-		<profile>
-			<id>sf</id>
-			<distributionManagement>
-				<repository>
-					<id>sourceforge</id>
-					<name>SourceForge</name>
-					<url>sftp://graywatson,simplejmx@frs.sourceforge.net:/home/frs/project/simplejmx/releases</url>
-				</repository>
-				<snapshotRepository>
-					<id>sourceforge</id>
-					<name>SourceForge</name>
-					<url>sftp://graywatson,simplejmx@frs.sourceforge.net:/home/frs/project/simplejmx/snapshots</url>
-				</snapshotRepository>
-			</distributionManagement>
-		</profile>
 		<profile>
 			<id>st</id>
 			<distributionManagement>

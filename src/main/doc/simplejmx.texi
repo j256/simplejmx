@@ -6,7 +6,7 @@
 @c %**end of header
 
 @c ----------------------------------------------------------------
-@set simplejmx_version 1.3
+@set simplejmx_version 1.4
 @set simplejmx_year 2014
 @set simplejmx_date January @value{simplejmx_year}
 @set package SimpleJMX
@@ -256,7 +256,7 @@ each of the objects should be self-naming and should provide a unique name that 
 public class DatabaseConnection extends BaseJmxSelfNaming
       implements JmxSelfNaming @{
    @@Override
-   public String getJmxNameOfObject() @{
+   public String getJmxBeanName() @{
       // return our toString as our name
       return toString();
    @}
@@ -274,7 +274,7 @@ The methods in the @code{JmxSelfNaming} interface are:
 
 Return the domain name of the object. Return null to use the one from the @code{@@JmxResource} annotation instead.
 
-@item String getJmxNameOfObject();
+@item String getJmxBeanName();
 
 Return the name of the object. Return null to use the one from the @code{@@JmxResource} annotation instead.
 
@@ -688,7 +688,7 @@ Here's a sample bean configuration:
 </bean>
 
 <!-- our JMX server which publishes our JMX beans -->
-<bean id="jmxServer" class="com.j256.simplejmx.server."
+<bean id="jmxServer" class="com.j256.simplejmx.server.JmxServer"
      init-method="start" destroy-method="stop">
    <property name="registryPort" value="8000" />
 </bean>
@@ -708,12 +708,14 @@ the @code{JmxSelfNaming} interface with the help of the @code{JmxBean} class:
 
 <!-- publish information about that bean via JMX -->
 <bean id="jmxServerJmx" class="com.j256.simplejmx.spring.JmxBean">
+   <!-- helps build the ObjectName -->
    <property name="jmxResourceInfo">
       <bean class="com.j256.simplejmx.common.JmxResourceInfo">
          <property name="jmxDomainName" value="your.domain" />
-         <property name="jmxNameOfObject" value="SomeBean" />
+         <property name="jmxBeanName" value="SomeBean" />
       </bean>
    </property>
+   <!-- defines the fields that are exposed for JMX -->
    <property name="attributeFieldInfos">
       <array>
          <bean class="com.j256.simplejmx.common.JmxAttributeFieldInfo">
@@ -721,6 +723,7 @@ the @code{JmxSelfNaming} interface with the help of the @code{JmxBean} class:
          </bean>
       </array>
    </property>
+   <!-- defines the get/is/set methods exposed -->
    <property name="attributeMethodInfos">
       <array>
          <bean class="com.j256.simplejmx.common.JmxAttributeMethodInfo">
@@ -728,6 +731,7 @@ the @code{JmxSelfNaming} interface with the help of the @code{JmxBean} class:
          </bean>
       </array>
    </property>
+   <!-- defines the operations (i.e. non get/is/set) methods exposed -->
    <property name="operationInfos">
       <array>
          <bean class="com.j256.simplejmx.common.JmxOperationInfo">
