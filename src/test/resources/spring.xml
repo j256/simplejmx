@@ -34,7 +34,7 @@
 		<property name="jmxResourceInfo">
 			<bean class="com.j256.simplejmx.common.JmxResourceInfo">
 				<property name="jmxDomainName" value="j256.simplejmx" />
-				<property name="jmxNameOfObject" value="JmxServer" />
+				<property name="jmxBeanName" value="JmxServer" />
 			</bean>
 		</property>
 		<property name="attributeFieldInfos">

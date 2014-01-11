@@ -69,7 +69,7 @@ public class BaseJmxSelfNamingTest {
 		public long foo = 10;
 
 		@Override
-		public String getJmxNameOfObject() {
+		public String getJmxBeanName() {
 			return JMX_SELF_NAMING_BEAN_NAME;
 		}
 	}

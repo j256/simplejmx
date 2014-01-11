@@ -15,7 +15,7 @@ public class JmxResourceInfoTest {
 		JmxResourceInfo info =
 				new JmxResourceInfo(domain, objName, new JmxFolderName[] { new JmxFolderName(folder1) }, desc);
 		assertEquals(domain, info.getJmxDomainName());
-		assertEquals(objName, info.getJmxNameOfObject());
+		assertEquals(objName, info.getJmxBeanName());
 		assertEquals(desc, info.getJmxDescription());
 		assertEquals(1, info.getJmxFolderNames().length);
 		assertEquals(folder1, info.getJmxFolderNames()[0].getValue());
@@ -23,7 +23,7 @@ public class JmxResourceInfoTest {
 		String folder2 = "folder2";
 		info = new JmxResourceInfo(domain, objName, new String[] { folder2 }, desc);
 		assertEquals(domain, info.getJmxDomainName());
-		assertEquals(objName, info.getJmxNameOfObject());
+		assertEquals(objName, info.getJmxBeanName());
 		assertEquals(desc, info.getJmxDescription());
 		assertEquals(1, info.getJmxFolderNames().length);
 		assertEquals(1, info.getJmxFolderNames().length);
@@ -37,8 +37,8 @@ public class JmxResourceInfoTest {
 		info.setJmxDomainName(domain);
 		assertEquals(domain, info.getJmxDomainName());
 		String objName = "someName";
-		info.setJmxNameOfObject(objName);
-		assertEquals(objName, info.getJmxNameOfObject());
+		info.setJmxBeanName(objName);
+		assertEquals(objName, info.getJmxBeanName());
 		String desc = "description of someName";
 		info.setJmxDescription(desc);
 		assertEquals(desc, info.getJmxDescription());

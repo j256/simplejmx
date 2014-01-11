@@ -106,7 +106,7 @@ public class ObjectNameUtilTest {
 	public void testFolderNamesFromAnnoationWithSelfNaming() {
 		FoldersFromAnnotationWithSelfNaming obj = new FoldersFromAnnotationWithSelfNaming();
 		ObjectName name = ObjectNameUtil.makeObjectName(obj);
-		assertEquals(obj.getJmxNameOfObject(), name.getKeyProperty("name"));
+		assertEquals(obj.getJmxBeanName(), name.getKeyProperty("name"));
 		assertEquals(FOLDER_NAME1, name.getKeyProperty("00"));
 	}
 
@@ -114,7 +114,7 @@ public class ObjectNameUtilTest {
 	public void testFolderNamesFromSelfNameingWithAnnoation() {
 		FoldersFromSelfNaming obj = new FoldersFromSelfNaming();
 		ObjectName name = ObjectNameUtil.makeObjectName(obj);
-		assertEquals(obj.getJmxNameOfObject(), name.getKeyProperty("name"));
+		assertEquals(obj.getJmxBeanName(), name.getKeyProperty("name"));
 		assertEquals(FOLDER_NAME2, name.getKeyProperty("00"));
 	}
 
@@ -125,7 +125,7 @@ public class ObjectNameUtilTest {
 		public String getJmxDomainName() {
 			return null;
 		}
-		public String getJmxNameOfObject() {
+		public String getJmxBeanName() {
 			return null;
 		}
 		public JmxFolderName[] getJmxFolderNames() {
@@ -138,7 +138,7 @@ public class ObjectNameUtilTest {
 		public String getJmxDomainName() {
 			return DOMAIN_NAME;
 		}
-		public String getJmxNameOfObject() {
+		public String getJmxBeanName() {
 			return null;
 		}
 		public JmxFolderName[] getJmxFolderNames() {
@@ -155,7 +155,7 @@ public class ObjectNameUtilTest {
 		public String getJmxDomainName() {
 			return null;
 		}
-		public String getJmxNameOfObject() {
+		public String getJmxBeanName() {
 			return null;
 		}
 		public JmxFolderName[] getJmxFolderNames() {
@@ -177,7 +177,7 @@ public class ObjectNameUtilTest {
 		public String getJmxDomainName() {
 			return null;
 		}
-		public String getJmxNameOfObject() {
+		public String getJmxBeanName() {
 			return null;
 		}
 		public JmxFolderName[] getJmxFolderNames() {
@@ -191,7 +191,7 @@ public class ObjectNameUtilTest {
 		public String getJmxDomainName() {
 			return null;
 		}
-		public String getJmxNameOfObject() {
+		public String getJmxBeanName() {
 			return null;
 		}
 		public JmxFolderName[] getJmxFolderNames() {
@@ -204,7 +204,7 @@ public class ObjectNameUtilTest {
 		public String getJmxDomainName() {
 			return null;
 		}
-		public String getJmxNameOfObject() {
+		public String getJmxBeanName() {
 			return "FoldersFromAnnotationWithSelfNaming";
 		}
 		public JmxFolderName[] getJmxFolderNames() {
@@ -217,7 +217,7 @@ public class ObjectNameUtilTest {
 		public String getJmxDomainName() {
 			return null;
 		}
-		public String getJmxNameOfObject() {
+		public String getJmxBeanName() {
 			return "FoldersFromSelfNaming";
 		}
 		// NOTE: this overrides the folders in the @JmxResource
@@ -239,7 +239,7 @@ public class ObjectNameUtilTest {
 		public String getJmxDomainName() {
 			return null;
 		}
-		public String getJmxNameOfObject() {
+		public String getJmxBeanName() {
 			return null;
 		}
 		public JmxFolderName[] getJmxFolderNames() {
@@ -251,7 +251,7 @@ public class ObjectNameUtilTest {
 		public String getJmxDomainName() {
 			return "NoObjectNameInfo";
 		}
-		public String getJmxNameOfObject() {
+		public String getJmxBeanName() {
 			return null;
 		}
 		public JmxFolderName[] getJmxFolderNames() {

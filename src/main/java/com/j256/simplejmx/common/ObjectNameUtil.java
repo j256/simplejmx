@@ -32,7 +32,7 @@ public class ObjectNameUtil {
 						"Could not create ObjectName because domain name not specified in getJmxDomainName() nor @JmxResource");
 			}
 		}
-		String beanName = selfNamingObj.getJmxNameOfObject();
+		String beanName = selfNamingObj.getJmxBeanName();
 		if (beanName == null) {
 			if (jmxResource != null) {
 				beanName = getBeanName(jmxResource);

@@ -23,7 +23,7 @@ public interface JmxSelfNaming {
 	 * Return the name of the object that will be the "name=..." part of the associated {@link ObjectName}. Return null
 	 * to use the one from the {@link JmxResource#beanName()} annotation instead.
 	 */
-	public String getJmxNameOfObject();
+	public String getJmxBeanName();
 
 	/**
 	 * Return the appropriate array of folder names used to built the associated {@link ObjectName}. Return null to use

@@ -12,7 +12,7 @@ public class BaseJmxSelfNaming implements JmxSelfNaming {
 		return null;
 	}
 
-	public String getJmxNameOfObject() {
+	public String getJmxBeanName() {
 		return null;
 	}
 

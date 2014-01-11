@@ -32,7 +32,7 @@ public @interface JmxResource {
 	 * Name of the JMX bean in the jconsole folder it is in.
 	 * <p>
 	 * If the object implements {@link JmxSelfNaming} then this would be replaced by
-	 * {@link JmxSelfNaming#getJmxNameOfObject()}. If the object doesn't implement {@link JmxSelfNaming} and this is not
+	 * {@link JmxSelfNaming#getJmxBeanName()}. If the object doesn't implement {@link JmxSelfNaming} and this is not
 	 * specified then the object class name is used.
 	 * </p>
 	 */

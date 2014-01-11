@@ -84,7 +84,7 @@ public class DynamicJmx {
 		}
 
 		@Override
-		public String getJmxNameOfObject() {
+		public String getJmxBeanName() {
 			// we just return our number as our bean name in JMX
 			return Integer.toString(number);
 		}

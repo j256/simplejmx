@@ -58,7 +58,7 @@ public class JmxSelfNamingTest {
 			return JMX_SELF_NAMING_DOMAIN_NAME;
 		}
 
-		public String getJmxNameOfObject() {
+		public String getJmxBeanName() {
 			return JMX_SELF_NAMING_BEAN_NAME;
 		}
 
