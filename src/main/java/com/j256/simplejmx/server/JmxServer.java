@@ -60,7 +60,7 @@ public class JmxServer {
 	 *            {@link #setRegistryPort(int)}.
 	 * @param serverPort
 	 *            The RMI server port that jconsole uses to transfer data to/from the server. See
-	 *            {@link #setServerPort(int)}.
+	 *            {@link #setServerPort(int)}. The same port as the registry-port can be used.
 	 */
 	public JmxServer(int registryPort, int serverPort) {
 		this.registryPort = registryPort;
@@ -297,9 +297,9 @@ public class JmxServer {
 
 	/**
 	 * Chances are you should be using {@link #setPort(int)} or {@link #setRegistryPort(int)} unless you know what you
-	 * are doing. This sets what JMX calls the "RMI server port". By default this does not have to be set and a default
-	 * value of 1 plus the registry port will be used. When you specify a port number in jconsole this is not the port
-	 * that should be specified -- see the registry port.
+	 * are doing. This sets what JMX calls the "RMI server port". By default this does not have to be set and the
+	 * registry-port will be used. Both the registry and the server can be the same port. When you specify a port number
+	 * in jconsole this is not the port that should be specified -- see the registry port.
 	 */
 	public void setServerPort(int serverPort) {
 		this.serverPort = serverPort;
@@ -345,9 +345,14 @@ public class JmxServer {
 		if (connector == null) {
 			JMXServiceURL url = null;
 			if (serverPort == 0) {
-				serverPort = registryPort + 1;
+				/*
+				 * Using the registry-port for both the registry call _and_ the RMI calls seems to work fine. There must
+				 * be RMI multiplexing underneath the covers of the JMX handler. Did not know that. Thanks to EJB@SO.
+				 */
+				serverPort = registryPort;
 			}
-			String urlString = "service:jmx:rmi://localhost:" + serverPort + "/jndi/rmi://:" + registryPort + "/jmxrmi";
+			String urlString =
+					"service:jmx:rmi://localhost:" + registryPort + "/jndi/rmi://:" + registryPort + "/jmxrmi";
 			try {
 				url = new JMXServiceURL(urlString);
 			} catch (MalformedURLException e) {

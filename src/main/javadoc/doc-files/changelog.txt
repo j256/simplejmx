@@ -1,3 +1,6 @@
+1.5: 2/??/2014
+	* Turns out that you can map the server-port to be the same as the registry-port.  I've made this the default.
+
 1.4: 1/11/2014
 	* Renamed JmxSelfNaming.getJmxNameOfObject() to getJmxBeanName().  Sorry for breaking backwards compatibility.
 
