@@ -72,7 +72,7 @@ public class JmxServer {
 	 * Create a JMX server running on a particular address and registry-port.
 	 * 
 	 * @param inetAddress
-	 *            Address to bind to.
+	 *            Address to bind to.  If you use on the non-address constructors, it will bind to all interfaces.
 	 * @param registryPort
 	 *            The "RMI registry port" that you specify in jconsole to connect to the server. See
 	 *            {@link #setRegistryPort(int)}.
@@ -101,7 +101,7 @@ public class JmxServer {
 	 * Create a JMX server running on a particular registry and server port pair.
 	 * 
 	 * @param inetAddress
-	 *            Address to bind to.
+	 *            Address to bind to.  If you use on the non-address constructors, it will bind to all interfaces.
 	 * @param registryPort
 	 *            The "RMI registry port" that you specify in jconsole to connect to the server. See
 	 *            {@link #setRegistryPort(int)}.
