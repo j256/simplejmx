@@ -9,7 +9,6 @@ import java.rmi.NoSuchObjectException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.RMIServerSocketFactory;
-import java.rmi.server.RMISocketFactory;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,6 +47,7 @@ public class JmxServer {
 	private int registeredCount;
 	private RMIServerSocketFactory serverSocketFactory;
 	private boolean serverHostNamePropertySet = false;
+	private String serviceUrl;
 
 	/**
 	 * Create a JMX server that will be set with the port using setters. Used with spring. You must at least specify the
@@ -72,7 +72,7 @@ public class JmxServer {
 	 * Create a JMX server running on a particular address and registry-port.
 	 * 
 	 * @param inetAddress
-	 *            Address to bind to.  If you use on the non-address constructors, it will bind to all interfaces.
+	 *            Address to bind to. If you use on the non-address constructors, it will bind to all interfaces.
 	 * @param registryPort
 	 *            The "RMI registry port" that you specify in jconsole to connect to the server. See
 	 *            {@link #setRegistryPort(int)}.
@@ -101,7 +101,7 @@ public class JmxServer {
 	 * Create a JMX server running on a particular registry and server port pair.
 	 * 
 	 * @param inetAddress
-	 *            Address to bind to.  If you use on the non-address constructors, it will bind to all interfaces.
+	 *            Address to bind to. If you use on the non-address constructors, it will bind to all interfaces.
 	 * @param registryPort
 	 *            The "RMI registry port" that you specify in jconsole to connect to the server. See
 	 *            {@link #setRegistryPort(int)}.
@@ -365,11 +365,25 @@ public class JmxServer {
 	}
 
 	/**
-	 * Optional server socket factory that can will be used to generate our registry and server ports. Unfortunately if
-	 * this is specified then the registry and server ports have to be different.
+	 * Optional server socket factory that can will be used to generate our registry and server ports.
 	 */
 	public void setServerSocketFactory(RMIServerSocketFactory serverSocketFactory) {
 		this.serverSocketFactory = serverSocketFactory;
+	}
+
+	/**
+	 * Optional service URL which is used to specify the connection endpoints. The format is something like:
+	 * 
+	 * <p>
+	 * 
+	 * <pre>
+	 * service:jmx:rmi://your-server-name:server-port/jndi/rmi://registry-host:registry-port/jmxrmi
+	 * </pre>
+	 * 
+	 * </p>
+	 */
+	public void setServiceUrl(String serviceUrl) {
+		this.serviceUrl = serviceUrl;
 	}
 
 	/**
@@ -399,30 +413,33 @@ public class JmxServer {
 	}
 
 	private void startRmiRegistry() throws JMException {
-		if (rmiRegistry == null) {
-			try {
-				if (inetAddress == null) {
-					rmiRegistry = LocateRegistry.createRegistry(registryPort);
-				} else {
-					if (serverSocketFactory == null) {
-						serverSocketFactory = new LocalSocketFactory(inetAddress);
-					}
-					if (System.getProperty(RMI_SERVER_HOST_NAME_PROPERTY) == null) {
-						/*
-						 * We have to do this because JMX tries to connect back the server that we just set and it won't
-						 * be able to locate it if we set our own address to anything but the InetAddress.getLocalHost()
-						 * address.
-						 */
-						System.setProperty(RMI_SERVER_HOST_NAME_PROPERTY, inetAddress.getHostAddress());
-						serverHostNamePropertySet = true;
-					}
-					rmiRegistry =
-							LocateRegistry.createRegistry(registryPort, RMISocketFactory.getDefaultSocketFactory(),
-									serverSocketFactory);
+		if (rmiRegistry != null) {
+			return;
+		}
+		try {
+			if (inetAddress == null) {
+				rmiRegistry = LocateRegistry.createRegistry(registryPort);
+			} else {
+				if (serverSocketFactory == null) {
+					serverSocketFactory = new LocalSocketFactory(inetAddress);
 				}
-			} catch (IOException e) {
-				throw createJmException("Unable to create RMI registry on port " + registryPort, e);
+				if (System.getProperty(RMI_SERVER_HOST_NAME_PROPERTY) == null) {
+					/*
+					 * We have to do this because JMX tries to connect back the server that we just set and it won't be
+					 * able to locate it if we set our own address to anything but the InetAddress.getLocalHost()
+					 * address.
+					 */
+					System.setProperty(RMI_SERVER_HOST_NAME_PROPERTY, inetAddress.getHostAddress());
+					serverHostNamePropertySet = true;
+				}
+				/*
+				 * NOTE: the client factory being null is a critical part of this for some reason. If we specify a
+				 * client socket factory then the registry and the RMI server can't be on the same port. Thanks to EJB.
+				 */
+				rmiRegistry = LocateRegistry.createRegistry(registryPort, null, serverSocketFactory);
 			}
+		} catch (IOException e) {
+			throw createJmException("Unable to create RMI registry on port " + registryPort, e);
 		}
 	}
 
@@ -430,23 +447,13 @@ public class JmxServer {
 		if (connector != null) {
 			return;
 		}
-		JMXServiceURL url = null;
 		if (serverPort == 0) {
-			if (inetAddress == null) {
-				/*
-				 * If we aren't specifying an address then we can use the registry-port for both the registry call _and_
-				 * the RMI calls seems to work fine. There must be RMI multiplexing underneath the covers of the JMX
-				 * handler. Did not know that. Thanks to EJB@SO.
-				 */
-				serverPort = registryPort;
-			} else {
-				/*
-				 * Unfortunately, it doesn't seem like we can use the same port if we are using a socket factory. When
-				 * this is debugged it calls createServerSocket(...) two times instead of sharing the same socket
-				 * without the socket-factory.
-				 */
-				serverPort = registryPort + 1;
-			}
+			/*
+			 * If we aren't specifying an address then we can use the registry-port for both the registry call _and_ the
+			 * RMI calls. There is RMI port multiplexing underneath the covers of the JMX handler. Did not know that.
+			 * Thanks to EJB.
+			 */
+			serverPort = registryPort;
 		}
 		String serverHost = "localhost";
 		String registryHost = "";
@@ -455,13 +462,16 @@ public class JmxServer {
 			serverHost = hostAddr;
 			registryHost = hostAddr;
 		}
-		String urlString =
-				"service:jmx:rmi://" + serverHost + ":" + serverPort + "/jndi/rmi://" + registryHost + ":"
-						+ registryPort + "/jmxrmi";
+		if (serviceUrl == null) {
+			serviceUrl =
+					"service:jmx:rmi://" + serverHost + ":" + serverPort + "/jndi/rmi://" + registryHost + ":"
+							+ registryPort + "/jmxrmi";
+		}
+		JMXServiceURL url;
 		try {
-			url = new JMXServiceURL(urlString);
+			url = new JMXServiceURL(serviceUrl);
 		} catch (MalformedURLException e) {
-			throw createJmException("Malformed service url created " + urlString, e);
+			throw createJmException("Malformed service url created " + serviceUrl, e);
 		}
 
 		Map<String, Object> envMap = null;
