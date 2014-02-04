@@ -357,22 +357,24 @@ public class JmxServer {
 	/**
 	 * Chances are you should be using {@link #setPort(int)} or {@link #setRegistryPort(int)} unless you know what you
 	 * are doing. This sets what JMX calls the "RMI server port". By default this does not have to be set and the
-	 * registry-port will be used. Both the registry and the server can be the same port. When you specify a port number
-	 * in jconsole this is not the port that should be specified -- see the registry port.
+	 * registry-port will be used also as the server-port. Both the registry and the server can be the same port. When
+	 * you specify a port number in jconsole this is not the port that should be specified -- see the registry port.
 	 */
 	public void setServerPort(int serverPort) {
 		this.serverPort = serverPort;
 	}
 
 	/**
-	 * Optional server socket factory that can will be used to generate our registry and server ports.
+	 * Optional server socket factory that can will be used to generate our registry and server ports. This is not
+	 * necessary if you are specifying addresses or ports.
 	 */
 	public void setServerSocketFactory(RMIServerSocketFactory serverSocketFactory) {
 		this.serverSocketFactory = serverSocketFactory;
 	}
 
 	/**
-	 * Optional service URL which is used to specify the connection endpoints. The format is something like:
+	 * Optional service URL which is used to specify the connection endpoints. You should not use this if you are
+	 * setting the address or the ports directly. The format is something like:
 	 * 
 	 * <p>
 	 * 
@@ -380,6 +382,11 @@ public class JmxServer {
 	 * service:jmx:rmi://your-server-name:server-port/jndi/rmi://registry-host:registry-port/jmxrmi
 	 * </pre>
 	 * 
+	 * </p>
+	 * 
+	 * <p>
+	 * <tt>your-server-name</tt> could be an IP of an interface or just localhost. <tt>registry-host</tt> can also be an
+	 * interface IP or blank for localhost.
 	 * </p>
 	 */
 	public void setServiceUrl(String serviceUrl) {
