@@ -13,7 +13,7 @@ import com.j256.simplejmx.server.JmxServer;
  * <p>
  * You register these objects using the standard {@link JmxServer#register(Object)} methods and then call
  * {@link JmxServer#unregister(Object)} if they are removed later. For an example of dynamic self-naming objects, see
- * the {@link JmxIntegrationTest}.
+ * the JmxIntegrationTest class.
  * </p>
  * 
  * @author graywatson
