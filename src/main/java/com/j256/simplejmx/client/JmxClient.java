@@ -2,6 +2,7 @@ package com.j256.simplejmx.client;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -109,6 +110,13 @@ public class JmxClient {
 	 */
 	public JmxClient(String hostName, int port) throws JMException {
 		this(generalJmxUrlForHostNamePort(hostName, port));
+	}
+
+	/**
+	 * Connect the client to an address and port combination.
+	 */
+	public JmxClient(InetAddress address, int port) throws JMException {
+		this(address.getHostAddress(), port);
 	}
 
 	/**
