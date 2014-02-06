@@ -75,7 +75,6 @@ public class DynamicJmx {
 
 		@JmxAttributeField(description = "Our thing number")
 		private int number;
-		@SuppressWarnings("unused")
 		@JmxAttributeField(description = "Time in millis when we were created")
 		private long startTimeMillis = System.currentTimeMillis();
 
