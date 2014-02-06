@@ -442,6 +442,9 @@ public class JmxServer {
 				/*
 				 * NOTE: the client factory being null is a critical part of this for some reason. If we specify a
 				 * client socket factory then the registry and the RMI server can't be on the same port. Thanks to EJB.
+				 * 
+				 * I also tried to inject a client socket factory both here and below in the connector environment but I
+				 * could not get it to work.
 				 */
 				rmiRegistry = LocateRegistry.createRegistry(registryPort, null, serverSocketFactory);
 			}
@@ -486,11 +489,15 @@ public class JmxServer {
 			envMap = new HashMap<String, Object>();
 			envMap.put(RMIConnectorServer.RMI_SERVER_SOCKET_FACTORY_ATTRIBUTE, serverSocketFactory);
 		}
+		/*
+		 * NOTE: I tried to inject a client socket factory with RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE
+		 * but I could not get it to work. It seemed to require the client to have the LocalSocketFactory class in the
+		 * classpath.
+		 */
 
 		try {
-			connector =
-					JMXConnectorServerFactory.newJMXConnectorServer(url, envMap,
-							ManagementFactory.getPlatformMBeanServer());
+			mbeanServer = ManagementFactory.getPlatformMBeanServer();
+			connector = JMXConnectorServerFactory.newJMXConnectorServer(url, envMap, mbeanServer);
 		} catch (IOException e) {
 			throw createJmException("Could not make our Jmx connector server on URL: " + url, e);
 		}
@@ -500,7 +507,6 @@ public class JmxServer {
 			connector = null;
 			throw createJmException("Could not start our Jmx connector server on URL: " + url, e);
 		}
-		mbeanServer = connector.getMBeanServer();
 	}
 
 	private JMException createJmException(String message, Exception e) {

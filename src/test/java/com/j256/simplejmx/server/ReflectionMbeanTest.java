@@ -452,14 +452,12 @@ public class ReflectionMbeanTest {
 
 	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	protected static class AttributeField {
-		@SuppressWarnings("unused")
 		@JmxAttributeField(description = "some thing")
 		private int readOnly = READ_ONLY_DEFAULT;
 		@JmxAttributeField(isWritable = true)
 		private int readWrite = READ_WRITE_DEFAULT;
 		@JmxAttributeField(isReadible = false, isWritable = true)
 		private int writeOnly = WRITE_ONLY_DEFAULT;
-		@SuppressWarnings("unused")
 		@JmxAttributeField(isReadible = false, isWritable = false)
 		private int neither = NEITHER_DEFAULT;
 		@SuppressWarnings("unused")
