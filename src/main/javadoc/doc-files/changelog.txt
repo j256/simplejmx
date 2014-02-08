@@ -1,3 +1,6 @@
+1.7: 2/8/2014
+	* Fixed an embarrassing bug in the JmxClient code which was improperly caching bean information.  Thanks to Michael Ottati.
+
 1.6: 2/4/2014
 	* Re-released to fix release numbering. 
 

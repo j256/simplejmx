@@ -35,8 +35,6 @@ public class JmxClient {
 	private JMXConnector jmxConnector;
 	private JMXServiceURL serviceUrl;
 	private MBeanServerConnection mbeanConn;
-	private MBeanAttributeInfo[] attributes;
-	private MBeanOperationInfo[] operations;
 
 	/**
 	 * Connect the client to a JMX server using the full JMX URL format. The URL should look something like:
@@ -317,7 +315,11 @@ public class JmxClient {
 	 */
 	public void setAttribute(ObjectName name, String attrName, String value) throws Exception {
 		MBeanAttributeInfo info = getAttrInfo(name, attrName);
-		setAttribute(name, attrName, stringToObject(value, info.getType()));
+		if (info == null) {
+			throw new IllegalArgumentException("Cannot find attribute named '" + attrName + "'");
+		} else {
+			setAttribute(name, attrName, stringToObject(value, info.getType()));
+		}
 	}
 
 	/**
@@ -418,12 +420,11 @@ public class JmxClient {
 
 	private String[] lookupParamTypes(ObjectName objectName, String operName, Object[] params) throws JMException {
 		checkClientConnected();
-		if (operations == null) {
-			try {
-				operations = mbeanConn.getMBeanInfo(objectName).getOperations();
-			} catch (Exception e) {
-				throw createJmException("Cannot get attribute info from " + objectName, e);
-			}
+		MBeanOperationInfo[] operations;
+		try {
+			operations = mbeanConn.getMBeanInfo(objectName).getOperations();
+		} catch (Exception e) {
+			throw createJmException("Cannot get attribute info from " + objectName, e);
 		}
 		String[] paramTypes = new String[params.length];
 		for (int i = 0; i < params.length; i++) {
@@ -468,12 +469,11 @@ public class JmxClient {
 	}
 
 	private MBeanAttributeInfo getAttrInfo(ObjectName objectName, String attrName) throws JMException {
-		if (attributes == null) {
-			try {
-				attributes = mbeanConn.getMBeanInfo(objectName).getAttributes();
-			} catch (Exception e) {
-				throw createJmException("Cannot get attribute info from " + objectName, e);
-			}
+		MBeanAttributeInfo[] attributes;
+		try {
+			attributes = mbeanConn.getMBeanInfo(objectName).getAttributes();
+		} catch (Exception e) {
+			throw createJmException("Cannot get attribute info from " + objectName, e);
 		}
 		for (MBeanAttributeInfo info : attributes) {
 			if (info.getName().equals(attrName)) {

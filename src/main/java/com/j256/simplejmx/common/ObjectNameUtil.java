@@ -20,6 +20,8 @@ public class ObjectNameUtil {
 	 *            Annotation from the class for which we are creating our ObjectName. It may be null.
 	 * @param selfNamingObj
 	 *            Object that implements the self-naming interface.
+	 * @throws IllegalArgumentException
+	 *             If we had problems building the name
 	 */
 	public static ObjectName makeObjectName(JmxResource jmxResource, JmxSelfNaming selfNamingObj) {
 		String domainName = selfNamingObj.getJmxDomainName();
@@ -53,6 +55,8 @@ public class ObjectNameUtil {
 	 * 
 	 * @param selfNamingObj
 	 *            Object that implements the self-naming interface.
+	 * @throws IllegalArgumentException
+	 *             If we had problems building the name
 	 */
 	public static ObjectName makeObjectName(JmxSelfNaming selfNamingObj) {
 		JmxResource jmxResource = selfNamingObj.getClass().getAnnotation(JmxResource.class);
@@ -66,6 +70,8 @@ public class ObjectNameUtil {
 	 *            Annotation from the class for which we are creating our ObjectName.
 	 * @param obj
 	 *            Object for which we are creating our ObjectName
+	 * @throws IllegalArgumentException
+	 *             If we had problems building the name
 	 */
 	public static ObjectName makeObjectName(JmxResource jmxResource, Object obj) {
 		String domainName = jmxResource.domainName();
@@ -90,6 +96,8 @@ public class ObjectNameUtil {
 	 * @param folderNameStrings
 	 *            These can be used to setup folders inside of the top folder. Each of the entries in the array can
 	 *            either be in "value" or "name=value" format.
+	 * @throws IllegalArgumentException
+	 *             If we had problems building the name
 	 */
 	public static ObjectName makeObjectName(String domainName, String beanName, String[] folderNameStrings) {
 		return makeObjectName(domainName, beanName, null, folderNameStrings);
@@ -104,9 +112,28 @@ public class ObjectNameUtil {
 	 * @param beanName
 	 *            This corresponds to the {@link JmxResource#beanName()} and is the bean name in the lowest folder
 	 *            level.
+	 * @throws IllegalArgumentException
+	 *             If we had problems building the name
 	 */
 	public static ObjectName makeObjectName(String domainName, String beanName) {
 		return makeObjectName(domainName, beanName, null, null);
+	}
+
+	/**
+	 * Constructs an object-name from a domain-name and object-name.
+	 * 
+	 * @param objectNameString
+	 *            The entire object-name string in the form of something like
+	 *            <tt>your.domain:folder=1,name=beanBean</tt>
+	 * @throws IllegalArgumentException
+	 *             If we had problems building the name
+	 */
+	public static ObjectName makeObjectName(String objectNameString) {
+		try {
+			return new ObjectName(objectNameString);
+		} catch (Exception e) {
+			throw new IllegalArgumentException("Invalid ObjectName generated: " + objectNameString, e);
+		}
 	}
 
 	/**
@@ -115,6 +142,8 @@ public class ObjectNameUtil {
 	 * 
 	 * @param obj
 	 *            Object for which we are creating our ObjectName
+	 * @throws IllegalArgumentException
+	 *             If we had problems building the name
 	 */
 	public static ObjectName makeObjectName(Object obj) {
 		JmxResource jmxResource = obj.getClass().getAnnotation(JmxResource.class);
@@ -177,11 +206,7 @@ public class ObjectNameUtil {
 		sb.append("name=");
 		sb.append(beanName);
 		String objectNameString = sb.toString();
-		try {
-			return new ObjectName(objectNameString);
-		} catch (Exception e) {
-			throw new IllegalArgumentException("Invalid ObjectName generated: " + objectNameString, e);
-		}
+		return makeObjectName(objectNameString);
 	}
 
 	private static void appendNumericalPrefix(StringBuilder sb, int prefixC) {

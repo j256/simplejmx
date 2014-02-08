@@ -32,6 +32,8 @@ public class JmxClientTest {
 	private static JmxServer server;
 	private static String beanName;
 	private static ObjectName objectName;
+	private static String anotherBeanName;
+	private static ObjectName anotherObjectName;
 	private static JmxClient client;
 	private static JmxClient closedClient;
 
@@ -43,6 +45,12 @@ public class JmxClientTest {
 		server.register(obj);
 		beanName = JmxClientTestObject.class.getSimpleName();
 		objectName = ObjectNameUtil.makeObjectName(JMX_DOMAIN, beanName);
+
+		JmxClientTestAnotherObject anotherObj = new JmxClientTestAnotherObject();
+		server.register(anotherObj);
+		anotherBeanName = JmxClientTestAnotherObject.class.getSimpleName();
+		anotherObjectName = ObjectNameUtil.makeObjectName(JMX_DOMAIN, anotherBeanName);
+
 		client = new JmxClient(JMX_PORT);
 		closedClient = new JmxClient(JMX_PORT);
 		closedClient.closeThrow();
@@ -418,6 +426,22 @@ public class JmxClientTest {
 		assertTrue("Found bean " + beanName, found);
 	}
 
+	@Test
+	public void testAnotherObjectAttribute() throws Exception {
+		int val = 273907923;
+		client.setAttribute(anotherObjectName, "y", Integer.toString(val));
+		assertEquals(val, client.getAttribute(anotherObjectName, "y"));
+	}
+
+	@Test
+	public void testAnotherObjectOperation() throws Exception {
+		short val1 = 23;
+		int val2 = 245;
+		Object result = client.invokeOperation(anotherObjectName, "timesTwo", val1, val2);
+		long times = val1 * val2;
+		assertEquals(times, result);
+	}
+
 	/* ======================================================================= */
 
 	private void testThingtoString(String methodName, Object arg) throws Exception {
@@ -495,6 +519,23 @@ public class JmxClientTest {
 		@JmxOperation
 		public String doubleToString(double doubleVal) {
 			return Double.toString(doubleVal);
+		}
+	}
+
+	@JmxResource(domainName = JMX_DOMAIN)
+	protected static class JmxClientTestAnotherObject {
+		int y;
+		@JmxAttributeMethod
+		public int getY() {
+			return y;
+		}
+		@JmxAttributeMethod
+		public void setY(int y) {
+			this.y = y;
+		}
+		@JmxOperation
+		public long timesTwo(short y1, int y2) {
+			return y1 * y2;
 		}
 	}
 }
