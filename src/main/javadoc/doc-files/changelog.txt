@@ -1,3 +1,6 @@
+1.8: 2/??/2014
+	* Added support for PublishAllBeanWrapper which exposes all public fields and methods as attributes and operations.
+
 1.7: 2/8/2014
 	* Fixed an embarrassing bug in the JmxClient code which was improperly caching bean information.  Thanks to Michael Ottati.
 

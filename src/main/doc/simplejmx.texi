@@ -601,6 +601,13 @@ jmxServer.register(someObject,
    attributeFieldInfos, attributeMethodInfos, operationInfos);
 @end example
 
+@cindex PublishAllBeanWrapper
+@cindex all public fields, methods
+You can also use the @code{PublishAllBeanWrapper} which exposes all public fields and methods as attributes or operations.
+All public fields will be exposed as an attribute and if not-final will be exposed as writable.  All public methods that
+start with @code{is} or @code{get} will be exposed as attributes and if they have a @code{set} method will be writable.
+All other public methods will be exposed as operations. 
+
 Take a look at the random-object example program for a working example.  @xref{random object example}.
 
 @c ----------------------------------------------------------------
@@ -674,10 +681,13 @@ See the @code{JmxClient} javadocs for more information
 
 @cindex Spring framework
 @cindex using with Spring
+@cindex JmxBean
+@cindex PublishAllBeanWrapper
 SimpleJMX has an optional dependency on the Spring Framework jar(s).  This means that if you have the Spring framework
 included in your project, you can make use of the @code{BeanPublisher} class which will automagically register the beans
 from your spring XML configuration files to the @code{JmxServer} class.  The @code{BeanPublisher} class will register
-classes that have the @code{@@JmxResource} annotation and the classes that implement the @code{JmxSelfNaming} interface.
+classes that have the @code{@@JmxResource} annotation, that implement the @code{JmxSelfNaming} interface, that are of
+type that are of type @code{JmxBean}, and are of type @code{PublishAllBeanWrapper}.
 
 Here's a sample bean configuration:
 

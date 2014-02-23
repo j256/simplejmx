@@ -36,6 +36,13 @@ public class JmxResourceInfo implements JmxSelfNaming {
 		this.jmxDescription = jmxDescription;
 	}
 
+	public JmxResourceInfo(String jmxDomainName, String jmxBeanName, String jmxDescription) {
+		this.jmxDomainName = jmxDomainName;
+		this.jmxBeanName = jmxBeanName;
+		this.jmxFolderNames = null;
+		this.jmxDescription = jmxDescription;
+	}
+
 	public String getJmxDomainName() {
 		return jmxDomainName;
 	}

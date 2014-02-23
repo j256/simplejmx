@@ -23,4 +23,3 @@ Used to maintain requested features or future work.
 
 - have the client be able to access a bean by its class.
 	- it would use the annotations to determine the domain and object-name
- 

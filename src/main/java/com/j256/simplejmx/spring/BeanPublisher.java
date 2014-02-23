@@ -10,12 +10,13 @@ import org.springframework.context.ApplicationContextAware;
 
 import com.j256.simplejmx.common.JmxResource;
 import com.j256.simplejmx.common.JmxSelfNaming;
+import com.j256.simplejmx.server.PublishAllBeanWrapper;
 import com.j256.simplejmx.server.JmxServer;
 
 /**
  * Utility class designed to be used with Spring which runs through and discovers any beans that need to be registered
- * with the JmxServer. This looks for beans annotated with {@link JmxResource}, that extend {@link JmxSelfNaming}, or
- * that are of type {@link JmxBean}.
+ * with the JmxServer. This looks for beans annotated with {@link JmxResource}, that extend {@link JmxSelfNaming}, that
+ * are of type {@link JmxBean}, or are of type {@link PublishAllBeanWrapper}.
  * 
  * <p>
  * <b>NOTE:</b> This will only compile if com.springframework jar(s) are available to the application. Otherwise it will
@@ -40,6 +41,9 @@ public class BeanPublisher implements InitializingBean, ApplicationContextAware 
 				JmxBean jmxBean = (JmxBean) bean;
 				jmxServer.register(jmxBean.getTarget(), jmxBean.getJmxResourceInfo(), jmxBean.getAttributeFieldInfos(),
 						jmxBean.getAttributeMethodInfos(), jmxBean.getOperationInfos());
+			} else if (bean instanceof PublishAllBeanWrapper) {
+				PublishAllBeanWrapper wrapper = (PublishAllBeanWrapper) bean;
+				jmxServer.register(wrapper);
 			}
 		}
 	}

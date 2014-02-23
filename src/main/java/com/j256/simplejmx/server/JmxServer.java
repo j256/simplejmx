@@ -219,6 +219,36 @@ public class JmxServer {
 	}
 
 	/**
+	 * Register the object parameter for exposure with JMX that is wrapped using the PublishAllBeanWrapper.
+	 */
+	public synchronized void register(PublishAllBeanWrapper wrapper) throws JMException {
+		register(wrapper, wrapper.getJmxResourceInfo(), wrapper.getAttributeFieldInfos(),
+				wrapper.getAttributeMethodInfos(), wrapper.getOperationInfos());
+	}
+
+	/**
+	 * Register the object parameter for exposure with JMX with user defined field-attribute, method-attribute, and
+	 * operation information.
+	 * 
+	 * @param obj
+	 *            Object that we are registering.
+	 * @param resourceInfo
+	 *            Resource information used to build the object-name.
+	 * @param attributeFieldInfos
+	 *            Array of attribute information for fields that are exposed through reflection. Can be null if none.
+	 * @param attributeMethodInfos
+	 *            Array of attribute information for fields that are exposed through get/set/is methods.
+	 * @param operationInfos
+	 *            Array of operation information for methods.
+	 */
+	public synchronized void register(Object obj, JmxResourceInfo resourceInfo,
+			JmxAttributeFieldInfo[] attributeFieldInfos, JmxAttributeMethodInfo[] attributeMethodInfos,
+			JmxOperationInfo[] operationInfos) throws JMException {
+		register(obj, ObjectNameUtil.makeObjectName(resourceInfo), resourceInfo.getJmxDescription(),
+				attributeFieldInfos, attributeMethodInfos, operationInfos);
+	}
+
+	/**
 	 * Register the object parameter for exposure with JMX with user defined field-attribute, method-attribute, and
 	 * operation information.
 	 * 
@@ -241,36 +271,6 @@ public class JmxServer {
 		ReflectionMbean mbean;
 		try {
 			mbean = new ReflectionMbean(obj, description, attributeFieldInfos, attributeMethodInfos, operationInfos);
-		} catch (Exception e) {
-			throw createJmException("Could not build MBean object for: " + obj, e);
-		}
-		doRegister(objectName, mbean);
-	}
-
-	/**
-	 * Register the object parameter for exposure with JMX with user defined field-attribute, method-attribute, and
-	 * operation information.
-	 * 
-	 * @param obj
-	 *            Object that we are registering.
-	 * @param resourceInfo
-	 *            Resource information used to build the object-name.
-	 * @param attributeFieldInfos
-	 *            Array of attribute information for fields that are exposed through reflection. Can be null if none.
-	 * @param attributeMethodInfos
-	 *            Array of attribute information for fields that are exposed through get/set/is methods.
-	 * @param operationInfos
-	 *            Array of operation information for methods.
-	 */
-	public synchronized void register(Object obj, JmxResourceInfo resourceInfo,
-			JmxAttributeFieldInfo[] attributeFieldInfos, JmxAttributeMethodInfo[] attributeMethodInfos,
-			JmxOperationInfo[] operationInfos) throws JMException {
-		ObjectName objectName = ObjectNameUtil.makeObjectName(resourceInfo);
-		ReflectionMbean mbean;
-		try {
-			mbean =
-					new ReflectionMbean(obj, resourceInfo.getJmxDescription(), attributeFieldInfos,
-							attributeMethodInfos, operationInfos);
 		} catch (Exception e) {
 			throw createJmException("Could not build MBean object for: " + obj, e);
 		}

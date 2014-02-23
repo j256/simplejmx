@@ -47,9 +47,15 @@ public class ReflectionMbean implements DynamicMBean {
 	 * Create a mbean associated with a delegate object that must have a {@link JmxResource} annotation.
 	 */
 	public ReflectionMbean(Object delegate, String description) {
-		this.delegate = delegate;
-		this.description = preprocessDescription(delegate, description);
-		this.mbeanInfo = buildMbeanInfo(null, null, null);
+		this(delegate, description, null, null, null);
+	}
+
+	/**
+	 * Create a mbean associated with a wrapped object that exposes all public fields and methods.
+	 */
+	public ReflectionMbean(PublishAllBeanWrapper wrapper) {
+		this(wrapper.getDelegate(), null, wrapper.getAttributeFieldInfos(), wrapper.getAttributeMethodInfos(),
+				wrapper.getOperationInfos());
 	}
 
 	/**
