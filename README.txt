@@ -13,7 +13,7 @@ Maven packages are published via the central repo:
 	http://repo1.maven.org/maven2/com/j256/simplejmx/simplejmx/
 
 Little sample working example program:
-	https://github.com/j256/simplejmx/blob/master/src/test/java/com/j256/simplejmx/server/ExampleTestProgram.java
+	http://256.com/sources/simplejmx/docs/example-simple
 
 Enjoy,
 Gray Watson
