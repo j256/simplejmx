@@ -1,9 +1,10 @@
-package com.j256.simplejmx.server;
+package com.j256.simplejmx.example;
 
 import com.j256.simplejmx.common.JmxAttributeField;
 import com.j256.simplejmx.common.JmxAttributeMethod;
 import com.j256.simplejmx.common.JmxOperation;
 import com.j256.simplejmx.common.JmxResource;
+import com.j256.simplejmx.server.JmxServer;
 
 /**
  * Here's a little example program that was written to show off the basic features of SimpleJmx.
