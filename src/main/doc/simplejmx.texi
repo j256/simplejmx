@@ -6,7 +6,7 @@
 @c %**end of header
 
 @c ----------------------------------------------------------------
-@set simplejmx_version 1.7
+@set simplejmx_version 1.8
 @set simplejmx_year 2014
 @set simplejmx_date February @value{simplejmx_year}
 @set package SimpleJMX
@@ -781,7 +781,7 @@ jmxWebServer.start();
 
 We recommend that you run the JMX server even if you are planning to use the web server most of the time.  You still
 register beans via the @code{JmxServer} and any beans added to the platform @code{MBeanServer} will be visible via your
-browser. 
+browser.
 
 For a working example, take a look at the web server example program.  @xref{web server example}.
 
