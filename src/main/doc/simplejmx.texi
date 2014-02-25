@@ -764,8 +764,9 @@ For a working example, take a look at the spring example program.  @xref{spring 
 @cindex http
 @cindex jmx via web
 @cindex publish via http
-SimpleJMX contains a simple web-server implementation that uses Jetty (if in the classpath) so that you can access
-JMX information from a web browser or other web client using the @code{JmxWebServer} class.
+SimpleJMX contains a simple web-server implementation that uses Jetty so that you can access
+JMX information from a web browser or other web client using the @code{JmxWebServer} class.  To use this class you
+need to provide a Jetty version in your dependency list or classpath.
 
 @example
 // first start the jmx server

@@ -30,7 +30,8 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import com.j256.simplejmx.client.ClientUtils;
 
 /**
- * Simple JMX handler that displays JMX information for a HTTP request.
+ * Simple JMX handler that displays JMX information for a HTTP request using Jetty. To use this class you need to
+ * provide a Jetty version in your dependency list or classpath.
  * 
  * @author graywatson
  */
@@ -154,7 +155,7 @@ public class JmxHandler extends AbstractHandler {
 	}
 
 	private void listBeansInDomain(BufferedWriter writer, boolean textOnly, String domainName) throws IOException {
-		// TODO: need to show directories here
+		// NOTE: should we show directories here or maybe do cute javascript arrows to hide/show sub-beans?
 		if (!textOnly) {
 			if (domainName == null) {
 				writer.append("<h1> All Beans </h1>\n");
