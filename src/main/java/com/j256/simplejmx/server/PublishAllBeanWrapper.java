@@ -43,8 +43,8 @@ public class PublishAllBeanWrapper {
 	/**
 	 * @param delegate
 	 *            Object that we are exposing.
-	 * @param description
-	 *            Optional description of the object or null if none.
+	 * @param jmxResourceInfo
+	 *            Resource information about the bean.
 	 */
 	public PublishAllBeanWrapper(Object delegate, JmxResourceInfo jmxResourceInfo) {
 		this.delegate = delegate;
