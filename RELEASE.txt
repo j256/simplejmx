@@ -6,7 +6,7 @@ To release SimpleJmx:
 
 1) Run tests
 
-2) Add section to ~/svn/local/simplejmx/src/main/javadoc/doc-files/changelog.txt.  Commit it.
+2) Add section to ~/svn/local/simplejmx/src/main/javadoc/doc-files/changelog.txt.  Update the release date.  Commit it.
 
 3) Run the release.sh script
 
