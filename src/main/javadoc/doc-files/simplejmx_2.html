@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html401/loose.dtd">
 <html>
-<!-- Created on February 8, 2014 by texi2html 1.82
+<!-- Created on February 25, 2014 by texi2html 1.82
 texi2html was written by: 
             Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -79,6 +79,8 @@ ul.toc {list-style: none}
 <tr><td align="left" valign="top"><a href="#Using-Client">2.7 Using the JMX Client</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">               Using the programmatic JMX client.
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Using-With-Spring">2.8 Using With the Spring Framework</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">          Using SimpleJMX with the Spring framework.
+</td></tr>
+<tr><td align="left" valign="top"><a href="#Exporting-via-HTTP">2.9 Exposing JMX Beans Over HTTP</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">         Using the internal web server to expose JMX beans.
 </td></tr>
 </table>
 
@@ -721,6 +723,13 @@ exposed through get/set/is methods:
    attributeFieldInfos, attributeMethodInfos, operationInfos);
 </pre></td></tr></table>
 
+<a name="index-PublishAllBeanWrapper"></a>
+<a name="index-all-public-fields_002c-methods"></a>
+<p>You can also use the <code>PublishAllBeanWrapper</code> which exposes all public fields and methods as attributes or operations.
+All public fields will be exposed as an attribute and if not-final will be exposed as writable.  All public methods that
+start with <code>is</code> or <code>get</code> will be exposed as attributes and if they have a <code>set</code> method will be writable.
+All other public methods will be exposed as operations. 
+</p>
 <p>Take a look at the random-object example program for a working example.  See <a href="simplejmx_3.html#random-object-example">random object example</a>.
 </p>
 <hr size="6">
@@ -802,7 +811,7 @@ copy the <code>ObjectName</code> field associaed to a bean from Jconsole and the
 <a name="Using-With-Spring"></a>
 <table cellpadding="1" cellspacing="1" border="0">
 <tr><td valign="middle" align="left">[<a href="#Using-Client" title="Previous section in reading order"> &lt; </a>]</td>
-<td valign="middle" align="left">[<a href="simplejmx_3.html#Examples" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Exporting-via-HTTP" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Using" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#Using" title="Up section"> Up </a>]</td>
@@ -821,10 +830,13 @@ copy the <code>ObjectName</code> field associaed to a bean from Jconsole and the
 
 <a name="index-Spring-framework"></a>
 <a name="index-using-with-Spring"></a>
+<a name="index-JmxBean"></a>
+<a name="index-PublishAllBeanWrapper-1"></a>
 <p>SimpleJMX has an optional dependency on the Spring Framework jar(s).  This means that if you have the Spring framework
 included in your project, you can make use of the <code>BeanPublisher</code> class which will automagically register the beans
 from your spring XML configuration files to the <code>JmxServer</code> class.  The <code>BeanPublisher</code> class will register
-classes that have the <code>@JmxResource</code> annotation and the classes that implement the <code>JmxSelfNaming</code> interface.
+classes that have the <code>@JmxResource</code> annotation, that implement the <code>JmxSelfNaming</code> interface, that are of
+type that are of type <code>JmxBean</code>, and are of type <code>PublishAllBeanWrapper</code>.
 </p>
 <p>Here&rsquo;s a sample bean configuration:
 </p>
@@ -891,6 +903,51 @@ the <code>JmxSelfNaming</code> interface with the help of the <code>JmxBean</cod
 <p>For a working example, take a look at the spring example program.  See <a href="simplejmx_3.html#spring-framework-example">spring framework example</a>.
 </p>
 <hr size="6">
+<a name="Exporting-via-HTTP"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#Using-With-Spring" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="simplejmx_3.html#Examples" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#Using" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Using" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="simplejmx_3.html#Examples" title="Next chapter"> &gt;&gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="simplejmx.html#Top" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[<a href="simplejmx_toc.html#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="simplejmx_5.html#Index-of-Concepts" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="simplejmx_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<a name="Exposing-JMX-Beans-Over-HTTP"></a>
+<h2 class="section">2.9 Exposing JMX Beans Over HTTP</h2>
+
+<a name="index-web-server"></a>
+<a name="index-http"></a>
+<a name="index-jmx-via-web"></a>
+<a name="index-publish-via-http"></a>
+<p>SimpleJMX contains a simple web-server implementation that uses Jetty (if in the classpath) so that you can access
+JMX information from a web browser or other web client using the <code>JmxWebServer</code> class.
+</p>
+<table><tr><td>&nbsp;</td><td><pre class="example">// first start the jmx server
+JmxServer jmxServer = new JmxServer(JMX_PORT);
+jmxServer.start();
+// register your beans as normal
+jmxServer.register(counter);
+
+// create a web server listening on a specific port
+JmxWebServer jmxWebServer = new JmxWebServer(WEB_PORT);
+jmxWebServer.start();
+</pre></td></tr></table>
+
+<p>We recommend that you run the JMX server even if you are planning to use the web server most of the time.  You still
+register beans via the <code>JmxServer</code> and any beans added to the platform <code>MBeanServer</code> will be visible via your
+browser. 
+</p>
+<p>For a working example, take a look at the web server example program.  See <a href="simplejmx_3.html#web-server-example">web server example</a>.
+</p>
+<hr size="6">
 <table cellpadding="1" cellspacing="1" border="0">
 <tr><td valign="middle" align="left">[<a href="#Using" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
 <td valign="middle" align="left">[<a href="simplejmx_3.html#Examples" title="Next chapter"> &gt;&gt; </a>]</td>
@@ -906,7 +963,7 @@ the <code>JmxSelfNaming</code> interface with the help of the <code>JmxBean</cod
 </tr></table>
 <p>
  <font size="-1">
-  This document was generated by <em>Gray Watson</em> on <em>February 8, 2014</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
+  This document was generated by <em>Gray Watson</em> on <em>February 25, 2014</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
  </font>
  <br>
 

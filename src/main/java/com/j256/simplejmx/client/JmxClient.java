@@ -1,7 +1,6 @@
 package com.j256.simplejmx.client;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.util.Arrays;
@@ -283,7 +282,7 @@ public class JmxClient {
 		if (bean == null) {
 			return null;
 		} else {
-			return bean.toString();
+			return ClientUtils.valueToString(bean);
 		}
 	}
 
@@ -318,7 +317,7 @@ public class JmxClient {
 		if (info == null) {
 			throw new IllegalArgumentException("Cannot find attribute named '" + attrName + "'");
 		} else {
-			setAttribute(name, attrName, stringToObject(value, info.getType()));
+			setAttribute(name, attrName, ClientUtils.stringToParam(value, info.getType()));
 		}
 	}
 
@@ -376,7 +375,7 @@ public class JmxClient {
 		} else {
 			paramObjs = new Object[paramStrings.length];
 			for (int i = 0; i < paramStrings.length; i++) {
-				paramObjs[i] = stringToObject(paramStrings[i], paramTypes[i]);
+				paramObjs[i] = ClientUtils.stringToParam(paramStrings[i], paramTypes[i]);
 			}
 		}
 		return invokeOperation(name, operName, paramTypes, paramObjs);
@@ -388,7 +387,7 @@ public class JmxClient {
 	 * @return The value returned by the method as a string or null if none.
 	 */
 	public String invokeOperationToString(ObjectName name, String operName, String... paramStrings) throws Exception {
-		return invokeOperation(name, operName, paramStrings).toString();
+		return ClientUtils.valueToString(invokeOperation(name, operName, paramStrings));
 	}
 
 	/**
@@ -481,59 +480,6 @@ public class JmxClient {
 			}
 		}
 		return null;
-	}
-
-	private Object stringToObject(String string, String typeString) throws IllegalArgumentException {
-		if (typeString.equals("boolean") || typeString.equals("java.lang.Boolean")) {
-			return Boolean.parseBoolean(string);
-		} else if (typeString.equals("char") || typeString.equals("java.lang.Character")) {
-			if (string.length() == 0) {
-				// not sure what to do here
-				return '\0';
-			} else {
-				return string.toCharArray()[0];
-			}
-		} else if (typeString.equals("byte") || typeString.equals("java.lang.Byte")) {
-			return Byte.parseByte(string);
-		} else if (typeString.equals("short") || typeString.equals("java.lang.Short")) {
-			return Short.parseShort(string);
-		} else if (typeString.equals("int") || typeString.equals("java.lang.Integer")) {
-			return Integer.parseInt(string);
-		} else if (typeString.equals("long") || typeString.equals("java.lang.Long")) {
-			return Long.parseLong(string);
-		} else if (typeString.equals("java.lang.String")) {
-			return string;
-		} else if (typeString.equals("float") || typeString.equals("java.lang.Float")) {
-			return Float.parseFloat(string);
-		} else if (typeString.equals("double") || typeString.equals("java.lang.Double")) {
-			return Double.parseDouble(string);
-		} else {
-			Constructor<?> constr = getConstructor(typeString);
-			try {
-				return constr.newInstance(new Object[] { string });
-			} catch (Exception e) {
-				throw new IllegalArgumentException("Could not get new instance using string constructor for type "
-						+ typeString);
-			}
-		}
-	}
-
-	private <C> Constructor<C> getConstructor(String typeString) throws IllegalArgumentException {
-		Class<Object> clazz;
-		try {
-			@SuppressWarnings("unchecked")
-			Class<Object> clazzCast = (Class<Object>) Class.forName(typeString);
-			clazz = clazzCast;
-		} catch (ClassNotFoundException e) {
-			throw new IllegalArgumentException("Unknown class for type " + typeString);
-		}
-		try {
-			@SuppressWarnings("unchecked")
-			Constructor<C> constructor = (Constructor<C>) clazz.getConstructor(new Class[] { String.class });
-			return constructor;
-		} catch (Exception e) {
-			throw new IllegalArgumentException("Could not find constructor with single String argument for " + clazz);
-		}
 	}
 
 	private JMException createJmException(String message, Exception e) {

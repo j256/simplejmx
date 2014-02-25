@@ -146,6 +146,7 @@ For more extensive instructions, @pxref{Using}.
 * Programmatic Publishing ::    How to define the name and exposed items programmatically.
 * Using Client ::               Using the programmatic JMX client.
 * Using With Spring ::          Using SimpleJMX with the Spring framework.
+* Exporting via HTTP ::         Using the internal web server to expose JMX beans.
 @end menu
 
 @c ----------------------------------------------------------------
@@ -676,7 +677,7 @@ client.invokeOperation(ObjectName.getInstance("java.lang:type=Memory"),
 See the @code{JmxClient} javadocs for more information
 
 @c ----------------------------------------------------------------
-@node Using With Spring, Examples, Using Client, Using
+@node Using With Spring, Exporting via HTTP, Using Client, Using
 @section Using With the Spring Framework
 
 @cindex Spring framework
@@ -756,7 +757,36 @@ the @code{JmxSelfNaming} interface with the help of the @code{JmxBean} class:
 For a working example, take a look at the spring example program.  @xref{spring framework example}.
 
 @c ----------------------------------------------------------------
-@node Examples, License, Using With Spring, Top
+@node Exporting via HTTP, Examples, Using With Spring, Using
+@section Exposing JMX Beans Over HTTP
+
+@cindex web server
+@cindex http
+@cindex jmx via web
+@cindex publish via http
+SimpleJMX contains a simple web-server implementation that uses Jetty (if in the classpath) so that you can access
+JMX information from a web browser or other web client using the @code{JmxWebServer} class.
+
+@example
+// first start the jmx server
+JmxServer jmxServer = new JmxServer(JMX_PORT);
+jmxServer.start();
+// register your beans as normal
+jmxServer.register(counter);
+
+// create a web server listening on a specific port
+JmxWebServer jmxWebServer = new JmxWebServer(WEB_PORT);
+jmxWebServer.start();
+@end example
+
+We recommend that you run the JMX server even if you are planning to use the web server most of the time.  You still
+register beans via the @code{JmxServer} and any beans added to the platform @code{MBeanServer} will be visible via your
+browser. 
+
+For a working example, take a look at the web server example program.  @xref{web server example}.
+
+@c ----------------------------------------------------------------
+@node Examples, License, Exporting via HTTP, Top
 @chapter Example Code
 
 @cindex examples of code
@@ -786,6 +816,20 @@ This is an example showing how you can use SimpleJMX with the Spring Framework.
 See the @uref{http://256.com/sources/simplejmx/docs/example-spring, source code on github}.  The
 @uref{http://256.com/sources/simplejmx/docs/example-spring-config, example spring
 config file} is also available.
+
+@cindex web server example
+@anchor{web server example}
+@item Jmx Web Server example
+
+This is an example showing how you can use SimpleJMX to expose JMX beans over HTTP to web browsers.
+See the @uref{http://256.com/sources/simplejmx/docs/example-web, source code on github}.
+
+@cindex publish all example
+@anchor{publish all example}
+@item Publish all example
+
+This is an example that shows how you can use the @code{PublishAllBeanWrapper} to publish information about a random
+object.  See the @uref{http://256.com/sources/simplejmx/docs/example-publish-all, source code on github}.
 
 @end table
 

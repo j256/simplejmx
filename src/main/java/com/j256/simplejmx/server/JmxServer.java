@@ -187,6 +187,9 @@ public class JmxServer {
 	 * annotation or must implement {@link JmxSelfNaming}.
 	 */
 	public synchronized void register(Object obj) throws JMException {
+		if (mbeanServer == null) {
+			throw new JMException("JmxServer has not be started");
+		}
 		ObjectName objectName = ObjectNameUtil.makeObjectName(obj);
 		ReflectionMbean mbean;
 		try {
@@ -268,6 +271,9 @@ public class JmxServer {
 	public synchronized void register(Object obj, ObjectName objectName, String description,
 			JmxAttributeFieldInfo[] attributeFieldInfos, JmxAttributeMethodInfo[] attributeMethodInfos,
 			JmxOperationInfo[] operationInfos) throws JMException {
+		if (mbeanServer == null) {
+			throw new JMException("JmxServer has not be started");
+		}
 		ReflectionMbean mbean;
 		try {
 			mbean = new ReflectionMbean(obj, description, attributeFieldInfos, attributeMethodInfos, operationInfos);
@@ -304,9 +310,7 @@ public class JmxServer {
 	 * want it to be silent.
 	 */
 	public synchronized void unregisterThrow(Object obj) throws JMException {
-		ObjectName objectName = ObjectNameUtil.makeObjectName(obj);
-		mbeanServer.unregisterMBean(objectName);
-		registeredCount--;
+		unregisterThrow(ObjectNameUtil.makeObjectName(obj));
 	}
 
 	/**
@@ -314,7 +318,11 @@ public class JmxServer {
 	 * it to be silent.
 	 */
 	public synchronized void unregisterThrow(ObjectName objName) throws JMException {
+		if (mbeanServer == null) {
+			throw new JMException("JmxServer has not be started");
+		}
 		mbeanServer.unregisterMBean(objName);
+		registeredCount--;
 	}
 
 	/**
