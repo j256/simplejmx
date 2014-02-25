@@ -1,10 +1,11 @@
-package com.j256.simplejmx.server;
+package com.j256.simplejmx.example;
 
 import com.j256.simplejmx.common.JmxAttributeFieldInfo;
 import com.j256.simplejmx.common.JmxAttributeMethodInfo;
 import com.j256.simplejmx.common.JmxOperationInfo;
 import com.j256.simplejmx.common.JmxOperationInfo.OperationAction;
 import com.j256.simplejmx.common.ObjectNameUtil;
+import com.j256.simplejmx.server.JmxServer;
 
 /**
  * Little example program that shows how to expose any object via JMX -- even those without annotations. This allows you
@@ -16,12 +17,12 @@ import com.j256.simplejmx.common.ObjectNameUtil;
  * 
  * @author graywatson
  */
-public class RandomObjectTestProgram {
+public class RandomObjectExample {
 
 	private static final int JMX_PORT = 8000;
 
 	public static void main(String[] args) throws Exception {
-		new RandomObjectTestProgram().doMain(args);
+		new RandomObjectExample().doMain(args);
 	}
 
 	private void doMain(String[] args) throws Exception {
