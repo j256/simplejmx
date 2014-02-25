@@ -40,6 +40,7 @@ public class JmxHandler extends AbstractHandler {
 	private static final String COMMAND_SHOW_BEAN = "b";
 	private static final String COMMAND_ASSIGN_ATTRIBUTE = "a";
 	private static final String COMMAND_INVOKE_OPERATION = "o";
+	private static final String COMMAND_SHOW_ALL_BEANS = "s";
 	private static final String PARAM_ATTRIBUTE_VALUE = "v";
 	private static final String PARAM_OPERATION_PREFIX = "p";
 	private static final String PARAM_TEXT_ONLY = "t";
@@ -79,9 +80,17 @@ public class JmxHandler extends AbstractHandler {
 			if (!textOnly) {
 				appendHeader(writer);
 			}
-			listDomains(writer, textOnly);
+			if (pathInfo.equals(COMMAND_SHOW_ALL_BEANS)) {
+				listBeansInDomain(writer, textOnly, null);
+			} else {
+				listDomains(writer, textOnly);
+				if (!textOnly) {
+					writer.append("<br />\n");
+					appendLink(writer, textOnly, '/' + COMMAND_SHOW_ALL_BEANS, "Show all beans.");
+					writer.append("  ");
+				}
+			}
 			if (!textOnly) {
-				writer.append("<br />\n");
 				appendFooter(writer);
 			}
 			return;
@@ -147,9 +156,18 @@ public class JmxHandler extends AbstractHandler {
 	private void listBeansInDomain(BufferedWriter writer, boolean textOnly, String domainName) throws IOException {
 		// TODO: need to show directories here
 		if (!textOnly) {
-			writer.append("<h1> Beans in domain " + domainName + " </h1>\n");
+			if (domainName == null) {
+				writer.append("<h1> All Beans </h1>\n");
+			} else {
+				writer.append("<h1> Beans in domain " + domainName + " </h1>\n");
+			}
 		}
-		Set<ObjectInstance> mbeans = mbeanServer.queryMBeans(null, new DomainQueryExp(domainName));
+		Set<ObjectInstance> mbeans;
+		if (domainName == null) {
+			mbeans = mbeanServer.queryMBeans(null, null);
+		} else {
+			mbeans = mbeanServer.queryMBeans(null, new DomainQueryExp(domainName));
+		}
 		List<ObjectName> objectNames = new ArrayList<ObjectName>();
 		for (ObjectInstance mbean : mbeans) {
 			objectNames.add(mbean.getObjectName());
@@ -224,9 +242,6 @@ public class JmxHandler extends AbstractHandler {
 				}
 			} else {
 				value = "not readable";
-			}
-			if (Character.isUpperCase(name.charAt(0))) {
-				name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
 			}
 			String valueString = ClientUtils.valueToString(value);
 			if (textOnly) {
@@ -350,7 +365,7 @@ public class JmxHandler extends AbstractHandler {
 		} catch (Exception e) {
 			if (!textOnly) {
 				appendHeader(writer);
-				writer.append("<h1> Setting Bean Attribute </h1>\n");
+				writer.append("<h1> Setting Attribute " + attributeName + "</h1>\n");
 			}
 			appendLine(writer, textOnly, "Could not get mbean info for: " + objectName + ": " + e);
 			if (!textOnly) {
@@ -369,7 +384,7 @@ public class JmxHandler extends AbstractHandler {
 		if (info == null) {
 			if (!textOnly) {
 				appendHeader(writer);
-				writer.append("<h1> Setting Bean Attribute </h1>\n");
+				writer.append("<h1> Setting Attribute " + attributeName + "</h1>\n");
 			}
 			appendLine(writer, textOnly, "Cannot find attribute: " + attributeName);
 			if (!textOnly) {
@@ -386,7 +401,7 @@ public class JmxHandler extends AbstractHandler {
 			Attribute attribute = new Attribute(attributeName, value);
 			mbeanServer.setAttribute(objectName, attribute);
 			if (textOnly) {
-				appendLine(writer, textOnly, "set attributeName to " + value);
+				appendLine(writer, textOnly, attributeName + " set to " + value);
 			} else {
 				// redirect back to the display of the attribute if in html mode
 				response.sendRedirect("/" + COMMAND_SHOW_BEAN + "/" + objectName);
@@ -394,7 +409,7 @@ public class JmxHandler extends AbstractHandler {
 		} catch (Exception e) {
 			if (!textOnly) {
 				appendHeader(writer);
-				writer.append("<h1> Setting Bean Attribute </h1>\n");
+				writer.append("<h1> Setting Attribute " + attributeName + "</h1>\n");
 			}
 			appendLine(writer, textOnly, "Could not set attribute: " + attributeName + ": " + e);
 			if (!textOnly) {
@@ -440,9 +455,6 @@ public class JmxHandler extends AbstractHandler {
 			}
 			return;
 		}
-		if (!textOnly) {
-			displayClassInfo(writer, mbeanInfo);
-		}
 
 		MBeanOperationInfo operation = null;
 		for (MBeanOperationInfo info : mbeanInfo.getOperations()) {
@@ -471,7 +483,7 @@ public class JmxHandler extends AbstractHandler {
 		try {
 			result = mbeanServer.invoke(objectName, operationName, params, paramTypes);
 		} catch (Exception e) {
-			appendLine(writer, textOnly, "Invoking threw exception: " + e);
+			appendLine(writer, textOnly, "Invoking operation " + operationName + " threw exception: " + e);
 			if (!textOnly) {
 				appendBackToBean(writer, objectName);
 			}
@@ -479,10 +491,10 @@ public class JmxHandler extends AbstractHandler {
 			return;
 		}
 
-		if (result == null) {
-			appendLine(writer, textOnly, "Method successfully invoked.");
+		if (operation.getReturnType().equals("void")) {
+			appendLine(writer, textOnly, operationName + " method successfully invoked.");
 		} else {
-			appendLine(writer, textOnly, "Result is: " + result);
+			appendLine(writer, textOnly, operationName + " result is: " + ClientUtils.valueToString(result));
 		}
 		if (!textOnly) {
 			appendBackToBean(writer, objectName);
@@ -550,6 +562,9 @@ public class JmxHandler extends AbstractHandler {
 		return (name.startsWith("is") || name.startsWith("get") || name.startsWith("set"));
 	}
 
+	/**
+	 * Limits the objects to a specific domain name.
+	 */
 	private static class DomainQueryExp implements QueryExp {
 		private static final long serialVersionUID = 6041820913324186392L;
 		private final String domain;
@@ -564,6 +579,9 @@ public class JmxHandler extends AbstractHandler {
 		}
 	}
 
+	/**
+	 * Compares two ObjectNames.
+	 */
 	private static class ObjectNameComparator implements Comparator<ObjectName> {
 		public int compare(ObjectName o1, ObjectName o2) {
 			return o1.toString().compareTo(o2.toString());
