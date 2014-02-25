@@ -146,7 +146,7 @@ For more extensive instructions, @pxref{Using}.
 * Programmatic Publishing ::    How to define the name and exposed items programmatically.
 * Using Client ::               Using the programmatic JMX client.
 * Using With Spring ::          Using SimpleJMX with the Spring framework.
-* Exporting via HTTP ::         Using the internal web server to expose JMX beans.
+* Exposing via HTTP ::          Using the internal web server to expose JMX beans.
 @end menu
 
 @c ----------------------------------------------------------------
@@ -677,7 +677,7 @@ client.invokeOperation(ObjectName.getInstance("java.lang:type=Memory"),
 See the @code{JmxClient} javadocs for more information
 
 @c ----------------------------------------------------------------
-@node Using With Spring, Exporting via HTTP, Using Client, Using
+@node Using With Spring, Exposing via HTTP, Using Client, Using
 @section Using With the Spring Framework
 
 @cindex Spring framework
@@ -757,8 +757,8 @@ the @code{JmxSelfNaming} interface with the help of the @code{JmxBean} class:
 For a working example, take a look at the spring example program.  @xref{spring framework example}.
 
 @c ----------------------------------------------------------------
-@node Exporting via HTTP, Examples, Using With Spring, Using
-@section Exposing JMX Beans Over HTTP
+@node Exposing via HTTP, Examples, Using With Spring, Using
+@section Exposing Beans Over HTTP
 
 @cindex web server
 @cindex http
@@ -786,7 +786,7 @@ browser.
 For a working example, take a look at the web server example program.  @xref{web server example}.
 
 @c ----------------------------------------------------------------
-@node Examples, License, Exporting via HTTP, Top
+@node Examples, License, Exposing via HTTP, Top
 @chapter Example Code
 
 @cindex examples of code

@@ -43,47 +43,33 @@ public class ExampleJmxWebServer {
 	}
 
 	/**
-	 * Here is our little bean that we are exposing via JMX. It can be in another class. It's just an inner class here
-	 * for convenience. We could also specify folderNames array here to locate the inside of a folder for jconsole.
+	 * Here is our little bean that we are exposing via JMX. For more documentation about how it works, see
+	 * {@link ExampleTestProgram}.
 	 */
-	@JmxResource(description = "Runtime counter", domainName = "j256.simplejmx", beanName = "RuntimeCounter")
+	@JmxResource(domainName = "j256.simplejmx")
 	public static class RuntimeCounter {
 
-		// start our timer
 		private long startMillis = System.currentTimeMillis();
-
-		// we can annotate fields directly to be published in JMX, isReadible defaults to true
-		@JmxAttributeField(description = "Show runtime in seconds", isWritable = true)
+		@JmxAttributeField(isWritable = true)
 		private boolean showSeconds;
 
-		// we can annotate getter methods
-		@JmxAttributeMethod(description = "Run time in seconds or milliseconds")
+		@JmxAttributeMethod
 		public long getRunTime() {
-			// show how long we are running
 			long diffMillis = System.currentTimeMillis() - startMillis;
 			if (showSeconds) {
-				// as seconds
 				return diffMillis / 1000;
 			} else {
-				// or as milliseconds
 				return diffMillis;
 			}
 		}
 
-		/*
-		 * NOTE: there is no setRunTime(...) so it won't be writable.
-		 */
-
-		// this is an operation that shows up in the operations tab in jconsole.
-		@JmxOperation(description = "Reset our start time to the current millis")
+		@JmxOperation
 		public String resetStartTime() {
 			startMillis = System.currentTimeMillis();
 			return "Timer has been reset to current millis";
 		}
 
-		// this is an operation that shows up in the operations tab in jconsole.
-		@JmxOperation(description = "Add a positive or negative offset to the start millis",
-				parameterNames = { "long offset" }, parameterDescriptions = { "offset value to add" })
+		@JmxOperation(parameterNames = { "long offset" }, parameterDescriptions = { "offset value to add" })
 		public String addToStartTime(long offset) {
 			long old = startMillis;
 			startMillis += offset;
