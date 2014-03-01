@@ -54,7 +54,7 @@ public class WebServerExample {
 
 	/**
 	 * Here is our little bean that we are exposing via JMX. For more documentation about how it works, see
-	 * {@link ExampleTestProgram}.
+	 * {@link BasicExample}.
 	 */
 	@JmxResource(domainName = "j256.simplejmx")
 	public static class RuntimeCounter {

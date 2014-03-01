@@ -17,12 +17,12 @@ import com.j256.simplejmx.server.JmxServer;
  * 
  * @author graywatson
  */
-public class ExampleTestProgram {
+public class BasicExample {
 
 	private static final int JMX_PORT = 8000;
 
 	public static void main(String[] args) throws Exception {
-		new ExampleTestProgram().doMain(args);
+		new BasicExample().doMain(args);
 	}
 
 	private void doMain(String[] args) throws Exception {
