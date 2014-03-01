@@ -1,10 +1,12 @@
 1.9: 3/??/2014
 	* Fixed a bug with leading capital attributes in web mode.  Should not downcase them.
+	* Fixed a small bug in the auto generated descriptions for operations.
 	* Added show all beans for easier bean scraping.
+	* Improved the web displaying of description information for beans, attributes, and operations.
 
 1.8: 2/25/2014
 	* Added support for PublishAllBeanWrapper which exposes all public fields and methods as attributes and operations.
-	* Added an internal little web-server to expose all beans via HTTP.  See JmxWebServer class.
+	* Added an internal little web-server to expose all beans via HTTP.  See JmxWebServer class.  Work in progress.
 
 1.7: 2/8/2014
 	* Fixed an embarrassing bug in the JmxClient code which was improperly caching bean information.  Thanks to Michael Ottati.
