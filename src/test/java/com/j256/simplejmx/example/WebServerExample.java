@@ -56,14 +56,14 @@ public class WebServerExample {
 	 * Here is our little bean that we are exposing via JMX. For more documentation about how it works, see
 	 * {@link BasicExample}.
 	 */
-	@JmxResource(domainName = "j256.simplejmx")
+	@JmxResource(domainName = "j256.simplejmx", description = "Counter that shows how long we have been running")
 	public static class RuntimeCounter {
 
 		private long startMillis = System.currentTimeMillis();
-		@JmxAttributeField(isWritable = true)
+		@JmxAttributeField(isWritable = true, description = "Show the time in seconds if true else milliseconds")
 		private boolean showSeconds;
 
-		@JmxAttributeMethod
+		@JmxAttributeMethod(description = "The time we have been running in seconds or milliseconds")
 		public long getRunTime() {
 			long diffMillis = System.currentTimeMillis() - startMillis;
 			if (showSeconds) {
@@ -73,13 +73,15 @@ public class WebServerExample {
 			}
 		}
 
-		@JmxOperation
+		@JmxOperation(description = "Reset the start time to the current time millis")
 		public String resetStartTime() {
 			startMillis = System.currentTimeMillis();
 			return "Timer has been reset to current millis";
 		}
 
-		@JmxOperation(parameterNames = { "long offset" }, parameterDescriptions = { "offset value to add" })
+		@JmxOperation(description = "Add a positive or negative offset to the start time milliseconds",
+				parameterNames = { "offset in millis" },
+				parameterDescriptions = { "offset milliseconds value to add to start time millis" })
 		public String addToStartTime(long offset) {
 			long old = startMillis;
 			startMillis += offset;

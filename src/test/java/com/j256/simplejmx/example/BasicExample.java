@@ -64,7 +64,7 @@ public class BasicExample {
 	 * Here is our little bean that we are exposing via JMX. It can be in another class. It's just an inner class here
 	 * for convenience. We could also specify folderNames array here to locate the inside of a folder for jconsole.
 	 */
-	@JmxResource(description = "Runtime counter", domainName = "j256.simplejmx")
+	@JmxResource(domainName = "j256.simplejmx", description = "Counter that shows how long we have been running")
 	public static class RuntimeCounter {
 
 		// start our timer
@@ -100,8 +100,9 @@ public class BasicExample {
 		}
 
 		// this is an operation that shows up in the operations tab in jconsole.
-		@JmxOperation(description = "Add a positive or negative offset to the start millis",
-				parameterNames = { "long offset" }, parameterDescriptions = { "offset value to add" })
+		@JmxOperation(description = "Add a positive or negative offset to the start time milliseconds",
+				parameterNames = { "offset in millis" },
+				parameterDescriptions = { "offset milliseconds value to add to start time millis" })
 		public String addToStartTime(long offset) {
 			long old = startMillis;
 			startMillis += offset;
