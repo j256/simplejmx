@@ -6,13 +6,15 @@ import com.j256.simplejmx.common.JmxOperationInfo;
 import com.j256.simplejmx.common.JmxOperationInfo.OperationAction;
 import com.j256.simplejmx.common.ObjectNameUtil;
 import com.j256.simplejmx.server.JmxServer;
+import com.j256.simplejmx.server.PublishAllBeanWrapper;
 
 /**
- * Little example program that shows how to expose any object via JMX -- even those without annotations. This allows you
- * to expose objects that you don't have code access to without having to write your own wrapper class.
+ * Example program that shows how to expose any object via JMX programmatically -- even those without annotations. This
+ * allows you to expose objects that you don't have code access to without having to write your own wrapper class. You
+ * may also want to take a look at the {@link ExamplePublishAll} example which uses the {@link PublishAllBeanWrapper}.
  * 
  * <p>
- * <b>NOTE:</b> This is posted on the http://256.com/sources/simplejmx/ website.
+ * <b>NOTE:</b> For more details, see the SimpleJMX website: http://256.com/sources/simplejmx/
  * </p>
  * 
  * @author graywatson

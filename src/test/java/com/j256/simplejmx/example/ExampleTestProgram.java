@@ -10,7 +10,7 @@ import com.j256.simplejmx.server.JmxServer;
  * Here's a little example program that was written to show off the basic features of SimpleJmx.
  * 
  * <p>
- * <b>NOTE:</b> This is posted on the http://256.com/sources/simplejmx/ website.
+ * <b>NOTE:</b> For more details, see the SimpleJMX website: http://256.com/sources/simplejmx/
  * </p>
  * 
  * @author graywatson

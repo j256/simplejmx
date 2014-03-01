@@ -5,10 +5,12 @@ import com.j256.simplejmx.server.JmxServer;
 import com.j256.simplejmx.server.PublishAllBeanWrapper;
 
 /**
- * Here's a little example program that was written to show off the basic features of SimpleJmx.
+ * Example program that was written to show off how you can publish any object using the {@link PublishAllBeanWrapper}
+ * which publishes all public fields and methods. You may also want to look at the {@link RandomObjectExample} which
+ * publishes objects to JMX programmatically.
  * 
  * <p>
- * <b>NOTE:</b> This is posted on the http://256.com/sources/simplejmx/ website.
+ * <b>NOTE:</b> For more details, see the SimpleJMX website: http://256.com/sources/simplejmx/
  * </p>
  * 
  * @author graywatson

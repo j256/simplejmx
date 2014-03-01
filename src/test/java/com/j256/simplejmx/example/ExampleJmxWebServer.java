@@ -7,6 +7,16 @@ import com.j256.simplejmx.common.JmxResource;
 import com.j256.simplejmx.server.JmxServer;
 import com.j256.simplejmx.web.JmxWebServer;
 
+/**
+ * Example program which uses the {@link JmxWebServer} which publishes the beans over JMX _and_ over a simple web
+ * interface.
+ * 
+ * <p>
+ * <b>NOTE:</b> For more details, see the SimpleJMX website: http://256.com/sources/simplejmx/
+ * </p>
+ * 
+ * @author graywatson
+ */
 public class ExampleJmxWebServer {
 
 	private static final int JMX_PORT = 8000;
