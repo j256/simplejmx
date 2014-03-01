@@ -397,7 +397,7 @@ public class ReflectionMbean implements DynamicMBean {
 
 			String description = operationInfo.getDescription();
 			if (isEmpty(description)) {
-				description = methodName + " attribute";
+				description = methodName + " operation";
 			}
 
 			operations.add(new MBeanOperationInfo(methodName, description, parameterInfos, method.getReturnType()
