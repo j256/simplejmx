@@ -15,12 +15,12 @@ import com.j256.simplejmx.server.PublishAllBeanWrapper;
  * 
  * @author graywatson
  */
-public class ExamplePublishAll {
+public class PublishAllExample {
 
 	private static final int JMX_PORT = 8000;
 
 	public static void main(String[] args) throws Exception {
-		new ExamplePublishAll().doMain(args);
+		new PublishAllExample().doMain(args);
 	}
 
 	private void doMain(String[] args) throws Exception {

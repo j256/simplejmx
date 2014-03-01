@@ -17,13 +17,13 @@ import com.j256.simplejmx.web.JmxWebServer;
  * 
  * @author graywatson
  */
-public class ExampleJmxWebServer {
+public class WebServerExample {
 
 	private static final int JMX_PORT = 8000;
 	private static final int WEB_PORT = 8080;
 
 	public static void main(String[] args) throws Exception {
-		new ExampleJmxWebServer().doMain(args);
+		new WebServerExample().doMain(args);
 	}
 
 	private void doMain(String[] args) throws Exception {

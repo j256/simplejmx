@@ -7,7 +7,9 @@ import com.j256.simplejmx.common.JmxResource;
 import com.j256.simplejmx.server.JmxServer;
 
 /**
- * Here's a little example program that was written to show off the basic features of SimpleJmx.
+ * Example program that was written to show off the basic features of SimpleJmx. It starts up a JMX server and registers
+ * an object with the server. The object exposes field and method information as JMX attributes and operations using
+ * annotations.
  * 
  * <p>
  * <b>NOTE:</b> For more details, see the SimpleJMX website: http://256.com/sources/simplejmx/

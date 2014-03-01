@@ -11,7 +11,7 @@ import com.j256.simplejmx.server.PublishAllBeanWrapper;
 /**
  * Example program that shows how to expose any object via JMX programmatically -- even those without annotations. This
  * allows you to expose objects that you don't have code access to without having to write your own wrapper class. You
- * may also want to take a look at the {@link ExamplePublishAll} example which uses the {@link PublishAllBeanWrapper}.
+ * may also want to take a look at the {@link PublishAllExample} example which uses the {@link PublishAllBeanWrapper}.
  * 
  * <p>
  * <b>NOTE:</b> For more details, see the SimpleJMX website: http://256.com/sources/simplejmx/
