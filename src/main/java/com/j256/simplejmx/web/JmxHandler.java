@@ -87,7 +87,7 @@ public class JmxHandler extends AbstractHandler {
 				listDomains(writer, textOnly);
 				if (!textOnly) {
 					writer.append("<br />\n");
-					appendLink(writer, textOnly, '/' + COMMAND_SHOW_ALL_BEANS, "all", "Show all beans.");
+					appendLink(writer, textOnly, '/' + COMMAND_SHOW_ALL_BEANS, "all", null, "Show all beans.");
 					writer.append("  ");
 				}
 			}
@@ -149,7 +149,8 @@ public class JmxHandler extends AbstractHandler {
 		}
 		Collections.sort(domainNames);
 		for (String domainName : domainNames) {
-			appendLink(writer, textOnly, '/' + COMMAND_LIST_BEANS_IN_DOMAIN + '/' + domainName, "beans", domainName);
+			appendLink(writer, textOnly, '/' + COMMAND_LIST_BEANS_IN_DOMAIN + '/' + domainName, "beans", null,
+					domainName);
 			appendLine(writer, textOnly, null);
 		}
 	}
@@ -175,6 +176,13 @@ public class JmxHandler extends AbstractHandler {
 		}
 		Collections.sort(objectNames, objectNameComparator);
 		for (ObjectName objectName : objectNames) {
+			String description = null;
+			try {
+				MBeanInfo mbeanInfo = mbeanServer.getMBeanInfo(objectName);
+				description = mbeanInfo.getDescription();
+			} catch (Exception e) {
+				// ignored
+			}
 			String nameString = objectName.toString();
 			if (textOnly) {
 				writer.append(nameString + '\n');
@@ -184,7 +192,8 @@ public class JmxHandler extends AbstractHandler {
 				if (index > 0) {
 					display = nameString.substring(index + 1, nameString.length());
 				}
-				appendLink(writer, textOnly, '/' + COMMAND_SHOW_BEAN + '/' + nameString, nameString, display);
+				appendLink(writer, textOnly, '/' + COMMAND_SHOW_BEAN + '/' + nameString, nameString, description,
+						display);
 				appendLine(writer, textOnly, null);
 			}
 		}
@@ -250,13 +259,13 @@ public class JmxHandler extends AbstractHandler {
 				continue;
 			}
 			if (attribute.isWritable()) {
-				writer.append("<form action=\"/" + COMMAND_ASSIGN_ATTRIBUTE + "/" + objectName + "/" + name
-						+ "\" name=\"" + name + "\">\n");
+				writer.append("<form action='/" + COMMAND_ASSIGN_ATTRIBUTE + "/" + objectName + "/" + name + "' name='"
+						+ name + "'>\n");
 			}
-			writer.append("<tr><td> " + name + " </td>");
+			writer.append("<tr><td title='" + attribute.getDescription() + "'> " + name + " </td>");
 			writer.append("<td> " + ClientUtils.displayType(attribute.getType(), value) + " </td>");
 			if (attribute.isWritable()) {
-				writer.append("<td><input name=\"" + PARAM_ATTRIBUTE_VALUE + "\" value=\"" + valueString + "\" ></td>");
+				writer.append("<td><input name='" + PARAM_ATTRIBUTE_VALUE + "' value='" + valueString + "' ></td>");
 			} else {
 				writer.append("<td> " + ClientUtils.valueToString(value) + " </td>");
 			}
@@ -305,9 +314,9 @@ public class JmxHandler extends AbstractHandler {
 			if (textOnly) {
 				writer.append(name);
 			} else {
-				writer.append("<form action=\"/" + COMMAND_INVOKE_OPERATION + "/" + objectName + "/" + name
-						+ "\" name=\"" + name + "\">\n");
-				writer.append("<tr><td> " + name + " </td>");
+				writer.append("<form action='/" + COMMAND_INVOKE_OPERATION + "/" + objectName + "/" + name + "' name='"
+						+ name + "'>\n");
+				writer.append("<tr><td title='" + operation.getDescription() + "'> " + name + " </td>");
 				writer.append("<td> " + ClientUtils.displayType(operation.getReturnType(), null) + " </td>");
 			}
 			MBeanParameterInfo[] params = operation.getSignature();
@@ -316,8 +325,8 @@ public class JmxHandler extends AbstractHandler {
 				if (textOnly) {
 					writer.append(" " + param.getType());
 				} else {
-					writer.append("<td> <input name=\"" + PARAM_OPERATION_PREFIX + paramCount++ + "\" value=\""
-							+ param.getName() + "\" > (" + param.getType() + ")</td>");
+					writer.append("<td> <input name='" + PARAM_OPERATION_PREFIX + paramCount++ + "' value='"
+							+ param.getName() + "' > (" + param.getType() + ")</td>");
 				}
 			}
 			if (textOnly) {
@@ -326,7 +335,8 @@ public class JmxHandler extends AbstractHandler {
 				for (; paramCount < maxParams; paramCount++) {
 					writer.append("<td> &nbsp; </td>");
 				}
-				writer.append("<td><input type='submit' value='" + name + "' /></td>");
+				writer.append("<td><input type='submit' value='" + name + "' title='" + operation.getDescription()
+						+ "' /></td>");
 				writer.append("</tr>\n");
 				writer.append("</form>\n");
 			}
@@ -528,39 +538,42 @@ public class JmxHandler extends AbstractHandler {
 	}
 
 	private void appendFooter(BufferedWriter writer) throws IOException {
-		appendLink(writer, false, "?t=1", "text", "Text version");
+		appendLink(writer, false, "?t=1", "text", null, "Text version");
 		writer.append(".  Produced by ");
-		appendLink(writer, false, "http://256.com/sources/simplejmx/", "simplejmx", "SimpleJMX");
+		appendLink(writer, false, "http://256.com/sources/simplejmx/", "simplejmx", null, "SimpleJMX");
 		appendLine(writer, false, null);
 		writer.append("</body></html>\n");
 	}
 
 	private void appendBackToBean(BufferedWriter writer, ObjectName objectName) throws IOException {
 		writer.append("<br />\n");
-		appendLink(writer, false, '/' + COMMAND_SHOW_BEAN + '/' + objectName.toString(), "bean",
+		appendLink(writer, false, '/' + COMMAND_SHOW_BEAN + '/' + objectName.toString(), "bean", null,
 				"Back to bean information");
 		writer.append("<br />\n");
 	}
 
 	private void appendBackToRoot(BufferedWriter writer) throws IOException {
 		writer.append("<br />\n");
-		appendLink(writer, false, "/", "root", "Back to root");
+		appendLink(writer, false, "/", "root", null, "Back to root");
 		writer.append("<br />\n");
 	}
 
 	private void appendBackToDomains(BufferedWriter writer, ObjectName objectName) throws IOException {
 		writer.append("<br />\n");
-		appendLink(writer, false, '/' + COMMAND_LIST_BEANS_IN_DOMAIN + '/' + objectName.getDomain(), "beans",
+		appendLink(writer, false, '/' + COMMAND_LIST_BEANS_IN_DOMAIN + '/' + objectName.getDomain(), "beans", null,
 				"Back to beans in domain");
 		writer.append("<br />\n");
 	}
 
-	private void appendLink(BufferedWriter writer, boolean textOnly, String url, String name, String text)
+	private void appendLink(BufferedWriter writer, boolean textOnly, String url, String name, String title, String text)
 			throws IOException {
 		if (!textOnly) {
-			writer.append("<a href=\"" + url + "\" ");
+			writer.append("<a href='" + url + "' ");
 			if (name != null) {
-				writer.append("name=\"" + name + "\" ");
+				writer.append("name='" + name + "' ");
+			}
+			if (title != null) {
+				writer.append("title='" + title + "' ");
 			}
 			writer.append(">");
 		}
