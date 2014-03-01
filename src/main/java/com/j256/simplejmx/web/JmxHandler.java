@@ -49,6 +49,23 @@ public class JmxHandler extends AbstractHandler {
 	private MBeanServer mbeanServer;
 	private ObjectNameComparator objectNameComparator = new ObjectNameComparator();
 
+	private static boolean charIsMapped[] = new boolean[256];
+
+	static {
+		// for <input values
+		charIsMapped['\''] = true;
+		charIsMapped['\"'] = true;
+		charIsMapped['&'] = true;
+		// general protection
+		charIsMapped['<'] = true;
+		charIsMapped['>'] = true;
+		// for URLs
+		charIsMapped[':'] = true;
+		charIsMapped['/'] = true;
+		charIsMapped['+'] = true;
+		charIsMapped['?'] = true;
+	}
+
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(response.getOutputStream()));
@@ -132,7 +149,7 @@ public class JmxHandler extends AbstractHandler {
 				response.sendError(Response.SC_NOT_FOUND);
 			} else {
 				appendHeader(writer);
-				writer.append("Unknown command: " + command + " <br />\n");
+				writer.append("Unknown command: " + makeHtmlSafe(command) + " <br />\n");
 				appendBackToRoot(writer);
 				appendFooter(writer);
 			}
@@ -149,8 +166,8 @@ public class JmxHandler extends AbstractHandler {
 		}
 		Collections.sort(domainNames);
 		for (String domainName : domainNames) {
-			appendLink(writer, textOnly, '/' + COMMAND_LIST_BEANS_IN_DOMAIN + '/' + domainName, "beans", null,
-					domainName);
+			appendLink(writer, textOnly, '/' + COMMAND_LIST_BEANS_IN_DOMAIN + '/' + makeHtmlSafe(domainName), "beans",
+					null, domainName);
 			appendLine(writer, textOnly, null);
 		}
 	}
@@ -161,7 +178,7 @@ public class JmxHandler extends AbstractHandler {
 			if (domainName == null) {
 				writer.append("<h1> All Beans </h1>\n");
 			} else {
-				writer.append("<h1> Beans in domain " + domainName + " </h1>\n");
+				writer.append("<h1> Beans in domain " + makeHtmlSafe(domainName) + " </h1>\n");
 			}
 		}
 		Set<ObjectInstance> mbeans;
@@ -188,12 +205,12 @@ public class JmxHandler extends AbstractHandler {
 				writer.append(nameString + '\n');
 			} else {
 				String display = nameString;
-				int index = nameString.indexOf(':');
-				if (index > 0) {
-					display = nameString.substring(index + 1, nameString.length());
+				if (domainName != null && display.startsWith(domainName)) {
+					// if we are looking at a domain name, remove it from the displayed beans
+					display = nameString.substring(domainName.length() + 1, nameString.length());
 				}
-				appendLink(writer, textOnly, '/' + COMMAND_SHOW_BEAN + '/' + nameString, nameString, description,
-						display);
+				appendLink(writer, textOnly, '/' + COMMAND_SHOW_BEAN + '/' + makeHtmlSafe(nameString), nameString,
+						description, display);
 				appendLine(writer, textOnly, null);
 			}
 		}
@@ -207,7 +224,7 @@ public class JmxHandler extends AbstractHandler {
 		try {
 			objectName = new ObjectName(objectNameString);
 		} catch (MalformedObjectNameException mone) {
-			appendLine(writer, textOnly, "Invalid object name: " + objectNameString);
+			appendLine(writer, textOnly, "Invalid object name: " + makeHtmlSafe(objectNameString));
 			if (!textOnly) {
 				appendBackToRoot(writer);
 			}
@@ -224,7 +241,7 @@ public class JmxHandler extends AbstractHandler {
 			return;
 		}
 		if (!textOnly) {
-			writer.append("<h1> Information about object " + objectNameString + " </h1>\n");
+			writer.append("<h1> Information about object " + makeHtmlSafe(objectNameString) + " </h1>\n");
 			displayClassInfo(writer, mbeanInfo);
 		}
 		displayAttributes(writer, textOnly, objectName, mbeanInfo);
@@ -259,13 +276,14 @@ public class JmxHandler extends AbstractHandler {
 				continue;
 			}
 			if (attribute.isWritable()) {
-				writer.append("<form action='/" + COMMAND_ASSIGN_ATTRIBUTE + "/" + objectName + "/" + name + "' name='"
-						+ name + "'>\n");
+				writer.append("<form action='/" + COMMAND_ASSIGN_ATTRIBUTE + "/" + makeHtmlSafe(objectName.toString())
+						+ "/" + makeHtmlSafe(name) + "' name='" + makeHtmlSafe(name) + "'>\n");
 			}
-			writer.append("<tr><td title='" + attribute.getDescription() + "'> " + name + " </td>");
+			writer.append("<tr><td title='" + makeHtmlSafe(attribute.getDescription()) + "'> " + name + " </td>");
 			writer.append("<td> " + ClientUtils.displayType(attribute.getType(), value) + " </td>");
 			if (attribute.isWritable()) {
-				writer.append("<td><input name='" + PARAM_ATTRIBUTE_VALUE + "' value='" + valueString + "' ></td>");
+				writer.append("<td><input name='" + PARAM_ATTRIBUTE_VALUE + "' value='" + makeHtmlSafe(valueString)
+						+ "' ></td>");
 			} else {
 				writer.append("<td> " + ClientUtils.valueToString(value) + " </td>");
 			}
@@ -314,9 +332,10 @@ public class JmxHandler extends AbstractHandler {
 			if (textOnly) {
 				writer.append(name);
 			} else {
-				writer.append("<form action='/" + COMMAND_INVOKE_OPERATION + "/" + objectName + "/" + name + "' name='"
-						+ name + "'>\n");
-				writer.append("<tr><td title='" + operation.getDescription() + "'> " + name + " </td>");
+				writer.append("<form action='/" + COMMAND_INVOKE_OPERATION + "/" + makeHtmlSafe(objectName.toString())
+						+ "/" + makeHtmlSafe(name) + "' name='" + makeHtmlSafe(name) + "'>\n");
+				writer.append("<tr><td title='" + makeHtmlSafe(operation.getDescription()) + "'> " + makeHtmlSafe(name)
+						+ " </td>");
 				writer.append("<td> " + ClientUtils.displayType(operation.getReturnType(), null) + " </td>");
 			}
 			MBeanParameterInfo[] params = operation.getSignature();
@@ -326,7 +345,7 @@ public class JmxHandler extends AbstractHandler {
 					writer.append(" " + param.getType());
 				} else {
 					writer.append("<td> <input name='" + PARAM_OPERATION_PREFIX + paramCount++ + "' value='"
-							+ param.getName() + "' > (" + param.getType() + ")</td>");
+							+ makeHtmlSafe(param.getName()) + "' > (" + makeHtmlSafe(param.getType()) + ")</td>");
 				}
 			}
 			if (textOnly) {
@@ -335,8 +354,8 @@ public class JmxHandler extends AbstractHandler {
 				for (; paramCount < maxParams; paramCount++) {
 					writer.append("<td> &nbsp; </td>");
 				}
-				writer.append("<td><input type='submit' value='" + name + "' title='" + operation.getDescription()
-						+ "' /></td>");
+				writer.append("<td><input type='submit' value='" + makeHtmlSafe(name) + "' title='"
+						+ makeHtmlSafe(operation.getDescription()) + "' /></td>");
 				writer.append("</tr>\n");
 				writer.append("</form>\n");
 			}
@@ -364,7 +383,7 @@ public class JmxHandler extends AbstractHandler {
 				appendHeader(writer);
 				writer.append("<h1> Setting Bean Attribute </h1>\n");
 			}
-			appendLine(writer, textOnly, "Invalid object name: " + parts[0] + ": " + e);
+			appendLine(writer, textOnly, "Invalid object name: " + makeHtmlSafe(parts[0]) + ": " + e);
 			if (!textOnly) {
 				appendBackToRoot(writer);
 				appendFooter(writer);
@@ -379,9 +398,10 @@ public class JmxHandler extends AbstractHandler {
 		} catch (Exception e) {
 			if (!textOnly) {
 				appendHeader(writer);
-				writer.append("<h1> Setting Attribute " + attributeName + "</h1>\n");
+				writer.append("<h1> Setting Attribute " + makeHtmlSafe(attributeName) + "</h1>\n");
 			}
-			appendLine(writer, textOnly, "Could not get mbean info for: " + objectName + ": " + e);
+			appendLine(writer, textOnly, "Could not get mbean info for: " + makeHtmlSafe(objectName.toString()) + ": "
+					+ e);
 			if (!textOnly) {
 				appendBackToBean(writer, objectName);
 				appendFooter(writer);
@@ -398,9 +418,9 @@ public class JmxHandler extends AbstractHandler {
 		if (info == null) {
 			if (!textOnly) {
 				appendHeader(writer);
-				writer.append("<h1> Setting Attribute " + attributeName + "</h1>\n");
+				writer.append("<h1> Setting Attribute " + makeHtmlSafe(attributeName) + "</h1>\n");
 			}
-			appendLine(writer, textOnly, "Cannot find attribute: " + attributeName);
+			appendLine(writer, textOnly, "Cannot find attribute: " + makeHtmlSafe(attributeName));
 			if (!textOnly) {
 				appendBackToBean(writer, objectName);
 				appendFooter(writer);
@@ -423,9 +443,9 @@ public class JmxHandler extends AbstractHandler {
 		} catch (Exception e) {
 			if (!textOnly) {
 				appendHeader(writer);
-				writer.append("<h1> Setting Attribute " + attributeName + "</h1>\n");
+				writer.append("<h1> Setting Attribute " + makeHtmlSafe(attributeName) + "</h1>\n");
 			}
-			appendLine(writer, textOnly, "Could not set attribute: " + attributeName + ": " + e);
+			appendLine(writer, textOnly, "Could not set attribute: " + makeHtmlSafe(attributeName) + ": " + e);
 			if (!textOnly) {
 				appendBackToBean(writer, objectName);
 				appendFooter(writer);
@@ -448,7 +468,7 @@ public class JmxHandler extends AbstractHandler {
 		try {
 			objectName = new ObjectName(parts[0]);
 		} catch (MalformedObjectNameException mone) {
-			appendLine(writer, textOnly, "Invalid object name: " + parts[0]);
+			appendLine(writer, textOnly, "Invalid object name: " + makeHtmlSafe(parts[0]));
 			if (!textOnly) {
 				appendBackToRoot(writer);
 			}
@@ -457,13 +477,14 @@ public class JmxHandler extends AbstractHandler {
 		String operationName = parts[1];
 
 		if (!textOnly) {
-			writer.append("<h1> Invoking Operation " + operationName + " </h1>\n");
+			writer.append("<h1> Invoking Operation " + makeHtmlSafe(operationName) + " </h1>\n");
 		}
 		MBeanInfo mbeanInfo;
 		try {
 			mbeanInfo = mbeanServer.getMBeanInfo(objectName);
 		} catch (Exception e) {
-			appendLine(writer, textOnly, "Could not get mbean info for: " + objectName + ": " + e);
+			appendLine(writer, textOnly, "Could not get mbean info for: " + makeHtmlSafe(objectName.toString()) + ": "
+					+ e);
 			if (!textOnly) {
 				appendBackToBean(writer, objectName);
 			}
@@ -478,7 +499,7 @@ public class JmxHandler extends AbstractHandler {
 			}
 		}
 		if (operation == null) {
-			appendLine(writer, textOnly, "Cannot find operation in " + objectName);
+			appendLine(writer, textOnly, "Cannot find operation in " + makeHtmlSafe(objectName.toString()));
 			if (!textOnly) {
 				appendBackToBean(writer, objectName);
 			}
@@ -490,25 +511,34 @@ public class JmxHandler extends AbstractHandler {
 		String[] paramTypes = new String[paramInfos.length];
 		for (int i = 0; i < paramInfos.length; i++) {
 			paramTypes[i] = paramInfos[i].getType();
-			params[i] = ClientUtils.stringToParam(request.getParameter(PARAM_OPERATION_PREFIX + i), paramTypes[i]);
+			try {
+				params[i] = ClientUtils.stringToParam(request.getParameter(PARAM_OPERATION_PREFIX + i), paramTypes[i]);
+			} catch (IllegalArgumentException iae) {
+				appendLine(writer, textOnly, "Converting parameter " + paramInfos[i].getName() + " threw exception: "
+						+ iae);
+				if (!textOnly) {
+					appendBackToBean(writer, objectName);
+				}
+				return;
+			}
 		}
 
 		Object result;
 		try {
 			result = mbeanServer.invoke(objectName, operationName, params, paramTypes);
 		} catch (Exception e) {
-			appendLine(writer, textOnly, "Invoking operation " + operationName + " threw exception: " + e);
+			appendLine(writer, textOnly, "Invoking operation " + makeHtmlSafe(operationName) + " threw exception: " + e);
 			if (!textOnly) {
 				appendBackToBean(writer, objectName);
 			}
-			e.printStackTrace();
 			return;
 		}
 
 		if (operation.getReturnType().equals("void")) {
-			appendLine(writer, textOnly, operationName + " method successfully invoked.");
+			appendLine(writer, textOnly, makeHtmlSafe(operationName) + " method successfully invoked.");
 		} else {
-			appendLine(writer, textOnly, operationName + " result is: " + ClientUtils.valueToString(result));
+			appendLine(writer, textOnly,
+					operationName + " result is: " + makeHtmlSafe(ClientUtils.valueToString(result)));
 		}
 		if (!textOnly) {
 			appendBackToBean(writer, objectName);
@@ -518,7 +548,7 @@ public class JmxHandler extends AbstractHandler {
 	private void displayClassInfo(BufferedWriter writer, MBeanInfo mbeanInfo) throws IOException {
 		writer.append("ClassName: " + mbeanInfo.getClassName() + "<br />\n");
 		if (mbeanInfo.getDescription() != null) {
-			writer.append("Description: " + mbeanInfo.getDescription() + "<br />\n");
+			writer.append("Description: " + makeHtmlSafe(mbeanInfo.getDescription()) + "<br />\n");
 		}
 		writer.append("<br />\n");
 	}
@@ -570,10 +600,10 @@ public class JmxHandler extends AbstractHandler {
 		if (!textOnly) {
 			writer.append("<a href='" + url + "' ");
 			if (name != null) {
-				writer.append("name='" + name + "' ");
+				writer.append("name='" + makeHtmlSafe(name) + "' ");
 			}
 			if (title != null) {
-				writer.append("title='" + title + "' ");
+				writer.append("title='" + makeHtmlSafe(title) + "' ");
 			}
 			writer.append(">");
 		}
@@ -585,6 +615,37 @@ public class JmxHandler extends AbstractHandler {
 
 	private boolean isGetSet(String name) {
 		return (name.startsWith("is") || name.startsWith("get") || name.startsWith("set"));
+	}
+
+	private String makeHtmlSafe(String value) {
+		if (value == null) {
+			return null;
+		}
+
+		boolean needsMap = false;
+		for (int i = 0; i < value.length(); i++) {
+			char ch = value.charAt(i);
+			if (ch < charIsMapped.length && charIsMapped[ch]) {
+				needsMap = true;
+				break;
+			}
+		}
+		if (!needsMap) {
+			return value;
+		}
+
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < value.length(); i++) {
+			char ch = value.charAt(i);
+			if (ch < charIsMapped.length && charIsMapped[ch]) {
+				sb.append("&#");
+				sb.append(Integer.toString(ch));
+				sb.append(';');
+			} else {
+				sb.append(ch);
+			}
+		}
+		return sb.toString();
 	}
 
 	/**
