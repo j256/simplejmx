@@ -95,9 +95,7 @@ public class JmxHandler extends AbstractHandler {
 
 		int slashIndex = pathInfo.indexOf('/');
 		if (slashIndex < 0) {
-			if (!textOnly) {
-				appendHeader(writer);
-			}
+			appendHeader(writer, textOnly);
 			if (pathInfo.equals(COMMAND_SHOW_ALL_BEANS)) {
 				listBeansInDomain(writer, textOnly, null);
 			} else {
@@ -108,9 +106,7 @@ public class JmxHandler extends AbstractHandler {
 					writer.append("  ");
 				}
 			}
-			if (!textOnly) {
-				appendFooter(writer);
-			}
+			appendFooter(writer, textOnly);
 			return;
 		}
 
@@ -118,40 +114,28 @@ public class JmxHandler extends AbstractHandler {
 		pathInfo = pathInfo.substring(slashIndex + 1);
 
 		if (command.equals(COMMAND_LIST_BEANS_IN_DOMAIN)) {
-			if (!textOnly) {
-				appendHeader(writer);
-			}
+			appendHeader(writer, textOnly);
 			listBeansInDomain(writer, textOnly, pathInfo);
-			if (!textOnly) {
-				appendFooter(writer);
-			}
+			appendFooter(writer, textOnly);
 		} else if (command.equals(COMMAND_SHOW_BEAN)) {
-			if (!textOnly) {
-				appendHeader(writer);
-			}
+			appendHeader(writer, textOnly);
 			showBean(writer, textOnly, pathInfo);
-			if (!textOnly) {
-				appendFooter(writer);
-			}
+			appendFooter(writer, textOnly);
 		} else if (command.equals(COMMAND_ASSIGN_ATTRIBUTE)) {
 			// this may redirect
 			assignAttribute(request, response, writer, textOnly, pathInfo);
 		} else if (command.equals(COMMAND_INVOKE_OPERATION)) {
-			if (!textOnly) {
-				appendHeader(writer);
-			}
+			appendHeader(writer, textOnly);
 			invokeOperation(request, writer, textOnly, pathInfo);
-			if (!textOnly) {
-				appendFooter(writer);
-			}
+			appendFooter(writer, textOnly);
 		} else {
 			if (textOnly) {
 				response.sendError(Response.SC_NOT_FOUND);
 			} else {
-				appendHeader(writer);
+				appendHeader(writer, textOnly);
 				writer.append("Unknown command: " + makeHtmlSafe(command) + " <br />\n");
-				appendBackToRoot(writer);
-				appendFooter(writer);
+				appendBackToRoot(writer, textOnly);
+				appendFooter(writer, textOnly);
 			}
 		}
 	}
@@ -214,9 +198,7 @@ public class JmxHandler extends AbstractHandler {
 				appendLine(writer, textOnly, null);
 			}
 		}
-		if (!textOnly) {
-			appendBackToRoot(writer);
-		}
+		appendBackToRoot(writer, textOnly);
 	}
 
 	private void showBean(BufferedWriter writer, boolean textOnly, String objectNameString) throws IOException {
@@ -225,9 +207,7 @@ public class JmxHandler extends AbstractHandler {
 			objectName = new ObjectName(objectNameString);
 		} catch (MalformedObjectNameException mone) {
 			appendLine(writer, textOnly, "Invalid object name: " + makeHtmlSafe(objectNameString));
-			if (!textOnly) {
-				appendBackToRoot(writer);
-			}
+			appendBackToRoot(writer, textOnly);
 			return;
 		}
 		MBeanInfo mbeanInfo;
@@ -235,9 +215,7 @@ public class JmxHandler extends AbstractHandler {
 			mbeanInfo = mbeanServer.getMBeanInfo(objectName);
 		} catch (Exception e) {
 			appendLine(writer, textOnly, "Investigating object threw exception: " + e);
-			if (!textOnly) {
-				appendBackToRoot(writer);;
-			}
+			appendBackToRoot(writer, textOnly);;
 			return;
 		}
 		if (!textOnly) {
@@ -246,9 +224,7 @@ public class JmxHandler extends AbstractHandler {
 		}
 		displayAttributes(writer, textOnly, objectName, mbeanInfo);
 		displayOperations(writer, textOnly, objectName, mbeanInfo);
-		if (!textOnly) {
-			appendBackToDomains(writer, objectName);
-		}
+		appendBackToDomains(writer, textOnly, objectName);
 	}
 
 	private void displayAttributes(BufferedWriter writer, boolean textOnly, ObjectName objectName, MBeanInfo mbeanInfo)
@@ -370,24 +346,19 @@ public class JmxHandler extends AbstractHandler {
 		String[] parts = pathInfo.split("/");
 		if (parts.length != 2) {
 			appendLine(writer, textOnly, "Invalid number of parameters to assign command");
-			if (!textOnly) {
-				appendBackToRoot(writer);
-			}
+			appendBackToRoot(writer, textOnly);
+			return;
+		}
+		String param = request.getParameter(PARAM_ATTRIBUTE_VALUE);
+		if (param == null) {
+			appendAssignError(writer, textOnly, "No value parameter specified.");
 			return;
 		}
 		ObjectName objectName;
 		try {
 			objectName = new ObjectName(parts[0]);
 		} catch (Exception e) {
-			if (!textOnly) {
-				appendHeader(writer);
-				writer.append("<h1> Setting Bean Attribute </h1>\n");
-			}
-			appendLine(writer, textOnly, "Invalid object name: " + makeHtmlSafe(parts[0]) + ": " + e);
-			if (!textOnly) {
-				appendBackToRoot(writer);
-				appendFooter(writer);
-			}
+			appendAssignError(writer, textOnly, "Invalid object name: " + makeHtmlSafe(parts[0]) + ": " + e);
 			return;
 		}
 		String attributeName = parts[1];
@@ -396,16 +367,8 @@ public class JmxHandler extends AbstractHandler {
 		try {
 			mbeanInfo = mbeanServer.getMBeanInfo(objectName);
 		} catch (Exception e) {
-			if (!textOnly) {
-				appendHeader(writer);
-				writer.append("<h1> Setting Attribute " + makeHtmlSafe(attributeName) + "</h1>\n");
-			}
-			appendLine(writer, textOnly, "Could not get mbean info for: " + makeHtmlSafe(objectName.toString()) + ": "
-					+ e);
-			if (!textOnly) {
-				appendBackToBean(writer, objectName);
-				appendFooter(writer);
-			}
+			appendAssignError(writer, textOnly, "Could not get mbean info for: " + makeHtmlSafe(objectName.toString())
+					+ ": " + e);
 			return;
 		}
 		MBeanAttributeInfo info = null;
@@ -416,22 +379,12 @@ public class JmxHandler extends AbstractHandler {
 			}
 		}
 		if (info == null) {
-			if (!textOnly) {
-				appendHeader(writer);
-				writer.append("<h1> Setting Attribute " + makeHtmlSafe(attributeName) + "</h1>\n");
-			}
-			appendLine(writer, textOnly, "Cannot find attribute: " + makeHtmlSafe(attributeName));
-			if (!textOnly) {
-				appendBackToBean(writer, objectName);
-				appendFooter(writer);
-			}
+			appendAssignError(writer, textOnly, "Cannot find attribute: " + makeHtmlSafe(attributeName));
 			return;
 		}
 
-		String result = request.getParameter(PARAM_ATTRIBUTE_VALUE);
-		Object value = ClientUtils.stringToParam(result, info.getType());
-
 		try {
+			Object value = ClientUtils.stringToParam(param, info.getType());
 			Attribute attribute = new Attribute(attributeName, value);
 			mbeanServer.setAttribute(objectName, attribute);
 			if (textOnly) {
@@ -441,17 +394,19 @@ public class JmxHandler extends AbstractHandler {
 				response.sendRedirect("/" + COMMAND_SHOW_BEAN + "/" + objectName);
 			}
 		} catch (Exception e) {
-			if (!textOnly) {
-				appendHeader(writer);
-				writer.append("<h1> Setting Attribute " + makeHtmlSafe(attributeName) + "</h1>\n");
-			}
-			appendLine(writer, textOnly, "Could not set attribute: " + makeHtmlSafe(attributeName) + ": " + e);
-			if (!textOnly) {
-				appendBackToBean(writer, objectName);
-				appendFooter(writer);
-			}
+			appendAssignError(writer, textOnly, "Could not set attribute: " + makeHtmlSafe(attributeName) + ": " + e);
 			return;
 		}
+	}
+
+	private void appendAssignError(BufferedWriter writer, boolean textOnly, String message) throws IOException {
+		if (!textOnly) {
+			appendHeader(writer, textOnly);
+			writer.append("<h1> Setting Bean Attribute </h1>\n");
+		}
+		appendLine(writer, textOnly, message);
+		appendBackToRoot(writer, textOnly);
+		appendFooter(writer, textOnly);
 	}
 
 	private void invokeOperation(HttpServletRequest request, BufferedWriter writer, boolean textOnly, String pathInfo)
@@ -459,9 +414,7 @@ public class JmxHandler extends AbstractHandler {
 		String[] parts = pathInfo.split("/");
 		if (parts.length != 2) {
 			appendLine(writer, textOnly, "Invalid number of parameters to invoke command");
-			if (!textOnly) {
-				appendBackToRoot(writer);
-			}
+			appendBackToRoot(writer, textOnly);
 			return;
 		}
 		ObjectName objectName;
@@ -469,9 +422,7 @@ public class JmxHandler extends AbstractHandler {
 			objectName = new ObjectName(parts[0]);
 		} catch (MalformedObjectNameException mone) {
 			appendLine(writer, textOnly, "Invalid object name: " + makeHtmlSafe(parts[0]));
-			if (!textOnly) {
-				appendBackToRoot(writer);
-			}
+			appendBackToRoot(writer, textOnly);
 			return;
 		}
 		String operationName = parts[1];
@@ -485,9 +436,7 @@ public class JmxHandler extends AbstractHandler {
 		} catch (Exception e) {
 			appendLine(writer, textOnly, "Could not get mbean info for: " + makeHtmlSafe(objectName.toString()) + ": "
 					+ e);
-			if (!textOnly) {
-				appendBackToBean(writer, objectName);
-			}
+			appendBackToBean(writer, textOnly, objectName);
 			return;
 		}
 
@@ -500,9 +449,7 @@ public class JmxHandler extends AbstractHandler {
 		}
 		if (operation == null) {
 			appendLine(writer, textOnly, "Cannot find operation in " + makeHtmlSafe(objectName.toString()));
-			if (!textOnly) {
-				appendBackToBean(writer, objectName);
-			}
+			appendBackToBean(writer, textOnly, objectName);
 			return;
 		}
 
@@ -516,9 +463,7 @@ public class JmxHandler extends AbstractHandler {
 			} catch (IllegalArgumentException iae) {
 				appendLine(writer, textOnly, "Converting parameter " + paramInfos[i].getName() + " threw exception: "
 						+ iae);
-				if (!textOnly) {
-					appendBackToBean(writer, objectName);
-				}
+				appendBackToBean(writer, textOnly, objectName);
 				return;
 			}
 		}
@@ -528,9 +473,7 @@ public class JmxHandler extends AbstractHandler {
 			result = mbeanServer.invoke(objectName, operationName, params, paramTypes);
 		} catch (Exception e) {
 			appendLine(writer, textOnly, "Invoking operation " + makeHtmlSafe(operationName) + " threw exception: " + e);
-			if (!textOnly) {
-				appendBackToBean(writer, objectName);
-			}
+			appendBackToBean(writer, textOnly, objectName);
 			return;
 		}
 
@@ -540,9 +483,7 @@ public class JmxHandler extends AbstractHandler {
 			appendLine(writer, textOnly,
 					operationName + " result is: " + makeHtmlSafe(ClientUtils.valueToString(result)));
 		}
-		if (!textOnly) {
-			appendBackToBean(writer, objectName);
-		}
+		appendBackToBean(writer, textOnly, objectName);
 	}
 
 	private void displayClassInfo(BufferedWriter writer, MBeanInfo mbeanInfo) throws IOException {
@@ -563,36 +504,46 @@ public class JmxHandler extends AbstractHandler {
 		writer.append("\n");
 	}
 
-	private void appendHeader(BufferedWriter writer) throws IOException {
-		writer.append("<html><body>\n");
+	private void appendHeader(BufferedWriter writer, boolean textOnly) throws IOException {
+		if (!textOnly) {
+			writer.append("<html><body>\n");
+		}
 	}
 
-	private void appendFooter(BufferedWriter writer) throws IOException {
-		appendLink(writer, false, "?t=1", "text", null, "Text version");
-		writer.append(".  Produced by ");
-		appendLink(writer, false, "http://256.com/sources/simplejmx/", "simplejmx", null, "SimpleJMX");
-		appendLine(writer, false, null);
-		writer.append("</body></html>\n");
+	private void appendFooter(BufferedWriter writer, boolean textOnly) throws IOException {
+		if (!textOnly) {
+			appendLink(writer, false, "?t=1", "text", null, "Text version");
+			writer.append(".  Produced by ");
+			appendLink(writer, false, "http://256.com/sources/simplejmx/", "simplejmx", null, "SimpleJMX");
+			appendLine(writer, false, null);
+			writer.append("</body></html>\n");
+		}
 	}
 
-	private void appendBackToBean(BufferedWriter writer, ObjectName objectName) throws IOException {
-		writer.append("<br />\n");
-		appendLink(writer, false, '/' + COMMAND_SHOW_BEAN + '/' + objectName.toString(), "bean", null,
-				"Back to bean information");
-		writer.append("<br />\n");
+	private void appendBackToBean(BufferedWriter writer, boolean textOnly, ObjectName objectName) throws IOException {
+		if (!textOnly) {
+			writer.append("<br />\n");
+			appendLink(writer, false, '/' + COMMAND_SHOW_BEAN + '/' + objectName.toString(), "bean", null,
+					"Back to bean information");
+			writer.append("<br />\n");
+		}
 	}
 
-	private void appendBackToRoot(BufferedWriter writer) throws IOException {
-		writer.append("<br />\n");
-		appendLink(writer, false, "/", "root", null, "Back to root");
-		writer.append("<br />\n");
+	private void appendBackToRoot(BufferedWriter writer, boolean textOnly) throws IOException {
+		if (!textOnly) {
+			writer.append("<br />\n");
+			appendLink(writer, false, "/", "root", null, "Back to root");
+			writer.append("<br />\n");
+		}
 	}
 
-	private void appendBackToDomains(BufferedWriter writer, ObjectName objectName) throws IOException {
-		writer.append("<br />\n");
-		appendLink(writer, false, '/' + COMMAND_LIST_BEANS_IN_DOMAIN + '/' + objectName.getDomain(), "beans", null,
-				"Back to beans in domain");
-		writer.append("<br />\n");
+	private void appendBackToDomains(BufferedWriter writer, boolean textOnly, ObjectName objectName) throws IOException {
+		if (!textOnly) {
+			writer.append("<br />\n");
+			appendLink(writer, false, '/' + COMMAND_LIST_BEANS_IN_DOMAIN + '/' + objectName.getDomain(), "beans", null,
+					"Back to beans in domain");
+			writer.append("<br />\n");
+		}
 	}
 
 	private void appendLink(BufferedWriter writer, boolean textOnly, String url, String name, String title, String text)
