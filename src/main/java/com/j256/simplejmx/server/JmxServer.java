@@ -186,7 +186,7 @@ public class JmxServer {
 	 * Register the object parameter for exposure with JMX. The object passed in must have a {@link JmxResource}
 	 * annotation or must implement {@link JmxSelfNaming}.
 	 */
-	public synchronized void register(Object obj) throws JMException {
+	public synchronized ObjectName register(Object obj) throws JMException {
 		if (mbeanServer == null) {
 			throw new JMException("JmxServer has not be started");
 		}
@@ -198,6 +198,7 @@ public class JmxServer {
 			throw createJmException("Could not build MBean object for: " + obj, e);
 		}
 		doRegister(objectName, mbean);
+		return objectName;
 	}
 
 	/**
@@ -224,8 +225,8 @@ public class JmxServer {
 	/**
 	 * Register the object parameter for exposure with JMX that is wrapped using the PublishAllBeanWrapper.
 	 */
-	public synchronized void register(PublishAllBeanWrapper wrapper) throws JMException {
-		register(wrapper, wrapper.getJmxResourceInfo(), wrapper.getAttributeFieldInfos(),
+	public synchronized ObjectName register(PublishAllBeanWrapper wrapper) throws JMException {
+		return register(wrapper, wrapper.getJmxResourceInfo(), wrapper.getAttributeFieldInfos(),
 				wrapper.getAttributeMethodInfos(), wrapper.getOperationInfos());
 	}
 
@@ -243,12 +244,15 @@ public class JmxServer {
 	 *            Array of attribute information for fields that are exposed through get/set/is methods.
 	 * @param operationInfos
 	 *            Array of operation information for methods.
+	 * @return Resulting object name.
 	 */
-	public synchronized void register(Object obj, JmxResourceInfo resourceInfo,
+	public synchronized ObjectName register(Object obj, JmxResourceInfo resourceInfo,
 			JmxAttributeFieldInfo[] attributeFieldInfos, JmxAttributeMethodInfo[] attributeMethodInfos,
 			JmxOperationInfo[] operationInfos) throws JMException {
-		register(obj, ObjectNameUtil.makeObjectName(resourceInfo), resourceInfo.getJmxDescription(),
-				attributeFieldInfos, attributeMethodInfos, operationInfos);
+		ObjectName objectName = ObjectNameUtil.makeObjectName(resourceInfo);
+		register(obj, objectName, resourceInfo.getJmxDescription(), attributeFieldInfos, attributeMethodInfos,
+				operationInfos);
+		return objectName;
 	}
 
 	/**
