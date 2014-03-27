@@ -55,10 +55,10 @@ public class JmxHandler extends AbstractHandler {
 		// for <input values
 		charIsMapped['\''] = true;
 		charIsMapped['\"'] = true;
-		charIsMapped['&'] = true;
 		// general protection
 		charIsMapped['<'] = true;
 		charIsMapped['>'] = true;
+		charIsMapped['&'] = true;
 		// for URLs
 		charIsMapped[':'] = true;
 		charIsMapped['/'] = true;
