@@ -3,6 +3,8 @@
 	* Fixed a small bug in the auto generated descriptions for operations.
 	* Added show all beans for easier bean scraping.
 	* Improved the web displaying of description information for beans, attributes, and operations.
+	* Return ObjectName from the JmxServer register methods.  BeanPublisher not unregisters beans appropriately.
+	* Added better support for running a JmxServer with an existing platform MBeanServer.
 
 1.8: 2/25/2014
 	* Added support for PublishAllBeanWrapper which exposes all public fields and methods as attributes and operations.

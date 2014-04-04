@@ -118,9 +118,23 @@ public class JmxServer {
 	/**
 	 * Create a JmxServer wrapper around an existing MBeanServer. You may want to use this with
 	 * {@link ManagementFactory#getPlatformMBeanServer()} to use the JVM platform's default server.
+	 * 
+	 * <p>
+	 * <b>NOTE:</b> You can also use the {@link #JmxServer(boolean)} or {@link #setUsePlatformMBeanServer(boolean)} with
+	 * true to set the internal MBeanServer to the platform one already defined.
+	 * </p>
 	 */
 	public JmxServer(MBeanServer mbeanServer) {
 		this.mbeanServer = mbeanServer;
+	}
+
+	/**
+	 * If you pass in true, this will create a JmxServer wrapper around the existing JVM platform's MBeanServer.
+	 */
+	public JmxServer(boolean usePlatformMBeanServer) {
+		if (usePlatformMBeanServer) {
+			this.mbeanServer = ManagementFactory.getPlatformMBeanServer();
+		}
 	}
 
 	/**
@@ -403,6 +417,16 @@ public class JmxServer {
 	 */
 	public void setServiceUrl(String serviceUrl) {
 		this.serviceUrl = serviceUrl;
+	}
+
+	/**
+	 * Set this to true (default is false) to have the JmxServer use the MBean server defined by the JVM as opposed to
+	 * making one itself.
+	 */
+	public void setUsePlatformMBeanServer(boolean usePlatformMBeanServer) {
+		if (usePlatformMBeanServer) {
+			mbeanServer = ManagementFactory.getPlatformMBeanServer();
+		}
 	}
 
 	/**
