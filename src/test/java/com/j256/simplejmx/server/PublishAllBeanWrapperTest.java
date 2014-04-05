@@ -14,7 +14,7 @@ public class PublishAllBeanWrapperTest {
 
 	private static final int DEFAULT_PORT = 5256;
 	private static final String DOMAIN_NAME = "j256";
-	private static final String OBJECT_NAME = "testObject";
+	private static final String OBJECT_NAME = PublishAllBeanWrapperTest.class.getSimpleName();
 	private static final int FOO_VALUE = 1459243;
 	private static final int BAR_VALUE = 1423459243;
 

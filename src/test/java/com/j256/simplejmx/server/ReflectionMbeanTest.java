@@ -27,7 +27,7 @@ public class ReflectionMbeanTest {
 
 	private static final int DEFAULT_PORT = 5256;
 	private static final String DOMAIN_NAME = "j256";
-	private static final String OBJECT_NAME = "testObject";
+	private static final String OBJECT_NAME = "ReflectionMbeanTest";
 	private static final int FOO_VALUE = 1459243;
 
 	private static final int READ_ONLY_DEFAULT = 789543534;
