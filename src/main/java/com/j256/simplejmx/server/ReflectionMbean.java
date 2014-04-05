@@ -54,7 +54,7 @@ public class ReflectionMbean implements DynamicMBean {
 	 * Create a mbean associated with a wrapped object that exposes all public fields and methods.
 	 */
 	public ReflectionMbean(PublishAllBeanWrapper wrapper) {
-		this(wrapper.getDelegate(), null, wrapper.getAttributeFieldInfos(), wrapper.getAttributeMethodInfos(),
+		this(wrapper.getTarget(), null, wrapper.getAttributeFieldInfos(), wrapper.getAttributeMethodInfos(),
 				wrapper.getOperationInfos(), true);
 	}
 

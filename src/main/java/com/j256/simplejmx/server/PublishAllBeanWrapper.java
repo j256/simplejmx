@@ -21,7 +21,7 @@ import com.j256.simplejmx.common.JmxResourceInfo;
  */
 public class PublishAllBeanWrapper {
 
-	private Object delegate;
+	private Object target;
 	private JmxResourceInfo jmxResourceInfo;
 
 	private static final Set<String> ignoredMethods = new HashSet<String>();
@@ -47,19 +47,27 @@ public class PublishAllBeanWrapper {
 	 *            Resource information about the bean.
 	 */
 	public PublishAllBeanWrapper(Object delegate, JmxResourceInfo jmxResourceInfo) {
-		this.delegate = delegate;
+		this.target = delegate;
 		this.jmxResourceInfo = jmxResourceInfo;
 		if (jmxResourceInfo.getJmxBeanName() == null) {
 			jmxResourceInfo.setJmxBeanName(delegate.getClass().getSimpleName());
 		}
 	}
 
-	public Object getDelegate() {
-		return delegate;
+	public Object getTarget() {
+		return target;
 	}
 
+	/**
+	 * @deprecated Should use {@link #setTarget(Object)}.
+	 */
+	@Deprecated
 	public void setDelegate(Object delegate) {
-		this.delegate = delegate;
+		this.target = delegate;
+	}
+
+	public void setTarget(Object target) {
+		this.target = target;
 	}
 
 	public JmxResourceInfo getJmxResourceInfo() {
@@ -74,7 +82,7 @@ public class PublishAllBeanWrapper {
 		// run through all _public_ fields, add get/set, final is no-write
 
 		List<JmxAttributeFieldInfo> fieldInfos = new ArrayList<JmxAttributeFieldInfo>();
-		Field[] fields = delegate.getClass().getFields();
+		Field[] fields = target.getClass().getFields();
 		for (Field field : fields) {
 			fieldInfos.add(new JmxAttributeFieldInfo(field.getName(), true, !Modifier.isFinal(field.getModifiers()),
 					null));
@@ -84,7 +92,7 @@ public class PublishAllBeanWrapper {
 
 	public JmxAttributeMethodInfo[] getAttributeMethodInfos() {
 		List<JmxAttributeMethodInfo> methodInfos = new ArrayList<JmxAttributeMethodInfo>();
-		Method[] methods = delegate.getClass().getMethods();
+		Method[] methods = target.getClass().getMethods();
 		for (Method method : methods) {
 			String name = method.getName();
 			if (!ignoredMethods.contains(name) && isGetGetAttributeMethod(name)) {
@@ -96,7 +104,7 @@ public class PublishAllBeanWrapper {
 
 	public JmxOperationInfo[] getOperationInfos() {
 		List<JmxOperationInfo> operationInfos = new ArrayList<JmxOperationInfo>();
-		Method[] methods = delegate.getClass().getMethods();
+		Method[] methods = target.getClass().getMethods();
 		for (Method method : methods) {
 			String name = method.getName();
 			if (!ignoredMethods.contains(name) && !isGetGetAttributeMethod(name)) {
