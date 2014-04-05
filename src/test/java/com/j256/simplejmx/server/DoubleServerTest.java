@@ -43,7 +43,7 @@ public class DoubleServerTest {
 			 */
 			server1.register(testObject);
 
-//			Thread.sleep(1000000000);
+			// Thread.sleep(1000000000);
 
 			client1 = new JmxClient(serverAddr1, serverPort1);
 			client2 = new JmxClient(serverAddr2, serverPort2);
@@ -61,6 +61,7 @@ public class DoubleServerTest {
 			}
 		}
 	}
+
 	private void testClient(JmxClient client) throws Exception {
 
 		int newValue = FOO_VALUE + 2;
