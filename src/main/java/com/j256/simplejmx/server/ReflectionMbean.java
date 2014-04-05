@@ -47,7 +47,7 @@ public class ReflectionMbean implements DynamicMBean {
 	 * Create a mbean associated with a delegate object that must have a {@link JmxResource} annotation.
 	 */
 	public ReflectionMbean(Object delegate, String description) {
-		this(delegate, description, null, null, null);
+		this(delegate, description, null, null, null, false);
 	}
 
 	/**
@@ -55,17 +55,17 @@ public class ReflectionMbean implements DynamicMBean {
 	 */
 	public ReflectionMbean(PublishAllBeanWrapper wrapper) {
 		this(wrapper.getDelegate(), null, wrapper.getAttributeFieldInfos(), wrapper.getAttributeMethodInfos(),
-				wrapper.getOperationInfos());
+				wrapper.getOperationInfos(), true);
 	}
 
 	/**
 	 * Create a mbean associated with a delegate object with user provided attribute and operation information.
 	 */
 	public ReflectionMbean(Object delegate, String description, JmxAttributeFieldInfo[] attributeFieldInfos,
-			JmxAttributeMethodInfo[] attributeMethodInfos, JmxOperationInfo[] operationInfos) {
+			JmxAttributeMethodInfo[] attributeMethodInfos, JmxOperationInfo[] operationInfos, boolean ignoreErrors) {
 		this.delegate = delegate;
 		this.description = preprocessDescription(delegate, description);
-		this.mbeanInfo = buildMbeanInfo(attributeFieldInfos, attributeMethodInfos, operationInfos);
+		this.mbeanInfo = buildMbeanInfo(attributeFieldInfos, attributeMethodInfos, operationInfos, ignoreErrors);
 	}
 
 	/**
@@ -197,13 +197,13 @@ public class ReflectionMbean implements DynamicMBean {
 	 * Build our JMX information object by using reflection.
 	 */
 	private MBeanInfo buildMbeanInfo(JmxAttributeFieldInfo[] attributeFieldInfos,
-			JmxAttributeMethodInfo[] attributeMethodInfos, JmxOperationInfo[] operationInfos) {
+			JmxAttributeMethodInfo[] attributeMethodInfos, JmxOperationInfo[] operationInfos, boolean ignoreErrors) {
 
 		Map<String, JmxAttributeFieldInfo> attributeFieldInfoMap = null;
 		if (attributeFieldInfos != null) {
 			attributeFieldInfoMap = new HashMap<String, JmxAttributeFieldInfo>();
 			for (JmxAttributeFieldInfo info : attributeFieldInfos) {
-				attributeFieldInfoMap.put(info.getName(), info);
+				attributeFieldInfoMap.put(info.getFieldName(), info);
 			}
 		}
 		Map<String, JmxAttributeMethodInfo> attributeMethodInfoMap = null;
@@ -224,7 +224,7 @@ public class ReflectionMbean implements DynamicMBean {
 		Class<?> clazz = delegate.getClass();
 		Method[] methods = clazz.getMethods();
 		List<MBeanAttributeInfo> attributes = new ArrayList<MBeanAttributeInfo>();
-		discoverAttributeMethods(methods, attributes, attributeMethodInfoMap);
+		discoverAttributeMethods(methods, attributes, attributeMethodInfoMap, ignoreErrors);
 		// NOTE: fields override attribute methods
 		discoverAttributeFields(attributes, attributeFieldInfoMap);
 		List<MBeanOperationInfo> operations = discoverOperations(methods, attributeOperationInfoMap);
@@ -238,7 +238,7 @@ public class ReflectionMbean implements DynamicMBean {
 	 * Find attribute methods from our object that will be exposed via JMX.
 	 */
 	private void discoverAttributeMethods(Method[] methods, List<MBeanAttributeInfo> attributes,
-			Map<String, JmxAttributeMethodInfo> attributeMethodInfoMap) {
+			Map<String, JmxAttributeMethodInfo> attributeMethodInfoMap, boolean ignoreErrors) {
 		for (Method method : methods) {
 			JmxAttributeMethod jmxAttribute = method.getAnnotation(JmxAttributeMethod.class);
 			JmxAttributeMethodInfo attributeMethodInfo = null;
@@ -255,53 +255,12 @@ public class ReflectionMbean implements DynamicMBean {
 				jmxAttribute = null;
 			}
 
-			String methodName = method.getName();
-			boolean isIs;
-			if (methodName.startsWith("is")) {
-				if (method.getReturnType() != boolean.class && method.getReturnType() != Boolean.class) {
-					throw new IllegalArgumentException("Method '" + method
-							+ "' starts with 'is' but does not return a boolean or Boolean class");
+			try {
+				discoverMethod(method, attributeMethodInfo);
+			} catch (IllegalArgumentException iae) {
+				if (!ignoreErrors) {
+					throw iae;
 				}
-				isIs = true;
-			} else {
-				isIs = false;
-			}
-			String varName = buildMethodSuffix(method, methodName, isIs);
-			AttributeMethodInfo methodInfo = attributeMethodMap.get(varName);
-			if (isIs || methodName.startsWith("get")) {
-				if (method.getParameterTypes().length != 0) {
-					throw new IllegalArgumentException("Method '" + method + "' starts with 'get' but has arguments");
-				}
-				if (method.getReturnType() == void.class) {
-					throw new IllegalArgumentException("Method '" + method
-							+ "' starts with 'get' but does not return anything");
-				}
-				if (methodInfo == null) {
-					attributeMethodMap.put(varName,
-							new AttributeMethodInfo(varName, attributeMethodInfo.getDescription(), method, null));
-				} else {
-					// setter must have already started our method-info, add the getter to it
-					methodInfo.getterMethod = method;
-				}
-			} else if (methodName.startsWith("set")) {
-				if (method.getParameterTypes().length != 1) {
-					throw new IllegalArgumentException("Method '" + method
-							+ "' starts with 'set' but does not have 1 argument");
-				}
-				if (method.getReturnType() != void.class) {
-					throw new IllegalArgumentException("Method '" + method
-							+ "' starts with 'set' but does not return void");
-				}
-				if (methodInfo == null) {
-					attributeMethodMap.put(varName,
-							new AttributeMethodInfo(varName, attributeMethodInfo.getDescription(), null, method));
-				} else {
-					// getter must have already started our method-info, add the setter to it
-					methodInfo.setterMethod = method;
-				}
-			} else {
-				throw new IllegalArgumentException("Method '" + method
-						+ "' is marked as an attribute but does not start with 'get' or 'set'");
 			}
 		}
 
@@ -313,6 +272,56 @@ public class ReflectionMbean implements DynamicMBean {
 			attributes.add(new MBeanAttributeInfo(methodInfo.varName, methodInfo.type.getName(),
 					methodInfo.description, (methodInfo.getterMethod != null), (methodInfo.setterMethod != null),
 					methodInfo.isIs()));
+		}
+	}
+
+	private void discoverMethod(Method method, JmxAttributeMethodInfo attributeMethodInfo) {
+		String methodName = method.getName();
+		boolean isIs;
+		if (methodName.startsWith("is")) {
+			if (method.getReturnType() != boolean.class && method.getReturnType() != Boolean.class) {
+				throw new IllegalArgumentException("Method '" + method
+						+ "' starts with 'is' but does not return a boolean or Boolean class");
+			}
+			isIs = true;
+		} else {
+			isIs = false;
+		}
+		String varName = buildMethodSuffix(method, methodName, isIs);
+		AttributeMethodInfo methodInfo = attributeMethodMap.get(varName);
+		if (isIs || methodName.startsWith("get")) {
+			if (method.getParameterTypes().length != 0) {
+				throw new IllegalArgumentException("Method '" + method + "' starts with 'get' but has arguments");
+			}
+			if (method.getReturnType() == void.class) {
+				throw new IllegalArgumentException("Method '" + method
+						+ "' starts with 'get' but does not return anything");
+			}
+			if (methodInfo == null) {
+				attributeMethodMap.put(varName, new AttributeMethodInfo(varName, attributeMethodInfo.getDescription(),
+						method, null));
+			} else {
+				// setter must have already started our method-info, add the getter to it
+				methodInfo.getterMethod = method;
+			}
+		} else if (methodName.startsWith("set")) {
+			if (method.getParameterTypes().length != 1) {
+				throw new IllegalArgumentException("Method '" + method
+						+ "' starts with 'set' but does not have 1 argument");
+			}
+			if (method.getReturnType() != void.class) {
+				throw new IllegalArgumentException("Method '" + method + "' starts with 'set' but does not return void");
+			}
+			if (methodInfo == null) {
+				attributeMethodMap.put(varName, new AttributeMethodInfo(varName, attributeMethodInfo.getDescription(),
+						null, method));
+			} else {
+				// getter must have already started our method-info, add the setter to it
+				methodInfo.setterMethod = method;
+			}
+		} else {
+			throw new IllegalArgumentException("Method '" + method
+					+ "' is marked as an attribute but does not start with 'get' or 'set'");
 		}
 	}
 

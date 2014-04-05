@@ -240,8 +240,15 @@ public class JmxServer {
 	 * Register the object parameter for exposure with JMX that is wrapped using the PublishAllBeanWrapper.
 	 */
 	public synchronized ObjectName register(PublishAllBeanWrapper wrapper) throws JMException {
-		return register(wrapper, wrapper.getJmxResourceInfo(), wrapper.getAttributeFieldInfos(),
-				wrapper.getAttributeMethodInfos(), wrapper.getOperationInfos());
+		ReflectionMbean mbean;
+		try {
+			mbean = new ReflectionMbean(wrapper);
+		} catch (Exception e) {
+			throw createJmException("Could not build MBean object for publis-all: " + wrapper.getDelegate(), e);
+		}
+		ObjectName objectName = ObjectNameUtil.makeObjectName(wrapper.getJmxResourceInfo());
+		doRegister(objectName, mbean);
+		return objectName;
 	}
 
 	/**
@@ -294,7 +301,9 @@ public class JmxServer {
 		}
 		ReflectionMbean mbean;
 		try {
-			mbean = new ReflectionMbean(obj, description, attributeFieldInfos, attributeMethodInfos, operationInfos);
+			mbean =
+					new ReflectionMbean(obj, description, attributeFieldInfos, attributeMethodInfos, operationInfos,
+							false);
 		} catch (Exception e) {
 			throw createJmException("Could not build MBean object for: " + obj, e);
 		}
