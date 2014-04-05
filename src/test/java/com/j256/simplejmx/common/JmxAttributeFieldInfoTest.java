@@ -13,7 +13,7 @@ public class JmxAttributeFieldInfoTest {
 		boolean isWritable = true;
 		String desc = "fjewpofjewf";
 		JmxAttributeFieldInfo info = new JmxAttributeFieldInfo(name, isReadable, isWritable, desc);
-		assertEquals(name, info.getName());
+		assertEquals(name, info.getFieldName());
 		assertEquals(isReadable, info.isReadible());
 		assertEquals(isWritable, info.isWritable());
 		assertEquals(desc, info.getDescription());
@@ -23,8 +23,8 @@ public class JmxAttributeFieldInfoTest {
 	public void testGetSet() {
 		JmxAttributeFieldInfo info = new JmxAttributeFieldInfo();
 		String name = "field";
-		info.setName(name);
-		assertEquals(name, info.getName());
+		info.setFieldName(name);
+		assertEquals(name, info.getFieldName());
 		boolean isReadable = false;
 		info.setReadible(isReadable);
 		assertEquals(isReadable, info.isReadible());
