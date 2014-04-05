@@ -8,7 +8,7 @@ package com.j256.simplejmx.common;
  */
 public class JmxAttributeFieldInfo {
 
-	public String name;
+	public String fieldName;
 	public boolean isReadible = true;
 	public boolean isWritable;
 	public String description;
@@ -17,29 +17,37 @@ public class JmxAttributeFieldInfo {
 		// for spring
 	}
 
-	public JmxAttributeFieldInfo(String name, boolean isReadible, boolean isWritable, String description) {
-		this.name = name;
+	public JmxAttributeFieldInfo(String fieldName, boolean isReadible, boolean isWritable, String description) {
+		this.fieldName = fieldName;
 		this.isReadible = isReadible;
 		this.isWritable = isWritable;
 		this.description = description;
 	}
 
-	public JmxAttributeFieldInfo(String name, JmxAttributeField jmxAttribute) {
-		this.name = name;
+	public JmxAttributeFieldInfo(String fieldName, JmxAttributeField jmxAttribute) {
+		this.fieldName = fieldName;
 		this.isReadible = jmxAttribute.isReadible();
 		this.isWritable = jmxAttribute.isWritable();
 		this.description = jmxAttribute.description();
 	}
 
-	public String getName() {
-		return name;
+	public String getFieldName() {
+		return fieldName;
+	}
+
+	/**
+	 * @deprecated Should use {@link #setFieldName(String)}.
+	 */
+	@Deprecated
+	public void setName(String name) {
+		this.fieldName = name;
 	}
 
 	/**
 	 * Required.
 	 */
-	public void setName(String name) {
-		this.name = name;
+	public void setFieldName(String fieldName) {
+		this.fieldName = fieldName;
 	}
 
 	public boolean isReadible() {
@@ -73,5 +81,10 @@ public class JmxAttributeFieldInfo {
 	 */
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	@Override
+	public String toString() {
+		return fieldName + '(' + (isReadible ? "r" : "") + (isWritable ? "w" : "") + ')';
 	}
 }

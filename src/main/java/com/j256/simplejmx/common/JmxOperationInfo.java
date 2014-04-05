@@ -95,6 +95,11 @@ public class JmxOperationInfo {
 		this.description = description;
 	}
 
+	@Override
+	public String toString() {
+		return methodName;
+	}
+
 	/**
 	 * An enumerated version of the constants from {@link MBeanOperationInfo}.
 	 */
