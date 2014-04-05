@@ -1,10 +1,11 @@
-1.9: 3/??/2014
+1.9: 4/5/2014
 	* Fixed a bug with leading capital attributes in web mode.  Should not downcase them.
 	* Fixed a small bug in the auto generated descriptions for operations.
-	* Added show all beans for easier bean scraping.
+	* Fixed some problems with PublishAllBeanWrapper.  Added validation.
+	* Added better support for running a JmxServer with an existing platform MBeanServer.  Thanks to sfrenkiel.
+	* Added show all beans to the web output for easier bean scraping by spider.
 	* Improved the web displaying of description information for beans, attributes, and operations.
-	* Return ObjectName from the JmxServer register methods.  BeanPublisher not unregisters beans appropriately.
-	* Added better support for running a JmxServer with an existing platform MBeanServer.
+	* Return ObjectName from the JmxServer register methods.  BeanPublisher now unregisters beans appropriately.
 
 1.8: 2/25/2014
 	* Added support for PublishAllBeanWrapper which exposes all public fields and methods as attributes and operations.

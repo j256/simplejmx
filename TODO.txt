@@ -2,7 +2,10 @@
 Used to maintain requested features or future work.
 ===================================================
 
-- Look into attributes on each of the operation parameters
+- add documentation about the system properties for exposing JMX from JVM args
+	- benefits of not doing it that way
+
+- look into attributes on each of the operation parameters
 
 - look into a setting that secures the server-side connections
 	- password files?
@@ -13,7 +16,6 @@ Used to maintain requested features or future work.
 	- maybe a test program instead
 	- show the bean names
 	- show the naming strategy
-	- still need naming strategy
 
 - add support for the Descriptor information on a class, method, or field basis:
 	- defaultValue
@@ -21,5 +23,9 @@ Used to maintain requested features or future work.
 	- enabled
 	- units
 
-- have the client be able to access a bean by its class.
+- have the JMX client be able to access a bean by its class.
 	- it would use the annotations to determine the domain and object-name
+	- jmxClient.get(Foo.class)
+
+- how about a HTTP proxy server
+	- exposes all beans that the server that it is pointed to exposes

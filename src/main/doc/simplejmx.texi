@@ -6,9 +6,9 @@
 @c %**end of header
 
 @c ----------------------------------------------------------------
-@set simplejmx_version 1.8
+@set simplejmx_version 1.9
 @set simplejmx_year 2014
-@set simplejmx_date February @value{simplejmx_year}
+@set simplejmx_date April @value{simplejmx_year}
 @set package SimpleJMX
 @c ----------------------------------------------------------------
 
@@ -461,6 +461,7 @@ This optional field is used by the JMX system to describe what sort of work is b
 @section Starting a JMX Server
 
 @cindex start a JMX server
+@cindex JmxServer
 The @code{JmxServer} class proves a server that jconsole and other JMX clients can connect to.  The easiest way to do this is
 to choose a port to use, define the server, and then start it:
 
@@ -469,6 +470,18 @@ to choose a port to use, define the server, and then start it:
 JmxServer jmxServer = new JmxServer(8000);
 // start our server
 jmxServer.start();
+@end example
+
+@cindex MBeanServer
+@cindex platform MBeanServer
+@cindex using platform MBeanServer
+@cindex ManagementFactory
+Instead of starting your own server, you can have the @code{JmxServer} make use of the @code{MBeanServer} that was started
+by the JVM platform.  It gets the server from a call to @code{ManagementFactory.getPlatformMBeanServer()}.
+
+@example
+// define a server that makes use of the platform MBeanServer 
+JmxServer jmxServer = new JmxServer(true);
 @end example
 
 Before your program exits, it is best to stop the server, so the following try/finally block is a good pattern to use:
@@ -602,14 +615,18 @@ jmxServer.register(someObject,
    attributeFieldInfos, attributeMethodInfos, operationInfos);
 @end example
 
+For more information, take a look at the random-object example program.  @xref{random object example}.
+
+@cindex publish all public
+@cindex all public info
+@cindex public fields, methods
 @cindex PublishAllBeanWrapper
-@cindex all public fields, methods
 You can also use the @code{PublishAllBeanWrapper} which exposes all public fields and methods as attributes or operations.
 All public fields will be exposed as an attribute and if not-final will be exposed as writable.  All public methods that
 start with @code{is} or @code{get} will be exposed as attributes and if they have a @code{set} method will be writable.
 All other public methods will be exposed as operations. 
 
-Take a look at the random-object example program for a working example.  @xref{random object example}.
+Take a look at the publish-all example program to see working code that uses this class.  @xref{publish all example}.
 
 @c ----------------------------------------------------------------
 @node Using Client, Using With Spring, Programmatic Publishing, Using
@@ -754,15 +771,15 @@ the @code{JmxSelfNaming} interface with the help of the @code{JmxBean} class:
 </bean>
 @end example
 
-For a working example, take a look at the spring example program.  @xref{spring framework example}.
+Take a look at the spring example program to see working code that uses this class.  @xref{spring framework example}.
 
 @c ----------------------------------------------------------------
 @node Exposing via HTTP, Examples, Using With Spring, Using
 @section Exposing Beans Over HTTP
 
 @cindex web server
-@cindex http
-@cindex jmx via web
+@cindex HTTP
+@cindex JMX via web
 @cindex publish via http
 SimpleJMX contains a simple web-server implementation that uses Jetty so that you can access
 JMX information from a web browser or other web client using the @code{JmxWebServer} class.  To use this class you
@@ -784,7 +801,7 @@ We recommend that you run the JMX server even if you are planning to use the web
 register beans via the @code{JmxServer} and any beans added to the platform @code{MBeanServer} will be visible via your
 browser.
 
-For a working example, take a look at the web server example program.  @xref{web server example}.
+Take a look at the web-server example program to see working code that uses this class.  @xref{web server example}.
 
 @c ----------------------------------------------------------------
 @node Examples, License, Exposing via HTTP, Top

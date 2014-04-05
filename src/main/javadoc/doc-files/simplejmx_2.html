@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html401/loose.dtd">
 <html>
-<!-- Created on February 25, 2014 by texi2html 1.82
+<!-- Created on April 5, 2014 by texi2html 1.82
 texi2html was written by: 
             Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -556,6 +556,7 @@ length as the <code>parameterNames</code> array.
 <h2 class="section">2.4 Starting a JMX Server</h2>
 
 <a name="index-start-a-JMX-server"></a>
+<a name="index-JmxServer"></a>
 <p>The <code>JmxServer</code> class proves a server that jconsole and other JMX clients can connect to.  The easiest way to do this is
 to choose a port to use, define the server, and then start it:
 </p>
@@ -563,6 +564,17 @@ to choose a port to use, define the server, and then start it:
 JmxServer jmxServer = new JmxServer(8000);
 // start our server
 jmxServer.start();
+</pre></td></tr></table>
+
+<a name="index-MBeanServer"></a>
+<a name="index-platform-MBeanServer"></a>
+<a name="index-using-platform-MBeanServer"></a>
+<a name="index-ManagementFactory"></a>
+<p>Instead of starting your own server, you can have the <code>JmxServer</code> make use of the <code>MBeanServer</code> that was started
+by the JVM platform.  It gets the server from a call to <code>ManagementFactory.getPlatformMBeanServer()</code>.
+</p>
+<table><tr><td>&nbsp;</td><td><pre class="example">// define a server that makes use of the platform MBeanServer 
+JmxServer jmxServer = new JmxServer(true);
 </pre></td></tr></table>
 
 <p>Before your program exits, it is best to stop the server, so the following try/finally block is a good pattern to use:
@@ -723,14 +735,18 @@ exposed through get/set/is methods:
    attributeFieldInfos, attributeMethodInfos, operationInfos);
 </pre></td></tr></table>
 
+<p>For more information, take a look at the random-object example program.  See <a href="simplejmx_3.html#random-object-example">random object example</a>.
+</p>
+<a name="index-publish-all-public"></a>
+<a name="index-all-public-info"></a>
+<a name="index-public-fields_002c-methods"></a>
 <a name="index-PublishAllBeanWrapper"></a>
-<a name="index-all-public-fields_002c-methods"></a>
 <p>You can also use the <code>PublishAllBeanWrapper</code> which exposes all public fields and methods as attributes or operations.
 All public fields will be exposed as an attribute and if not-final will be exposed as writable.  All public methods that
 start with <code>is</code> or <code>get</code> will be exposed as attributes and if they have a <code>set</code> method will be writable.
 All other public methods will be exposed as operations. 
 </p>
-<p>Take a look at the random-object example program for a working example.  See <a href="simplejmx_3.html#random-object-example">random object example</a>.
+<p>Take a look at the publish-all example program to see working code that uses this class.  See <a href="simplejmx_3.html#publish-all-example">publish all example</a>.
 </p>
 <hr size="6">
 <a name="Using-Client"></a>
@@ -900,7 +916,7 @@ the <code>JmxSelfNaming</code> interface with the help of the <code>JmxBean</cod
 &lt;/bean&gt;
 </pre></td></tr></table>
 
-<p>For a working example, take a look at the spring example program.  See <a href="simplejmx_3.html#spring-framework-example">spring framework example</a>.
+<p>Take a look at the spring example program to see working code that uses this class.  See <a href="simplejmx_3.html#spring-framework-example">spring framework example</a>.
 </p>
 <hr size="6">
 <a name="Exposing-via-HTTP"></a>
@@ -924,11 +940,12 @@ the <code>JmxSelfNaming</code> interface with the help of the <code>JmxBean</cod
 <h2 class="section">2.9 Exposing Beans Over HTTP</h2>
 
 <a name="index-web-server"></a>
-<a name="index-http"></a>
-<a name="index-jmx-via-web"></a>
+<a name="index-HTTP"></a>
+<a name="index-JMX-via-web"></a>
 <a name="index-publish-via-http"></a>
-<p>SimpleJMX contains a simple web-server implementation that uses Jetty (if in the classpath) so that you can access
-JMX information from a web browser or other web client using the <code>JmxWebServer</code> class.
+<p>SimpleJMX contains a simple web-server implementation that uses Jetty so that you can access
+JMX information from a web browser or other web client using the <code>JmxWebServer</code> class.  To use this class you
+need to provide a Jetty version in your dependency list or classpath.
 </p>
 <table><tr><td>&nbsp;</td><td><pre class="example">// first start the jmx server
 JmxServer jmxServer = new JmxServer(JMX_PORT);
@@ -945,7 +962,7 @@ jmxWebServer.start();
 register beans via the <code>JmxServer</code> and any beans added to the platform <code>MBeanServer</code> will be visible via your
 browser.
 </p>
-<p>For a working example, take a look at the web server example program.  See <a href="simplejmx_3.html#web-server-example">web server example</a>.
+<p>Take a look at the web-server example program to see working code that uses this class.  See <a href="simplejmx_3.html#web-server-example">web server example</a>.
 </p>
 <hr size="6">
 <table cellpadding="1" cellspacing="1" border="0">
@@ -963,7 +980,7 @@ browser.
 </tr></table>
 <p>
  <font size="-1">
-  This document was generated by <em>Gray Watson</em> on <em>February 25, 2014</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
+  This document was generated by <em>Gray Watson</em> on <em>April 5, 2014</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
  </font>
  <br>
 
