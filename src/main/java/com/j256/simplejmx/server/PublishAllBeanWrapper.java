@@ -41,16 +41,16 @@ public class PublishAllBeanWrapper {
 	}
 
 	/**
-	 * @param delegate
+	 * @param target
 	 *            Object that we are exposing.
 	 * @param jmxResourceInfo
 	 *            Resource information about the bean.
 	 */
-	public PublishAllBeanWrapper(Object delegate, JmxResourceInfo jmxResourceInfo) {
-		this.target = delegate;
+	public PublishAllBeanWrapper(Object target, JmxResourceInfo jmxResourceInfo) {
+		this.target = target;
 		this.jmxResourceInfo = jmxResourceInfo;
 		if (jmxResourceInfo.getJmxBeanName() == null) {
-			jmxResourceInfo.setJmxBeanName(delegate.getClass().getSimpleName());
+			jmxResourceInfo.setJmxBeanName(target.getClass().getSimpleName());
 		}
 	}
 
@@ -66,6 +66,9 @@ public class PublishAllBeanWrapper {
 		this.target = delegate;
 	}
 
+	/**
+	 * Required bean that we are wrapping.
+	 */
 	public void setTarget(Object target) {
 		this.target = target;
 	}
@@ -74,6 +77,9 @@ public class PublishAllBeanWrapper {
 		return jmxResourceInfo;
 	}
 
+	/**
+	 * Required resource information to provide domain and name information for the bean.
+	 */
 	public void setJmxResourceInfo(JmxResourceInfo jmxResourceInfo) {
 		this.jmxResourceInfo = jmxResourceInfo;
 	}
