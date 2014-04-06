@@ -36,7 +36,7 @@ import com.j256.simplejmx.common.JmxResource;
  */
 public class ReflectionMbean implements DynamicMBean {
 
-	private final Object delegate;
+	private final Object target;
 	private final String description;
 	private final Map<String, AttributeMethodInfo> attributeMethodMap = new HashMap<String, AttributeMethodInfo>();
 	private final Map<NameParams, Method> operationMethodMap = new HashMap<NameParams, Method>();
@@ -44,10 +44,10 @@ public class ReflectionMbean implements DynamicMBean {
 	private final MBeanInfo mbeanInfo;
 
 	/**
-	 * Create a mbean associated with a delegate object that must have a {@link JmxResource} annotation.
+	 * Create a mbean associated with a target object that must have a {@link JmxResource} annotation.
 	 */
-	public ReflectionMbean(Object delegate, String description) {
-		this(delegate, description, null, null, null, false);
+	public ReflectionMbean(Object target, String description) {
+		this(target, description, null, null, null, false);
 	}
 
 	/**
@@ -59,12 +59,12 @@ public class ReflectionMbean implements DynamicMBean {
 	}
 
 	/**
-	 * Create a mbean associated with a delegate object with user provided attribute and operation information.
+	 * Create a mbean associated with a target object with user provided attribute and operation information.
 	 */
-	public ReflectionMbean(Object delegate, String description, JmxAttributeFieldInfo[] attributeFieldInfos,
+	public ReflectionMbean(Object target, String description, JmxAttributeFieldInfo[] attributeFieldInfos,
 			JmxAttributeMethodInfo[] attributeMethodInfos, JmxOperationInfo[] operationInfos, boolean ignoreErrors) {
-		this.delegate = delegate;
-		this.description = preprocessDescription(delegate, description);
+		this.target = target;
+		this.description = preprocessDescription(target, description);
 		this.mbeanInfo = buildMbeanInfo(attributeFieldInfos, attributeMethodInfos, operationInfos, ignoreErrors);
 	}
 
@@ -87,10 +87,10 @@ public class ReflectionMbean implements DynamicMBean {
 			}
 			try {
 				// get the value by using reflection on the Field
-				return fieldInfo.field.get(delegate);
+				return fieldInfo.field.get(target);
 			} catch (Exception e) {
 				throw new ReflectionException(e, "Invoking getter attribute on field " + fieldInfo.field.getName()
-						+ " on " + delegate.getClass() + " threw exception");
+						+ " on " + target.getClass() + " threw exception");
 			}
 		} else {
 			if (methodInfo.getterMethod == null) {
@@ -98,10 +98,10 @@ public class ReflectionMbean implements DynamicMBean {
 			}
 			try {
 				// get the value by calling the method
-				return methodInfo.getterMethod.invoke(delegate);
+				return methodInfo.getterMethod.invoke(target);
 			} catch (Exception e) {
 				throw new ReflectionException(e, "Invoking getter attribute method "
-						+ methodInfo.getterMethod.getName() + " on " + delegate.getClass() + " threw exception");
+						+ methodInfo.getterMethod.getName() + " on " + target.getClass() + " threw exception");
 			}
 		}
 	}
@@ -132,20 +132,20 @@ public class ReflectionMbean implements DynamicMBean {
 				throwUnknownAttributeException(attribute.getName());
 			}
 			try {
-				fieldInfo.field.set(delegate, attribute.getValue());
+				fieldInfo.field.set(target, attribute.getValue());
 			} catch (Exception e) {
 				throw new ReflectionException(e, "Invoking setter attribute on field " + fieldInfo.field.getName()
-						+ " on " + delegate.getClass() + " threw exception");
+						+ " on " + target.getClass() + " threw exception");
 			}
 		} else {
 			if (methodInfo.setterMethod == null) {
 				throwUnknownAttributeException(attribute.getName());
 			}
 			try {
-				methodInfo.setterMethod.invoke(delegate, attribute.getValue());
+				methodInfo.setterMethod.invoke(target, attribute.getValue());
 			} catch (Exception e) {
 				throw new ReflectionException(e, "Invoking setter attribute method "
-						+ methodInfo.setterMethod.getName() + " on " + delegate.getClass() + " threw exception");
+						+ methodInfo.setterMethod.getName() + " on " + target.getClass() + " threw exception");
 			}
 		}
 	}
@@ -178,16 +178,16 @@ public class ReflectionMbean implements DynamicMBean {
 					+ "' with parameter types " + Arrays.toString(signatureTypes)));
 		}
 		try {
-			return method.invoke(delegate, params);
+			return method.invoke(target, params);
 		} catch (Exception e) {
 			throw new ReflectionException(e, "Invoking operation method " + method.getName() + " on "
-					+ delegate.getClass() + " threw exception");
+					+ target.getClass() + " threw exception");
 		}
 	}
 
-	private static String preprocessDescription(Object delegate, String description) {
+	private static String preprocessDescription(Object target, String description) {
 		if (description == null) {
-			return "Information about " + delegate.getClass();
+			return "Information about " + target.getClass();
 		} else {
 			return description;
 		}
@@ -221,7 +221,7 @@ public class ReflectionMbean implements DynamicMBean {
 			}
 		}
 
-		Class<?> clazz = delegate.getClass();
+		Class<?> clazz = target.getClass();
 		Method[] methods = clazz.getMethods();
 		List<MBeanAttributeInfo> attributes = new ArrayList<MBeanAttributeInfo>();
 		discoverAttributeMethods(methods, attributes, attributeMethodInfoMap, ignoreErrors);
@@ -330,7 +330,7 @@ public class ReflectionMbean implements DynamicMBean {
 	 */
 	private void discoverAttributeFields(List<MBeanAttributeInfo> attributes,
 			Map<String, JmxAttributeFieldInfo> attributeFieldInfoMap) {
-		Class<?> clazz = delegate.getClass();
+		Class<?> clazz = target.getClass();
 		Field[] fields = clazz.getDeclaredFields();
 		for (Field field : fields) {
 			JmxAttributeField attributeField = field.getAnnotation(JmxAttributeField.class);
