@@ -129,14 +129,7 @@ public class JmxHandler extends AbstractHandler {
 			invokeOperation(request, writer, textOnly, pathInfo);
 			appendFooter(writer, textOnly);
 		} else {
-			if (textOnly) {
-				response.sendError(Response.SC_NOT_FOUND);
-			} else {
-				appendHeader(writer, textOnly);
-				writer.append("Unknown command: " + makeHtmlSafe(command) + " <br />\n");
-				appendBackToRoot(writer, textOnly);
-				appendFooter(writer, textOnly);
-			}
+			response.sendError(Response.SC_NOT_FOUND);
 		}
 	}
 
@@ -251,22 +244,19 @@ public class JmxHandler extends AbstractHandler {
 				writer.append(name + (attribute.isWritable() ? "*" : "") + "=" + valueString + "\n");
 				continue;
 			}
-			if (attribute.isWritable()) {
-				writer.append("<form action='/" + COMMAND_ASSIGN_ATTRIBUTE + "/" + makeHtmlSafe(objectName.toString())
-						+ "/" + makeHtmlSafe(name) + "' name='" + makeHtmlSafe(name) + "'>\n");
-			}
 			writer.append("<tr><td title='" + makeHtmlSafe(attribute.getDescription()) + "'> " + name + " </td>");
 			writer.append("<td> " + ClientUtils.displayType(attribute.getType(), value) + " </td>");
 			if (attribute.isWritable()) {
-				writer.append("<td><input name='" + PARAM_ATTRIBUTE_VALUE + "' value='" + makeHtmlSafe(valueString)
-						+ "' ></td>");
+				writer.append("<form action='/" + COMMAND_ASSIGN_ATTRIBUTE + "/" + makeHtmlSafe(objectName.toString())
+						+ "/" + makeHtmlSafe(name) + "' name='" + makeHtmlSafe(name) + "'>\n");
+				writer.append("<td>");
+				writer.append("<input name='" + PARAM_ATTRIBUTE_VALUE + "' value='" + makeHtmlSafe(valueString) + "' >");
+				writer.append("</td>");
+				writer.append("</form>\n");
 			} else {
 				writer.append("<td> " + ClientUtils.valueToString(value) + " </td>");
 			}
 			writer.append("</tr>\n");
-			if (attribute.isWritable()) {
-				writer.append("</form>\n");
-			}
 		}
 		if (!textOnly) {
 			writer.append("</table>\n");
@@ -308,9 +298,10 @@ public class JmxHandler extends AbstractHandler {
 			if (textOnly) {
 				writer.append(name);
 			} else {
+				writer.append("<tr>\n");
 				writer.append("<form action='/" + COMMAND_INVOKE_OPERATION + "/" + makeHtmlSafe(objectName.toString())
 						+ "/" + makeHtmlSafe(name) + "' name='" + makeHtmlSafe(name) + "'>\n");
-				writer.append("<tr><td title='" + makeHtmlSafe(operation.getDescription()) + "'> " + makeHtmlSafe(name)
+				writer.append("<td title='" + makeHtmlSafe(operation.getDescription()) + "'> " + makeHtmlSafe(name)
 						+ " </td>");
 				writer.append("<td> " + ClientUtils.displayType(operation.getReturnType(), null) + " </td>");
 			}
@@ -332,8 +323,8 @@ public class JmxHandler extends AbstractHandler {
 				}
 				writer.append("<td><input type='submit' value='" + makeHtmlSafe(name) + "' title='"
 						+ makeHtmlSafe(operation.getDescription()) + "' /></td>");
-				writer.append("</tr>\n");
 				writer.append("</form>\n");
+				writer.append("</tr>\n");
 			}
 		}
 		if (!textOnly) {
