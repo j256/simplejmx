@@ -2,20 +2,12 @@
 Used to maintain requested features or future work.
 ===================================================
 
-- add documentation about the system properties for exposing JMX from JVM args
-	- benefits of not doing it that way
-
 - look into attributes on each of the operation parameters
 
 - look into a setting that secures the server-side connections
 	- password files?
 	- username/password map?
 	- SSL support
-
-- put together some documentation for Spring
-	- maybe a test program instead
-	- show the bean names
-	- show the naming strategy
 
 - add support for the Descriptor information on a class, method, or field basis:
 	- defaultValue

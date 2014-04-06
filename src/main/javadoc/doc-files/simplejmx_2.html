@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html401/loose.dtd">
 <html>
-<!-- Created on April 5, 2014 by texi2html 1.82
+<!-- Created on April 6, 2014 by texi2html 1.82
 texi2html was written by: 
             Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -81,6 +81,8 @@ ul.toc {list-style: none}
 <tr><td align="left" valign="top"><a href="#Using-With-Spring">2.8 Using With the Spring Framework</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">          Using SimpleJMX with the Spring framework.
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Exposing-via-HTTP">2.9 Exposing Beans Over HTTP</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">          Using the internal web server to expose JMX beans.
+</td></tr>
+<tr><td align="left" valign="top"><a href="#Using-JVM-JMX-Server">2.10 Using the JVM JMX Server</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">       Using the JVM JMX server.
 </td></tr>
 </table>
 
@@ -922,7 +924,7 @@ the <code>JmxSelfNaming</code> interface with the help of the <code>JmxBean</cod
 <a name="Exposing-via-HTTP"></a>
 <table cellpadding="1" cellspacing="1" border="0">
 <tr><td valign="middle" align="left">[<a href="#Using-With-Spring" title="Previous section in reading order"> &lt; </a>]</td>
-<td valign="middle" align="left">[<a href="simplejmx_3.html#Examples" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Using-JVM-JMX-Server" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Using" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#Using" title="Up section"> Up </a>]</td>
@@ -965,6 +967,73 @@ browser.
 <p>Take a look at the web-server example program to see working code that uses this class.  See <a href="simplejmx_3.html#web-server-example">web server example</a>.
 </p>
 <hr size="6">
+<a name="Using-JVM-JMX-Server"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#Exposing-via-HTTP" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="simplejmx_3.html#Examples" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#Using" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Using" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="simplejmx_3.html#Examples" title="Next chapter"> &gt;&gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="simplejmx.html#Top" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[<a href="simplejmx_toc.html#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="simplejmx_5.html#Index-of-Concepts" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="simplejmx_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<a name="Using-the-JVM-JMX-Server"></a>
+<h2 class="section">2.10 Using the JVM JMX Server</h2>
+
+<a name="index-firewall"></a>
+<a name="index-platform-JMX-server"></a>
+<a name="index-JVM-JMX-server"></a>
+<a name="index-NAT"></a>
+<a name="index-authentication"></a>
+<a name="index-SSL-connections"></a>
+<a name="index-port-number"></a>
+<a name="index-system-properties"></a>
+<p>SimpleJMX allows you to start your own JMX server on a particular port.  One of the benefits of using the <code>JmxServer</code>
+server instead of the JVM platform server is that you can specify both the registry and server ports.  This allows you to
+better control what ports need to be exposed through a firewall. 
+</p>
+<p>Sometimes, however, you want to use the one that is built into JVM platform and that is enabled by command line parameters
+to the <code>java</code> command.  To enable JMX on the command-line you need to use the following system properties:
+</p>
+<ul>
+<li> <code>com.sun.management.jmxremote</code> &ndash; turns on JMX
+</li><li> <code>com.sun.management.jmxremote.port</code> &ndash; sets the registry port
+</li><li> <code>com.sun.management.jmxremote.authenticate</code> &ndash; enables or disables authentication
+</li><li> <code>com.sun.management.jmxremote.ssl</code> &ndash; enables or disables SSL connections
+</li></ul>
+
+<p>For example:
+</p>
+<table><tr><td>&nbsp;</td><td><pre class="example">java -Dcom.sun.management.jmxremote \
+	-Dcom.sun.management.jmxremote.port=9999 \
+	-Dcom.sun.management.jmxremote.authenticate=false \
+	-Dcom.sun.management.jmxremote.ssl=false \
+	-jar yourApplication.jar
+</pre></td></tr></table>
+
+<p><em>WARNING:</em> You should disable authentication and SSL only if necessary.  If you are trying to use
+JMX over an insecure network then this will create a security hole.
+</p>
+<p>JMX is actually a two connection protocol.  Your JMX client connects first to the RMI registry port which tells you what
+IP/port to call to connect to the application for JMX.  Depending on the complexity of your network configuration, it may
+be that the JVM attaches the JMX server to an IP that is not the one the application can connect to.  In this case, you
+may need to use the <code>java.rmi.server.hostname</code> property to define what name/IP the JMX server should report back.
+</p>
+<table><tr><td>&nbsp;</td><td><pre class="example">java -Dcom.sun.management.jmxremote \
+	-Dcom.sun.management.jmxremote.port=9999 \
+	...
+	-Djava.rmi.server.hostname=10.1.2.3 \
+	...
+</pre></td></tr></table>
+
+<hr size="6">
 <table cellpadding="1" cellspacing="1" border="0">
 <tr><td valign="middle" align="left">[<a href="#Using" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
 <td valign="middle" align="left">[<a href="simplejmx_3.html#Examples" title="Next chapter"> &gt;&gt; </a>]</td>
@@ -980,7 +1049,7 @@ browser.
 </tr></table>
 <p>
  <font size="-1">
-  This document was generated by <em>Gray Watson</em> on <em>April 5, 2014</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
+  This document was generated by <em>Gray Watson</em> on <em>April 6, 2014</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
  </font>
  <br>
 

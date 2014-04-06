@@ -147,6 +147,7 @@ For more extensive instructions, @pxref{Using}.
 * Using Client ::               Using the programmatic JMX client.
 * Using With Spring ::          Using SimpleJMX with the Spring framework.
 * Exposing via HTTP ::          Using the internal web server to expose JMX beans.
+* Using JVM JMX Server ::       Using the JVM JMX server.
 @end menu
 
 @c ----------------------------------------------------------------
@@ -774,7 +775,7 @@ the @code{JmxSelfNaming} interface with the help of the @code{JmxBean} class:
 Take a look at the spring example program to see working code that uses this class.  @xref{spring framework example}.
 
 @c ----------------------------------------------------------------
-@node Exposing via HTTP, Examples, Using With Spring, Using
+@node Exposing via HTTP, Using JVM JMX Server, Using With Spring, Using
 @section Exposing Beans Over HTTP
 
 @cindex web server
@@ -804,7 +805,59 @@ browser.
 Take a look at the web-server example program to see working code that uses this class.  @xref{web server example}.
 
 @c ----------------------------------------------------------------
-@node Examples, License, Exposing via HTTP, Top
+@node Using JVM JMX Server, Examples, Exposing via HTTP, Using
+@section Using the JVM JMX Server
+
+@cindex firewall
+@cindex platform JMX server
+@cindex JVM JMX server
+@cindex NAT
+@cindex authentication
+@cindex SSL connections
+@cindex port number
+@cindex system properties
+SimpleJMX allows you to start your own JMX server on a particular port.  One of the benefits of using the @code{JmxServer}
+server instead of the JVM platform server is that you can specify both the registry and server ports.  This allows you to
+better control what ports need to be exposed through a firewall. 
+
+Sometimes, however, you want to use the one that is built into JVM platform and that is enabled by command line parameters
+to the @code{java} command.  To enable JMX on the command-line you need to use the following system properties:
+
+@itemize
+@item @code{com.sun.management.jmxremote} -- turns on JMX
+@item @code{com.sun.management.jmxremote.port} -- sets the registry port
+@item @code{com.sun.management.jmxremote.authenticate} -- enables or disables authentication
+@item @code{com.sun.management.jmxremote.ssl} -- enables or disables SSL connections
+@end itemize
+
+For example:
+
+@example
+java -Dcom.sun.management.jmxremote \
+	-Dcom.sun.management.jmxremote.port=9999 \
+	-Dcom.sun.management.jmxremote.authenticate=false \
+	-Dcom.sun.management.jmxremote.ssl=false \
+	-jar yourApplication.jar
+@end example
+
+@emph{WARNING:} You should disable authentication and SSL only if necessary.  If you are trying to use
+JMX over an insecure network then this will create a security hole.
+
+JMX is actually a two connection protocol.  Your JMX client connects first to the RMI registry port which tells you what
+IP/port to call to connect to the application for JMX.  Depending on the complexity of your network configuration, it may
+be that the JVM attaches the JMX server to an IP that is not the one the application can connect to.  In this case, you
+may need to use the @code{java.rmi.server.hostname} property to define what name/IP the JMX server should report back.
+
+@example
+java -Dcom.sun.management.jmxremote \
+	-Dcom.sun.management.jmxremote.port=9999 \
+	...
+	-Djava.rmi.server.hostname=10.1.2.3 \
+	...
+@end example
+
+@c ----------------------------------------------------------------
+@node Examples, License, Using JVM JMX Server, Top
 @chapter Example Code
 
 @cindex examples of code
