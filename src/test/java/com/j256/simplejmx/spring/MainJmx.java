@@ -1,6 +1,5 @@
 package com.j256.simplejmx.spring;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.CountDownLatch;
@@ -16,9 +15,6 @@ import com.j256.simplejmx.common.JmxResource;
  */
 @JmxResource(domainName = "j256.simplejmx", beanName = "Main", description = "Main Jmx class")
 public class MainJmx {
-
-	// WARNING: not reentrant
-	private static DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss z");
 
 	private long start = System.currentTimeMillis();
 	private CountDownLatch shutdownLatch = new CountDownLatch(1);
@@ -65,6 +61,6 @@ public class MainJmx {
 	}
 
 	private String millisTimeToStart(long millis) {
-		return dateFormat.format(new Date(millis));
+		return new SimpleDateFormat("yyyy/MM/dd HH:mm:ss z").format(new Date(millis));
 	}
 }

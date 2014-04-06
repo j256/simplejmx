@@ -351,7 +351,7 @@ public class JmxClientTest {
 		int val2 = 524;
 		String result =
 				client.invokeOperationToString(objectName, "times", Short.toString(val1), Integer.toString(val2));
-		long times = val1 * val2;
+		int times = val1 * val2;
 		assertEquals(Long.toString(times), result);
 	}
 

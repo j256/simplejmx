@@ -26,9 +26,7 @@ public class JmxIntegrationTest {
 			server.start();
 			server.register(new TestObject(server));
 			server.register(new TestSubObject());
-			synchronized (this) {
-				this.wait();
-			}
+			Thread.sleep(1000000000);
 		} finally {
 			server.stop();
 		}
