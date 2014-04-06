@@ -9,8 +9,8 @@ package com.j256.simplejmx.common;
  */
 public class JmxAttributeMethodInfo {
 
-	public String methodName;
-	public String description;
+	private String methodName;
+	private String description;
 
 	public JmxAttributeMethodInfo() {
 		// for spring

@@ -8,10 +8,10 @@ package com.j256.simplejmx.common;
  */
 public class JmxAttributeFieldInfo {
 
-	public String fieldName;
-	public boolean isReadible = true;
-	public boolean isWritable;
-	public String description;
+	private String fieldName;
+	private boolean isReadible = true;
+	private boolean isWritable;
+	private String description;
 
 	public JmxAttributeFieldInfo() {
 		// for spring

@@ -13,11 +13,11 @@ import javax.management.MBeanOperationInfo;
  */
 public class JmxOperationInfo {
 
-	public String methodName;
-	public String[] parameterNames;
-	public String[] parameterDescriptions;
-	public OperationAction action = OperationAction.UNKNOWN;
-	public String description;
+	private String methodName;
+	private String[] parameterNames;
+	private String[] parameterDescriptions;
+	private OperationAction action = OperationAction.UNKNOWN;
+	private String description;
 
 	public JmxOperationInfo() {
 		// for spring

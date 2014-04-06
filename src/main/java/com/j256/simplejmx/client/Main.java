@@ -20,12 +20,12 @@ public class Main {
 	}
 
 	/**
-	 * This is public for testing purposes.
+	 * This is package for testing purposes.
 	 * 
 	 * @param throwOnError
 	 *            If true then throw an exception when we quit otherwise exit.
 	 */
-	public void doMain(String[] args, boolean throwOnError) throws Exception {
+	void doMain(String[] args, boolean throwOnError) throws Exception {
 		if (args.length == 0) {
 			usage(throwOnError, "no arguments specified");
 			return;
