@@ -18,7 +18,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
-public class JmxHandlerTest {
+public class JmxWebHandlerTest {
 
 	private static final int WEB_SERVER_PORT = 8080;
 	private static JmxWebServer webServer;

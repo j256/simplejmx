@@ -30,12 +30,11 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import com.j256.simplejmx.client.ClientUtils;
 
 /**
- * Simple JMX handler that displays JMX information for a HTTP request using Jetty. To use this class you need to
- * provide a Jetty version in your dependency list or classpath.
+ * Simple web handler that displays JMX information for a HTTP request. See {@link JmxWebServer}.
  * 
  * @author graywatson
  */
-public class JmxHandler extends AbstractHandler {
+public class JmxWebHandler extends AbstractHandler {
 
 	private static final String COMMAND_LIST_BEANS_IN_DOMAIN = "d";
 	private static final String COMMAND_SHOW_BEAN = "b";
