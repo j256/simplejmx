@@ -21,3 +21,4 @@ Used to maintain requested features or future work.
 
 - how about a HTTP proxy server
 	- exposes all beans that the server that it is pointed to exposes
+	- combination of a web-client and a jmx_client
