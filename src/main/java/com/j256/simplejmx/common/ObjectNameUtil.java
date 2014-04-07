@@ -120,7 +120,7 @@ public class ObjectNameUtil {
 	}
 
 	/**
-	 * Constructs an object-name from a domain-name and object-name.
+	 * Constructs an object-name from a string suitable to be passed to the {@link ObjectName} constructor.
 	 * 
 	 * @param objectNameString
 	 *            The entire object-name string in the form of something like
