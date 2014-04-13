@@ -1,24 +1,25 @@
 package com.j256.simplejmx.web;
 
-import org.eclipse.jetty.server.AbstractConnector;
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
-import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 /**
  * Simple web-server which exposes JMX beans via HTTP. To use this class you need to provide a Jetty version in your
  * dependency list or classpath.
  * 
+ * <p>
+ * <b>NOTE:</b> This class tries to support both Jetty version 8 and 9. If the
+ * {@code org.eclipse.jetty.server.nio.SelectChannelConnector} class is available it will assume you are using version 8
+ * otherwise version 9.
+ * </p>
+ * 
  * @author graywatson
  */
 public class JmxWebServer {
 
-	private static final int WEB_SERVER_MIN_THREADS = 1;
-	private static final int WEB_SERVER_MAX_THREADS = 5;
-
 	private int serverPort;
 	private Server server;
-	private SelectChannelConnector connector;
+	private final JettyConnectorFactory jettyConnectorFactory = getConnectorFactory();
 
 	public JmxWebServer() {
 		// for spring
@@ -33,13 +34,8 @@ public class JmxWebServer {
 	 */
 	public void start() throws Exception {
 		server = new Server();
-
-		// create the NIO connector
-		connector = new SelectChannelConnector();
-		connector.setPort(serverPort);
-		configConnector(connector);
+		Connector connector = jettyConnectorFactory.buildConnector(server, serverPort);
 		server.addConnector(connector);
-
 		server.setHandler(new JmxWebHandler());
 		server.start();
 	}
@@ -50,8 +46,6 @@ public class JmxWebServer {
 	public void stop() throws Exception {
 		server.stop();
 		server = null;
-		connector.close();
-		connector = null;
 	}
 
 	/**
@@ -61,16 +55,15 @@ public class JmxWebServer {
 		this.serverPort = serverPort;
 	}
 
-	private void configConnector(AbstractConnector conector) {
-		// turn on collection of statistics by Jetty
-		connector.setStatsOn(true);
-		// configure the thread pool for accepting connections
-		QueuedThreadPool threadPool = new QueuedThreadPool();
-		threadPool.setMinThreads(WEB_SERVER_MIN_THREADS);
-		threadPool.setMaxThreads(WEB_SERVER_MAX_THREADS);
-		threadPool.setName("web-server");
-		connector.setThreadPool(threadPool);
-		// set whether or not to reuse the addresses
-		connector.setReuseAddress(true);
+	/**
+	 * Try to figure out and return a connector factory compatible with either Jetty version 8 or 9.
+	 */
+	private JettyConnectorFactory getConnectorFactory() {
+		try {
+			Class.forName("org.eclipse.jetty.server.nio.SelectChannelConnector");
+			return new Jetty8ConnectorFactory();
+		} catch (Exception e) {
+			return new Jetty9ConnectorFactory();
+		}
 	}
 }

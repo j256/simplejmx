@@ -31,7 +31,9 @@ public class JmxWebHandlerTest {
 
 	@AfterClass
 	public static void afterClass() throws Exception {
-		webServer.stop();
+		if (webServer != null) {
+			webServer.stop();
+		}
 	}
 
 	@Test
