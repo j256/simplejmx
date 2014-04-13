@@ -44,9 +44,10 @@ Version @value{simplejmx_version} -- @value{simplejmx_date}
 @cindex author
 @cindex simple jmx
 @cindex jconsole
-This package provides some classes that publish object using Java's Management Extensions (JMX).   These published objects
-can be investigated with jconsole (Sun's graphical JMX user interface application) or another JMX client.  Included is also
-a programmatic JMX client which you can use to connect to and interrogate remote JMX servers.
+This package provides classes that simplify the publishing of objects using Java's Management Extensions (JMX). These
+published objects can be investigated with jconsole or another JMX client.  Included is also a programmatic JMX client
+which you can use to connect to and interrogate remote JMX servers as well as a web/HTTP interface so you can publish
+JMX beans to a browser or other web client.
 
 To get started quickly using SimpleJMX, @pxref{Quick Start}.  You can also take a look at the  the examples section of the
 document which has various working code packages. @xref{Examples}.

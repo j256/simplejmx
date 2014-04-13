@@ -116,7 +116,7 @@ public class JmxServer {
 	}
 
 	/**
-	 * Create a JmxServer wrapper around an existing MBeanServer. You may want to use this with
+	 * Create a JmxServer that uses an existing MBeanServer. You may want to use this with
 	 * {@link ManagementFactory#getPlatformMBeanServer()} to use the JVM platform's default server.
 	 * 
 	 * <p>
@@ -129,7 +129,9 @@ public class JmxServer {
 	}
 
 	/**
-	 * If you pass in true, this will create a JmxServer wrapper around the existing JVM platform's MBeanServer.
+	 * If you pass in true, this will create a JmxServer that uses the existing JVM platform's MBeanServer. This calls
+	 * through to the {@link ManagementFactory#getPlatformMBeanServer()} which will create one if it doesn't already
+	 * exist.
 	 */
 	public JmxServer(boolean usePlatformMBeanServer) {
 		if (usePlatformMBeanServer) {
