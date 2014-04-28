@@ -3,7 +3,7 @@ This package provides some Java classes to help with the publishing of objects u
 For more information, visit the home page:
 	http://256.com/sources/simplejmx/
 
-Online documentation can be found off the home page:
+Online documentation can be found off the home page.  Here are the Javadocs:
 	http://256.com/sources/simplejmx/javadoc/simplejmx/doc-files/simplejmx.html
 
 The git repository is:
@@ -12,7 +12,7 @@ The git repository is:
 Maven packages are published via the central repo:
 	http://repo1.maven.org/maven2/com/j256/simplejmx/simplejmx/
 
-Little sample working example program:
+Here's a little working example program:
 	http://256.com/sources/simplejmx/docs/example-simple
 
 Enjoy,
