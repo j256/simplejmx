@@ -148,7 +148,7 @@ public class JmxServer {
 	 */
 	public synchronized void start() throws JMException {
 		if (mbeanServer != null) {
-			// no-op
+			// if we've already assigned a mbean-server then there's nothing to start
 			return;
 		}
 		if (registryPort == 0) {

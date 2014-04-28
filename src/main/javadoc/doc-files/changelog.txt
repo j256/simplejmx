@@ -1,3 +1,6 @@
+1.10: 4/??/2014
+	* Added some provisional support for Jetty version 9.
+
 1.9: 4/5/2014
 	* Fixed a bug with leading capital attributes in web mode.  Should not downcase them.
 	* Fixed a small bug in the auto generated descriptions for operations.
