@@ -40,9 +40,15 @@ public class BeanPublisher implements InitializingBean, ApplicationContextAware,
 		// do the annotations
 		Map<String, Object> beans = applicationContext.getBeansOfType(null);
 		for (Object bean : beans.values()) {
+			// this seems to happen with MethodInvokingFactoryBean and maybe others
+			if (bean == null) {
+				continue;
+			}
 			// we handle @JmxResource annotations or JmxSelfNaming
 			ObjectName objectName = null;
-			if (bean.getClass().isAnnotationPresent(JmxResource.class) || bean instanceof JmxSelfNaming) {
+			if (bean instanceof JmxSelfNaming) {
+				objectName = jmxServer.register((JmxSelfNaming) bean);
+			} else if (bean.getClass().isAnnotationPresent(JmxResource.class)) {
 				objectName = jmxServer.register(bean);
 			} else if (bean instanceof JmxBean) {
 				JmxBean jmxBean = (JmxBean) bean;
@@ -51,8 +57,7 @@ public class BeanPublisher implements InitializingBean, ApplicationContextAware,
 								jmxBean.getAttributeFieldInfos(), jmxBean.getAttributeMethodInfos(),
 								jmxBean.getOperationInfos());
 			} else if (bean instanceof PublishAllBeanWrapper) {
-				PublishAllBeanWrapper wrapper = (PublishAllBeanWrapper) bean;
-				objectName = jmxServer.register(wrapper);
+				objectName = jmxServer.register((PublishAllBeanWrapper) bean);
 			}
 			if (objectName != null) {
 				registeredBeans.add(objectName);
