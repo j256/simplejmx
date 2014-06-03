@@ -1,5 +1,6 @@
-1.10: 4/??/2014
+1.10: 6/3/2014
 	* Added some provisional support for Jetty version 9.
+	* Fixed problem with Spring beans being null in some circumstances.
 
 1.9: 4/5/2014
 	* Fixed a bug with leading capital attributes in web mode.  Should not downcase them.

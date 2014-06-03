@@ -246,7 +246,7 @@ public class JmxServer {
 		try {
 			mbean = new ReflectionMbean(wrapper);
 		} catch (Exception e) {
-			throw createJmException("Could not build MBean object for publis-all: " + wrapper.getTarget(), e);
+			throw createJmException("Could not build mbean object for publish-all bean: " + wrapper.getTarget(), e);
 		}
 		ObjectName objectName = ObjectNameUtil.makeObjectName(wrapper.getJmxResourceInfo());
 		doRegister(objectName, mbean);
