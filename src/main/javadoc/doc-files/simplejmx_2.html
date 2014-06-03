@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html401/loose.dtd">
 <html>
-<!-- Created on April 6, 2014 by texi2html 1.82
+<!-- Created on June 3, 2014 by texi2html 1.82
 texi2html was written by: 
             Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -82,7 +82,7 @@ ul.toc {list-style: none}
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Exposing-via-HTTP">2.9 Exposing Beans Over HTTP</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">          Using the internal web server to expose JMX beans.
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Using-JVM-JMX-Server">2.10 Using the JVM JMX Server</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">       Using the JVM JMX server.
+<tr><td align="left" valign="top"><a href="#Using-JVM-JMX-Server">2.10 Using the JVM Platform JMX Server</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">       Using the JVM platform JMX server.
 </td></tr>
 </table>
 
@@ -984,8 +984,8 @@ browser.
 <td valign="middle" align="left">[<a href="simplejmx_5.html#Index-of-Concepts" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="simplejmx_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
-<a name="Using-the-JVM-JMX-Server"></a>
-<h2 class="section">2.10 Using the JVM JMX Server</h2>
+<a name="Using-the-JVM-Platform-JMX-Server"></a>
+<h2 class="section">2.10 Using the JVM Platform JMX Server</h2>
 
 <a name="index-firewall"></a>
 <a name="index-platform-JMX-server"></a>
@@ -999,8 +999,9 @@ browser.
 server instead of the JVM platform server is that you can specify both the registry and server ports.  This allows you to
 better control what ports need to be exposed through a firewall. 
 </p>
-<p>Sometimes, however, you want to use the one that is built into JVM platform and that is enabled by command line parameters
-to the <code>java</code> command.  To enable JMX on the command-line you need to use the following system properties:
+<p>Sometimes, however, you will instead want to use the JMX <code>MBeanServer</code> that is built into JVM platform and that is
+enabled by command line parameters to the <code>java</code> command.  To enable JMX on the command-line you need to use the
+following system properties:
 </p>
 <ul>
 <li> <code>com.sun.management.jmxremote</code> &ndash; turns on JMX
@@ -1019,12 +1020,12 @@ to the <code>java</code> command.  To enable JMX on the command-line you need to
 </pre></td></tr></table>
 
 <p><em>WARNING:</em> You should disable authentication and SSL only if necessary.  If you are trying to use
-JMX over an insecure network then this will create a security hole.
+JMX over an insecure network then this <em>will</em> create a security hole.
 </p>
-<p>JMX is actually a two connection protocol.  Your JMX client connects first to the RMI registry port which tells you what
+<p>JMX is actually a two connection protocol.  Your JMX client connects first to the RMI registry port which returns what
 IP/port to call to connect to the application for JMX.  Depending on the complexity of your network configuration, it may
-be that the JVM attaches the JMX server to an IP that is not the one the application can connect to.  In this case, you
-may need to use the <code>java.rmi.server.hostname</code> property to define what name/IP the JMX server should report back.
+be that the JVM attaches the JMX server to an IP that is not one that the client can contact.  In this case, you may need
+to use the <code>java.rmi.server.hostname</code> property to define what name/IP the RMI registry should report back.
 </p>
 <table><tr><td>&nbsp;</td><td><pre class="example">java -Dcom.sun.management.jmxremote \
 	-Dcom.sun.management.jmxremote.port=9999 \
@@ -1033,6 +1034,19 @@ may need to use the <code>java.rmi.server.hostname</code> property to define wha
 	...
 </pre></td></tr></table>
 
+<a name="index-MBeanServer-1"></a>
+<a name="index-platform-MBeanServer-1"></a>
+<a name="index-using-platform-MBeanServer-1"></a>
+<a name="index-ManagementFactory-1"></a>
+<p>To run the <code>JmxServer</code> but still use the <code>MBeanServer</code> that was started by the JVM platform, you use the
+<code>boolean</code> constructor and pass <code>true</code> to it:
+</p>
+<table><tr><td>&nbsp;</td><td><pre class="example">// define a server that makes use of the platform MBeanServer 
+JmxServer jmxServer = new JmxServer(true);
+</pre></td></tr></table>
+
+<p>There is also a <code>jmxServer.setUsePlatformMBeanServer(true)</code> method to use with Spring injection.
+</p>
 <hr size="6">
 <table cellpadding="1" cellspacing="1" border="0">
 <tr><td valign="middle" align="left">[<a href="#Using" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
@@ -1049,7 +1063,7 @@ may need to use the <code>java.rmi.server.hostname</code> property to define wha
 </tr></table>
 <p>
  <font size="-1">
-  This document was generated by <em>Gray Watson</em> on <em>April 6, 2014</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
+  This document was generated by <em>Gray Watson</em> on <em>June 3, 2014</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
  </font>
  <br>
 
