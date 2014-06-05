@@ -23,17 +23,18 @@ Little Sample Program
 http://256.com/sources/simplejmx/docs/example-simple
 -----------------------------------------------------------------------------
 
-// create the object we will be exposing with JMX
-RuntimeCounter counter = new RuntimeCounter();
 // create a new JMX server listening on a specific port
 JmxServer jmxServer = new JmxServer(JMX_PORT);
 // NOTE: you could also do: new JmxServer(ManagementFactory.getPlatformMBeanServer());
 // start our server
 jmxServer.start();
 
+// create the object we will be exposing with JMX
+RuntimeCounter counter = new RuntimeCounter();
 // register our object
 jmxServer.register(counter);
 ...
+// shutdown our server
 jmxServer.stop();
 ...
 
@@ -41,7 +42,7 @@ jmxServer.stop();
 public class RuntimeCounter {
 	private long startMillis = System.currentTimeMillis();
 
-	// we can annotate fields directly to be published in JMX, isReadible defaults to true
+	// we can annotate fields directly to be published, isReadible defaults to true
 	@JmxAttributeField(description = "Show runtime in seconds", isWritable = true)
 	private boolean showSeconds;
 
