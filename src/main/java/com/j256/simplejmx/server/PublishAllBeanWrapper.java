@@ -88,21 +88,23 @@ public class PublishAllBeanWrapper {
 		// run through all _public_ fields, add get/set, final is no-write
 
 		List<JmxAttributeFieldInfo> fieldInfos = new ArrayList<JmxAttributeFieldInfo>();
-		Field[] fields = target.getClass().getFields();
-		for (Field field : fields) {
-			fieldInfos.add(new JmxAttributeFieldInfo(field.getName(), true, !Modifier.isFinal(field.getModifiers()),
-					null));
+		for (Class<?> clazz = target.getClass(); clazz != Object.class; clazz = clazz.getSuperclass()) {
+			for (Field field : clazz.getFields()) {
+				fieldInfos.add(new JmxAttributeFieldInfo(field.getName(), true,
+						!Modifier.isFinal(field.getModifiers()), null));
+			}
 		}
 		return fieldInfos.toArray(new JmxAttributeFieldInfo[fieldInfos.size()]);
 	}
 
 	public JmxAttributeMethodInfo[] getAttributeMethodInfos() {
 		List<JmxAttributeMethodInfo> methodInfos = new ArrayList<JmxAttributeMethodInfo>();
-		Method[] methods = target.getClass().getMethods();
-		for (Method method : methods) {
-			String name = method.getName();
-			if (!ignoredMethods.contains(name) && isGetGetAttributeMethod(name)) {
-				methodInfos.add(new JmxAttributeMethodInfo(name, (String) null));
+		for (Class<?> clazz = target.getClass(); clazz != Object.class; clazz = clazz.getSuperclass()) {
+			for (Method method : clazz.getMethods()) {
+				String name = method.getName();
+				if (!ignoredMethods.contains(name) && isGetGetAttributeMethod(name)) {
+					methodInfos.add(new JmxAttributeMethodInfo(name, (String) null));
+				}
 			}
 		}
 		return methodInfos.toArray(new JmxAttributeMethodInfo[methodInfos.size()]);
@@ -110,11 +112,12 @@ public class PublishAllBeanWrapper {
 
 	public JmxOperationInfo[] getOperationInfos() {
 		List<JmxOperationInfo> operationInfos = new ArrayList<JmxOperationInfo>();
-		Method[] methods = target.getClass().getMethods();
-		for (Method method : methods) {
-			String name = method.getName();
-			if (!ignoredMethods.contains(name) && !isGetGetAttributeMethod(name)) {
-				operationInfos.add(new JmxOperationInfo(name, null, null, OperationAction.UNKNOWN, null));
+		for (Class<?> clazz = target.getClass(); clazz != Object.class; clazz = clazz.getSuperclass()) {
+			for (Method method : clazz.getMethods()) {
+				String name = method.getName();
+				if (!ignoredMethods.contains(name) && !isGetGetAttributeMethod(name)) {
+					operationInfos.add(new JmxOperationInfo(name, null, null, OperationAction.UNKNOWN, null));
+				}
 			}
 		}
 		return operationInfos.toArray(new JmxOperationInfo[operationInfos.size()]);

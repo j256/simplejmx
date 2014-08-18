@@ -181,6 +181,7 @@ public class ReflectionMbean implements DynamicMBean {
 	private MBeanInfo buildMbeanInfo(JmxAttributeFieldInfo[] attributeFieldInfos,
 			JmxAttributeMethodInfo[] attributeMethodInfos, JmxOperationInfo[] operationInfos, boolean ignoreErrors) {
 
+		// NOTE: setup the maps that track previous class configuration
 		Map<String, JmxAttributeFieldInfo> attributeFieldInfoMap = null;
 		if (attributeFieldInfos != null) {
 			attributeFieldInfoMap = new HashMap<String, JmxAttributeFieldInfo>();
@@ -203,15 +204,13 @@ public class ReflectionMbean implements DynamicMBean {
 			}
 		}
 
-		Class<?> clazz = target.getClass();
-		Method[] methods = clazz.getMethods();
 		List<MBeanAttributeInfo> attributes = new ArrayList<MBeanAttributeInfo>();
-		discoverAttributeMethods(methods, attributes, attributeMethodInfoMap, ignoreErrors);
-		// NOTE: fields override attribute methods
-		discoverAttributeFields(attributes, attributeFieldInfoMap);
-		List<MBeanOperationInfo> operations = discoverOperations(methods, attributeOperationInfoMap);
+		discoverAttributeFields(attributeFieldInfoMap, attributes);
+		// NOTE: methods override fields so subclasses can stop exposing of fields
+		discoverAttributeMethods(attributeMethodInfoMap, attributes, ignoreErrors);
+		List<MBeanOperationInfo> operations = discoverOperations(attributeOperationInfoMap);
 
-		return new MBeanInfo(clazz.getName(), description,
+		return new MBeanInfo(target.getClass().getName(), description,
 				attributes.toArray(new MBeanAttributeInfo[attributes.size()]), null,
 				operations.toArray(new MBeanOperationInfo[operations.size()]), null);
 	}
@@ -219,14 +218,22 @@ public class ReflectionMbean implements DynamicMBean {
 	/**
 	 * Find attribute methods from our object that will be exposed via JMX.
 	 */
-	private void discoverAttributeMethods(Method[] methods, List<MBeanAttributeInfo> attributes,
-			Map<String, JmxAttributeMethodInfo> attributeMethodInfoMap, boolean ignoreErrors) {
-		for (Method method : methods) {
+	private void discoverAttributeMethods(Map<String, JmxAttributeMethodInfo> attributeMethodInfoMap,
+			List<MBeanAttributeInfo> attributes, boolean ignoreErrors) {
+		for (Class<?> clazz = target.getClass(); clazz != Object.class; clazz = clazz.getSuperclass()) {
+			discoverAttributeMethods(attributes, attributeMethodInfoMap, ignoreErrors, clazz);
+		}
+	}
+
+	private void discoverAttributeMethods(List<MBeanAttributeInfo> attributes,
+			Map<String, JmxAttributeMethodInfo> attributeMethodInfoMap, boolean ignoreErrors, Class<?> clazz) {
+		for (Method method : clazz.getMethods()) {
 			JmxAttributeMethod jmxAttribute = method.getAnnotation(JmxAttributeMethod.class);
 			JmxAttributeMethodInfo attributeMethodInfo = null;
 			if (jmxAttribute == null) {
 				// skip it if no annotation
 				if (attributeMethodInfoMap != null) {
+					// was this attribute method already configured?
 					attributeMethodInfo = attributeMethodInfoMap.get(method.getName());
 				}
 				if (attributeMethodInfo == null) {
@@ -310,15 +317,22 @@ public class ReflectionMbean implements DynamicMBean {
 	/**
 	 * Find attribute methods from our object that will be exposed via JMX.
 	 */
+	private void discoverAttributeFields(Map<String, JmxAttributeFieldInfo> attributeFieldInfoMap,
+			List<MBeanAttributeInfo> attributes) {
+		for (Class<?> clazz = target.getClass(); clazz != Object.class; clazz = clazz.getSuperclass()) {
+			discoverAttributeFields(attributes, attributeFieldInfoMap, clazz);
+		}
+	}
+
 	private void discoverAttributeFields(List<MBeanAttributeInfo> attributes,
-			Map<String, JmxAttributeFieldInfo> attributeFieldInfoMap) {
-		Class<?> clazz = target.getClass();
+			Map<String, JmxAttributeFieldInfo> attributeFieldInfoMap, Class<?> clazz) {
 		Field[] fields = clazz.getDeclaredFields();
 		for (Field field : fields) {
 			JmxAttributeField attributeField = field.getAnnotation(JmxAttributeField.class);
 			JmxAttributeFieldInfo attributeFieldInfo = null;
 			if (attributeField == null) {
 				if (attributeFieldInfoMap != null) {
+					// was this attribute field already configured?
 					attributeFieldInfo = attributeFieldInfoMap.get(field.getName());
 				}
 				if (attributeFieldInfo == null) {
@@ -355,14 +369,22 @@ public class ReflectionMbean implements DynamicMBean {
 	/**
 	 * Find operation methods from our object that will be exposed via JMX.
 	 */
-	private List<MBeanOperationInfo> discoverOperations(Method[] methods,
-			Map<String, JmxOperationInfo> attributeOperationInfoMap) {
+	private List<MBeanOperationInfo> discoverOperations(Map<String, JmxOperationInfo> attributeOperationInfoMap) {
 		List<MBeanOperationInfo> operations = new ArrayList<MBeanOperationInfo>(operationMethodMap.size());
-		for (Method method : methods) {
+		for (Class<?> clazz = target.getClass(); clazz != Object.class; clazz = clazz.getSuperclass()) {
+			discoverOperations(attributeOperationInfoMap, operations, clazz);
+		}
+		return operations;
+	}
+
+	private void discoverOperations(Map<String, JmxOperationInfo> attributeOperationInfoMap,
+			List<MBeanOperationInfo> operations, Class<?> clazz) {
+		for (Method method : clazz.getMethods()) {
 			JmxOperation jmxOperation = method.getAnnotation(JmxOperation.class);
 			JmxOperationInfo operationInfo = null;
 			if (jmxOperation == null) {
 				if (attributeOperationInfoMap != null) {
+					// was this operation already configured?
 					operationInfo = attributeOperationInfoMap.get(method.getName());
 				}
 				if (operationInfo == null) {
@@ -394,7 +416,6 @@ public class ReflectionMbean implements DynamicMBean {
 			operations.add(new MBeanOperationInfo(methodName, description, parameterInfos, method.getReturnType()
 					.getName(), operationInfo.getAction().getActionValue()));
 		}
-		return operations;
 	}
 
 	/**

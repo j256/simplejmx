@@ -351,6 +351,27 @@ public class ReflectionMbeanTest {
 		server.register(isNotBoolean);
 	}
 
+	@Test
+	public void testAttributeFieldSubClass() throws Exception {
+		SubClassAttributeField obj = new SubClassAttributeField();
+		JmxClient client = new JmxClient(DEFAULT_PORT);
+		try {
+			server.register(obj);
+
+			obj.foo = 123213;
+			obj.notPrivate = 786451235;
+
+			List<Attribute> attributes =
+					client.getAttributes(DOMAIN_NAME, OBJECT_NAME, new String[] { "foo", "notPrivate" });
+			assertEquals(2, attributes.size());
+			assertEquals(obj.foo, attributes.get(0).getValue());
+			assertEquals(obj.notPrivate, attributes.get(1).getValue());
+		} finally {
+			server.unregister(obj);
+			client.close();
+		}
+	}
+
 	/* ======================================================================= */
 
 	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
@@ -460,6 +481,8 @@ public class ReflectionMbeanTest {
 		private int writeOnly = WRITE_ONLY_DEFAULT;
 		@JmxAttributeField(isReadible = false, isWritable = false)
 		private int neither = NEITHER_DEFAULT;
+		@JmxAttributeField
+		int notPrivate;
 		@SuppressWarnings("unused")
 		private int noAnnotation = 4;
 		@JmxOperation(description = "Do stuff")
@@ -500,5 +523,11 @@ public class ReflectionMbeanTest {
 		public String isFoo() {
 			return "";
 		}
+	}
+
+	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
+	protected static class SubClassAttributeField extends AttributeField {
+		@JmxAttributeField
+		private int foo;
 	}
 }

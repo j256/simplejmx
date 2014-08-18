@@ -38,10 +38,11 @@ public class PublishAllBeanWrapperTest {
 	public void testRegister() throws Exception {
 		TestObject obj = new TestObject();
 		JmxResourceInfo resourceInfo = new JmxResourceInfo(DOMAIN_NAME, OBJECT_NAME, "description");
-		JmxClient client;
+		PublishAllBeanWrapper publishAll = new PublishAllBeanWrapper(obj, resourceInfo);
+		JmxClient client = null;
 		try {
 			client = new JmxClient(DEFAULT_PORT);
-			server.register(new PublishAllBeanWrapper(obj, resourceInfo));
+			server.register(publishAll);
 
 			assertEquals(FOO_VALUE, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo"));
 			assertEquals(BAR_VALUE, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "bar"));
@@ -81,7 +82,33 @@ public class PublishAllBeanWrapperTest {
 			}
 
 		} finally {
-			server.unregister(obj);
+			server.unregister(resourceInfo);
+			if (client != null) {
+				client.close();
+			}
+		}
+	}
+
+	@Test
+	public void testSubClass() throws Exception {
+		SubClassTestObject obj = new SubClassTestObject();
+		JmxResourceInfo resourceInfo = new JmxResourceInfo(DOMAIN_NAME, OBJECT_NAME, "description");
+		PublishAllBeanWrapper publishAll = new PublishAllBeanWrapper(obj, resourceInfo);
+		JmxClient client = null;
+		try {
+			client = new JmxClient(DEFAULT_PORT);
+			server.register(publishAll);
+
+			obj.bar = 37634345;
+			obj.baz = 678934522;
+
+			assertEquals(obj.bar, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "bar"));
+			assertEquals(obj.baz, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "baz"));
+		} finally {
+			server.unregister(resourceInfo);
+			if (client != null) {
+				client.close();
+			}
 		}
 	}
 
@@ -101,6 +128,16 @@ public class PublishAllBeanWrapperTest {
 		}
 		public void resetFoo(int newValue) {
 			this.foo = newValue;
+		}
+	}
+
+	protected static class SubClassTestObject extends TestObject {
+		private int baz;
+		public int getBaz() {
+			return baz;
+		}
+		public void setBaz(int baz) {
+			this.baz = baz;
 		}
 	}
 }

@@ -1,5 +1,8 @@
-1.10: 6/3/2014
-	* Added some provisional support for Jetty version 9.
+1.11: 8/18/2014
+	* Added handling of base classes for field and method discovery with reflection MBean and publish-all wrapper.
+
+1.10: 6/4/2014
+	* Added some provisional support for Jetty version 9 using reflection.
 	* Fixed problem with Spring beans being null in some circumstances.
 
 1.9: 4/5/2014

@@ -339,7 +339,11 @@ public class JmxServer {
 	 * want it to be silent.
 	 */
 	public synchronized void unregisterThrow(Object obj) throws JMException {
-		unregisterThrow(ObjectNameUtil.makeObjectName(obj));
+		if (obj instanceof PublishAllBeanWrapper) {
+			unregisterThrow(ObjectNameUtil.makeObjectName(((PublishAllBeanWrapper)obj).getJmxResourceInfo()));
+		} else {
+			unregisterThrow(ObjectNameUtil.makeObjectName(obj));
+		}
 	}
 
 	/**
