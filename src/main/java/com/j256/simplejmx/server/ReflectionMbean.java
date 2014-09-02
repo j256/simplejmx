@@ -5,8 +5,10 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -204,10 +206,11 @@ public class ReflectionMbean implements DynamicMBean {
 			}
 		}
 
+		Set<String> attributeNameSet = new HashSet<String>();
 		List<MBeanAttributeInfo> attributes = new ArrayList<MBeanAttributeInfo>();
-		discoverAttributeFields(attributeFieldInfoMap, attributes);
 		// NOTE: methods override fields so subclasses can stop exposing of fields
-		discoverAttributeMethods(attributeMethodInfoMap, attributes, ignoreErrors);
+		discoverAttributeMethods(attributeMethodInfoMap, attributeNameSet, attributes, ignoreErrors);
+		discoverAttributeFields(attributeFieldInfoMap, attributeNameSet, attributes);
 		List<MBeanOperationInfo> operations = discoverOperations(attributeOperationInfoMap);
 
 		return new MBeanInfo(target.getClass().getName(), description,
@@ -219,14 +222,24 @@ public class ReflectionMbean implements DynamicMBean {
 	 * Find attribute methods from our object that will be exposed via JMX.
 	 */
 	private void discoverAttributeMethods(Map<String, JmxAttributeMethodInfo> attributeMethodInfoMap,
-			List<MBeanAttributeInfo> attributes, boolean ignoreErrors) {
+			Set<String> attributeNameSet, List<MBeanAttributeInfo> attributes, boolean ignoreErrors) {
 		for (Class<?> clazz = target.getClass(); clazz != Object.class; clazz = clazz.getSuperclass()) {
-			discoverAttributeMethods(attributes, attributeMethodInfoMap, ignoreErrors, clazz);
+			discoverAttributeMethods(attributeMethodInfoMap, attributeNameSet, attributes, ignoreErrors, clazz);
+		}
+		/*
+		 * we have to go back and post process the attribute-method-map because the getter and setter methods change the
+		 * method-info multiple times.
+		 */
+		for (AttributeMethodInfo methodInfo : attributeMethodMap.values()) {
+			attributes.add(new MBeanAttributeInfo(methodInfo.varName, methodInfo.type.getName(),
+					methodInfo.description, (methodInfo.getterMethod != null), (methodInfo.setterMethod != null),
+					methodInfo.isIs()));
+			attributeNameSet.add(methodInfo.varName);
 		}
 	}
 
-	private void discoverAttributeMethods(List<MBeanAttributeInfo> attributes,
-			Map<String, JmxAttributeMethodInfo> attributeMethodInfoMap, boolean ignoreErrors, Class<?> clazz) {
+	private void discoverAttributeMethods(Map<String, JmxAttributeMethodInfo> attributeMethodInfoMap,
+			Set<String> attributeNameSet, List<MBeanAttributeInfo> attributes, boolean ignoreErrors, Class<?> clazz) {
 		for (Method method : clazz.getMethods()) {
 			JmxAttributeMethod jmxAttribute = method.getAnnotation(JmxAttributeMethod.class);
 			JmxAttributeMethodInfo attributeMethodInfo = null;
@@ -245,26 +258,17 @@ public class ReflectionMbean implements DynamicMBean {
 			}
 
 			try {
-				discoverMethod(method, attributeMethodInfo);
+				discoverAttributeMethod(attributeNameSet, method, attributeMethodInfo);
 			} catch (IllegalArgumentException iae) {
 				if (!ignoreErrors) {
 					throw iae;
 				}
 			}
 		}
-
-		/*
-		 * we have to go back and post process the attribute-method-map because the getter and setter methods change the
-		 * method-info multiple times.
-		 */
-		for (AttributeMethodInfo methodInfo : attributeMethodMap.values()) {
-			attributes.add(new MBeanAttributeInfo(methodInfo.varName, methodInfo.type.getName(),
-					methodInfo.description, (methodInfo.getterMethod != null), (methodInfo.setterMethod != null),
-					methodInfo.isIs()));
-		}
 	}
 
-	private void discoverMethod(Method method, JmxAttributeMethodInfo attributeMethodInfo) {
+	private void discoverAttributeMethod(Set<String> attributeNameSet, Method method,
+			JmxAttributeMethodInfo attributeMethodInfo) {
 		String methodName = method.getName();
 		boolean isIs;
 		if (methodName.startsWith("is")) {
@@ -277,6 +281,9 @@ public class ReflectionMbean implements DynamicMBean {
 			isIs = false;
 		}
 		String varName = buildMethodSuffix(method, methodName, isIs);
+		if (attributeNameSet.contains(varName)) {
+			return;
+		}
 		AttributeMethodInfo methodInfo = attributeMethodMap.get(varName);
 		if (isIs || methodName.startsWith("get")) {
 			if (method.getParameterTypes().length != 0) {
@@ -318,51 +325,55 @@ public class ReflectionMbean implements DynamicMBean {
 	 * Find attribute methods from our object that will be exposed via JMX.
 	 */
 	private void discoverAttributeFields(Map<String, JmxAttributeFieldInfo> attributeFieldInfoMap,
-			List<MBeanAttributeInfo> attributes) {
+			Set<String> attributeNameSet, List<MBeanAttributeInfo> attributes) {
 		for (Class<?> clazz = target.getClass(); clazz != Object.class; clazz = clazz.getSuperclass()) {
-			discoverAttributeFields(attributes, attributeFieldInfoMap, clazz);
+			discoverAttributeFields(attributeFieldInfoMap, attributeNameSet, attributes, clazz);
 		}
 	}
 
-	private void discoverAttributeFields(List<MBeanAttributeInfo> attributes,
-			Map<String, JmxAttributeFieldInfo> attributeFieldInfoMap, Class<?> clazz) {
+	private void discoverAttributeFields(Map<String, JmxAttributeFieldInfo> attributeFieldInfoMap,
+			Set<String> attributeNameSet, List<MBeanAttributeInfo> attributes, Class<?> clazz) {
 		Field[] fields = clazz.getDeclaredFields();
 		for (Field field : fields) {
+			String fieldName = field.getName();
+			if (attributeNameSet.contains(fieldName)) {
+				continue;
+			}
 			JmxAttributeField attributeField = field.getAnnotation(JmxAttributeField.class);
 			JmxAttributeFieldInfo attributeFieldInfo = null;
 			if (attributeField == null) {
 				if (attributeFieldInfoMap != null) {
 					// was this attribute field already configured?
-					attributeFieldInfo = attributeFieldInfoMap.get(field.getName());
+					attributeFieldInfo = attributeFieldInfoMap.get(fieldName);
 				}
 				if (attributeFieldInfo == null) {
 					continue;
 				}
 			} else {
-				attributeFieldInfo = new JmxAttributeFieldInfo(field.getName(), attributeField);
+				attributeFieldInfo = new JmxAttributeFieldInfo(fieldName, attributeField);
 				attributeField = null;
 			}
 
 			if (!field.isAccessible()) {
 				field.setAccessible(true);
 			}
-			attributeFieldMap.put(field.getName(), new AttributeFieldInfo(field, attributeFieldInfo.isReadible(),
+			attributeFieldMap.put(fieldName, new AttributeFieldInfo(field, attributeFieldInfo.isReadible(),
 					attributeFieldInfo.isWritable()));
 
 			String description = attributeFieldInfo.getDescription();
 			if (isEmpty(description)) {
-				description = field.getName() + " attribute";
+				description = fieldName + " attribute";
 			}
 
 			boolean isIs;
-			if (field.getName().startsWith("is")
-					&& (field.getType() == boolean.class || field.getType() == Boolean.class)) {
+			if (fieldName.startsWith("is") && (field.getType() == boolean.class || field.getType() == Boolean.class)) {
 				isIs = true;
 			} else {
 				isIs = false;
 			}
-			attributes.add(new MBeanAttributeInfo(field.getName(), field.getType().getName(), description,
+			attributes.add(new MBeanAttributeInfo(fieldName, field.getType().getName(), description,
 					attributeFieldInfo.isReadible(), attributeFieldInfo.isWritable(), isIs));
+			attributeNameSet.add(fieldName);
 		}
 	}
 
@@ -370,31 +381,36 @@ public class ReflectionMbean implements DynamicMBean {
 	 * Find operation methods from our object that will be exposed via JMX.
 	 */
 	private List<MBeanOperationInfo> discoverOperations(Map<String, JmxOperationInfo> attributeOperationInfoMap) {
+		Set<MethodSignature> methodSignatureSet = new HashSet<MethodSignature>();
 		List<MBeanOperationInfo> operations = new ArrayList<MBeanOperationInfo>(operationMethodMap.size());
 		for (Class<?> clazz = target.getClass(); clazz != Object.class; clazz = clazz.getSuperclass()) {
-			discoverOperations(attributeOperationInfoMap, operations, clazz);
+			discoverOperations(attributeOperationInfoMap, methodSignatureSet, operations, clazz);
 		}
 		return operations;
 	}
 
 	private void discoverOperations(Map<String, JmxOperationInfo> attributeOperationInfoMap,
-			List<MBeanOperationInfo> operations, Class<?> clazz) {
+			Set<MethodSignature> methodSignatureSet, List<MBeanOperationInfo> operations, Class<?> clazz) {
 		for (Method method : clazz.getMethods()) {
+			MethodSignature methodSignature = new MethodSignature(method);
+			if (methodSignatureSet.contains(methodSignature)) {
+				continue;
+			}
+			String methodName = method.getName();
 			JmxOperation jmxOperation = method.getAnnotation(JmxOperation.class);
 			JmxOperationInfo operationInfo = null;
 			if (jmxOperation == null) {
 				if (attributeOperationInfoMap != null) {
 					// was this operation already configured?
-					operationInfo = attributeOperationInfoMap.get(method.getName());
+					operationInfo = attributeOperationInfoMap.get(methodName);
 				}
 				if (operationInfo == null) {
 					continue;
 				}
 			} else {
-				operationInfo = new JmxOperationInfo(method.getName(), jmxOperation);
+				operationInfo = new JmxOperationInfo(methodName, jmxOperation);
 				jmxOperation = null;
 			}
-			String methodName = method.getName();
 			if (methodName.startsWith("get") || methodName.startsWith("is") || methodName.startsWith("set")) {
 				throw new IllegalArgumentException("Operation method " + method
 						+ " cannot start with 'get', 'is', or 'set'.  Did you use the wrong annotation?");
@@ -415,6 +431,7 @@ public class ReflectionMbean implements DynamicMBean {
 
 			operations.add(new MBeanOperationInfo(methodName, description, parameterInfos, method.getReturnType()
 					.getName(), operationInfo.getAction().getActionValue()));
+			methodSignatureSet.add(methodSignature);
 		}
 	}
 
@@ -552,6 +569,38 @@ public class ReflectionMbean implements DynamicMBean {
 			this.field = field;
 			this.isGetter = isGetter;
 			this.isSetter = isSetter;
+		}
+	}
+
+	/**
+	 * Method signature that matches the name and parameter-types. We don't care about return type because Java doesn't
+	 * match methods using it.
+	 */
+	private static class MethodSignature {
+
+		final String name;
+		final Class<?>[] parameterTypes;
+
+		private MethodSignature(Method method) {
+			this.name = method.getName();
+			this.parameterTypes = method.getParameterTypes();
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = prime + name.hashCode();
+			result = prime * result + Arrays.hashCode(parameterTypes);
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (obj == null || getClass() != obj.getClass()) {
+				return false;
+			}
+			MethodSignature other = (MethodSignature) obj;
+			return name.equals(other.name) && Arrays.equals(parameterTypes, other.parameterTypes);
 		}
 	}
 }

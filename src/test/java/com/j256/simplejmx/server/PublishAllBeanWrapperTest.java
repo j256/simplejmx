@@ -104,6 +104,7 @@ public class PublishAllBeanWrapperTest {
 
 			assertEquals(obj.bar, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "bar"));
 			assertEquals(obj.baz, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "baz"));
+			assertEquals(3, client.getAttributesInfo(DOMAIN_NAME, OBJECT_NAME).length);
 		} finally {
 			server.unregister(resourceInfo);
 			if (client != null) {

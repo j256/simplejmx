@@ -3,9 +3,9 @@ package com.j256.simplejmx.client;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.management.Attribute;
@@ -34,6 +34,20 @@ public class JmxClient {
 	private JMXConnector jmxConnector;
 	private JMXServiceURL serviceUrl;
 	private MBeanServerConnection mbeanConn;
+
+	private final static Map<String, String> primitiveObjectMap = new HashMap<String, String>();
+
+	static {
+		primitiveObjectMap.put(boolean.class.getName(), Boolean.class.getName());
+		primitiveObjectMap.put(byte.class.getName(), Byte.class.getName());
+		primitiveObjectMap.put(char.class.getName(), Character.class.getName());
+		primitiveObjectMap.put(short.class.getName(), Short.class.getName());
+		primitiveObjectMap.put(int.class.getName(), Integer.class.getName());
+		primitiveObjectMap.put(long.class.getName(), Long.class.getName());
+		primitiveObjectMap.put(float.class.getName(), Float.class.getName());
+		primitiveObjectMap.put(double.class.getName(), Double.class.getName());
+		// NOTE: don't need void/Void
+	}
 
 	/**
 	 * Connect the client to a JMX server using the full JMX URL format. The URL should look something like:
@@ -427,7 +441,7 @@ public class JmxClient {
 		}
 		String[] paramTypes = new String[params.length];
 		for (int i = 0; i < params.length; i++) {
-			paramTypes[i] = params[i].getClass().toString();
+			paramTypes[i] = params[i].getClass().getName();
 		}
 		int nameC = 0;
 		String[] first = null;
@@ -443,8 +457,17 @@ public class JmxClient {
 			for (int i = 0; i < params.length; i++) {
 				signatureTypes[i] = mbeanParams[i].getType();
 			}
-			if (Arrays.equals(paramTypes, signatureTypes)) {
-				return signatureTypes;
+			if (paramTypes.length == signatureTypes.length) {
+				boolean found = true;
+				for (int i = 0; i < paramTypes.length; i++) {
+					if (!isClassNameEquivalent(paramTypes[i], signatureTypes[i])) {
+						found = false;
+						break;
+					}
+				}
+				if (found) {
+					return signatureTypes;
+				}
 			}
 			first = signatureTypes;
 			nameC++;
@@ -458,6 +481,19 @@ public class JmxClient {
 		} else {
 			// return the first one we found that matches the name
 			return first;
+		}
+	}
+
+	private boolean isClassNameEquivalent(String className1, String className2) {
+		return getWrapperClass(className1).equals(getWrapperClass(className2));
+	}
+
+	private String getWrapperClass(String className) {
+		String wrapperClassName = primitiveObjectMap.get(className);
+		if (wrapperClassName == null) {
+			return className;
+		} else {
+			return wrapperClassName;
 		}
 	}
 

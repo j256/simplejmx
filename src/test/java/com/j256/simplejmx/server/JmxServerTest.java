@@ -15,6 +15,7 @@ import javax.management.ReflectionException;
 import org.junit.Test;
 
 import com.j256.simplejmx.client.JmxClient;
+import com.j256.simplejmx.common.JmxAttributeField;
 import com.j256.simplejmx.common.JmxAttributeFieldInfo;
 import com.j256.simplejmx.common.JmxAttributeMethod;
 import com.j256.simplejmx.common.JmxAttributeMethodInfo;
@@ -153,6 +154,9 @@ public class JmxServerTest {
 			newValue = FOO_VALUE + 32;
 			client.invokeOperation(DOMAIN_NAME, OBJECT_NAME, "resetFoo", Integer.toString(newValue));
 			assertEquals(newValue, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo"));
+
+			assertEquals(1, client.getAttributesInfo(DOMAIN_NAME, OBJECT_NAME).length);
+			assertEquals(2, client.getOperationsInfo(DOMAIN_NAME, OBJECT_NAME).length);
 
 			server.unregister(obj);
 
@@ -464,6 +468,60 @@ public class JmxServerTest {
 		testAddress(InetAddress.getLocalHost(), DEFAULT_PORT + 20);
 	}
 
+	@Test
+	public void testSubClass() throws Exception {
+		JmxServer server = new JmxServer(DEFAULT_PORT);
+		SubClassTestObject obj = new SubClassTestObject();
+		JmxClient client = null;
+		try {
+			server.start();
+			client = new JmxClient(DEFAULT_PORT);
+
+			try {
+				client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo");
+				fail("should not get here");
+			} catch (Exception e) {
+				// ignored
+			}
+
+			server.register(obj);
+			assertEquals(FOO_VALUE, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo"));
+
+			assertEquals(2, client.getAttributesInfo(DOMAIN_NAME, OBJECT_NAME).length);
+			assertEquals(3, client.getOperationsInfo(DOMAIN_NAME, OBJECT_NAME).length);
+
+			int newValue = FOO_VALUE + 2;
+			client.setAttribute(DOMAIN_NAME, OBJECT_NAME, "foo", newValue);
+			assertEquals(newValue, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo"));
+
+			client.invokeOperation(DOMAIN_NAME, OBJECT_NAME, "resetFoo");
+			assertEquals(0, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo"));
+
+			newValue = FOO_VALUE + 12;
+			client.invokeOperation(DOMAIN_NAME, OBJECT_NAME, "resetFoo", newValue);
+			assertEquals(newValue, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo"));
+
+			newValue = FOO_VALUE + 32;
+			client.invokeOperation(DOMAIN_NAME, OBJECT_NAME, "resetFoo", Integer.toString(newValue));
+			assertEquals(newValue * 2, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo"));
+
+			server.unregister(obj);
+
+			try {
+				client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo");
+				fail("should not get here");
+			} catch (Exception e) {
+				// ignored
+			}
+		} finally {
+			closeClient(client);
+			server.unregister(obj);
+			server.stop();
+		}
+	}
+
+	/* =========================================================================================== */
+
 	private void testAddress(InetAddress address, int port) throws Exception {
 		JmxServer server = new JmxServer(address, port);
 		RandomObject obj = new RandomObject();
@@ -496,7 +554,7 @@ public class JmxServerTest {
 		}
 	}
 
-	/* ============================================================= */
+	/* =========================================================================================== */
 
 	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	protected static class TestObject {
@@ -636,6 +694,25 @@ public class JmxServerTest {
 
 		public void resetFoo(int newValue) {
 			this.foo = newValue;
+		}
+	}
+
+	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
+	protected static class SubClassTestObject extends TestObject {
+
+		@JmxAttributeField
+		private int bar;
+
+		// this stops the jmx access
+		@Override
+		public void setFoo(int foo) {
+			super.setFoo(foo);
+		}
+
+		// set it via a String
+		@JmxOperation
+		public void resetFoo(String newValue) {
+			resetFoo(Integer.parseInt(newValue) * 2);
 		}
 	}
 }
