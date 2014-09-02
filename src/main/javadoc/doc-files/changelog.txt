@@ -1,3 +1,6 @@
+1.12: 9/2/2014
+	* Fixed the handling of base classes by removing duplicate fields and methods.  Sigh.
+
 1.11: 8/18/2014
 	* Added handling of base classes for field and method discovery with reflection MBean and publish-all wrapper.
 
