@@ -4,7 +4,7 @@ For more information, visit the home page:
 	http://256.com/sources/simplejmx/
 
 Online documentation can be found off the home page.  Here are the Javadocs:
-	http://256.com/sources/simplejmx/javadoc/simplejmx/doc-files/simplejmx.html
+	http://256.com/sources/simplejmx/javadoc/simplejmx/
 
 The git repository is:
 	https://github.com/j256/simplejmx
