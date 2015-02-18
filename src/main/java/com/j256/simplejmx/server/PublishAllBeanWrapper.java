@@ -88,8 +88,12 @@ public class PublishAllBeanWrapper {
 		// run through all _public_ fields, add get/set, final is no-write
 
 		List<JmxAttributeFieldInfo> fieldInfos = new ArrayList<JmxAttributeFieldInfo>();
+		Set<String> knownFields = new HashSet<String>();
 		for (Class<?> clazz = target.getClass(); clazz != Object.class; clazz = clazz.getSuperclass()) {
 			for (Field field : clazz.getFields()) {
+				if (!knownFields.add(field.getName())) {
+					continue;
+				}
 				fieldInfos.add(new JmxAttributeFieldInfo(field.getName(), true,
 						!Modifier.isFinal(field.getModifiers()), null));
 			}
@@ -99,8 +103,12 @@ public class PublishAllBeanWrapper {
 
 	public JmxAttributeMethodInfo[] getAttributeMethodInfos() {
 		List<JmxAttributeMethodInfo> methodInfos = new ArrayList<JmxAttributeMethodInfo>();
+		Set<String> knownMethods = new HashSet<String>();
 		for (Class<?> clazz = target.getClass(); clazz != Object.class; clazz = clazz.getSuperclass()) {
 			for (Method method : clazz.getMethods()) {
+				if (!knownMethods.add(method.getName())) {
+					continue;
+				}
 				String name = method.getName();
 				if (!ignoredMethods.contains(name) && isGetGetAttributeMethod(name)) {
 					methodInfos.add(new JmxAttributeMethodInfo(name, (String) null));
@@ -112,8 +120,12 @@ public class PublishAllBeanWrapper {
 
 	public JmxOperationInfo[] getOperationInfos() {
 		List<JmxOperationInfo> operationInfos = new ArrayList<JmxOperationInfo>();
+		Set<String> knownMethods = new HashSet<String>();
 		for (Class<?> clazz = target.getClass(); clazz != Object.class; clazz = clazz.getSuperclass()) {
 			for (Method method : clazz.getMethods()) {
+				if (!knownMethods.add(method.getName())) {
+					continue;
+				}
 				String name = method.getName();
 				if (!ignoredMethods.contains(name) && !isGetGetAttributeMethod(name)) {
 					operationInfos.add(new JmxOperationInfo(name, null, null, OperationAction.UNKNOWN, null));
