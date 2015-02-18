@@ -49,7 +49,7 @@ published objects can be investigated with jconsole or another JMX client.  Incl
 which you can use to connect to and interrogate remote JMX servers as well as a web/HTTP interface so you can publish
 JMX beans to a browser or other web client.
 
-To get started quickly using SimpleJMX, @pxref{Quick Start}.  You can also take a look at the  the examples section of the
+To get started quickly using SimpleJMX, @pxref{Quick Start}.  You can also take a look at the examples section of the
 document which has various working code packages. @xref{Examples}.
 @ifhtml
 There is also a @uref{http://256.com/sources/simplejmx/docs/simplejmx.pdf, PDF version of this documentation}.
@@ -160,9 +160,9 @@ For more extensive instructions, @pxref{Using}.
 @cindex where to get new jars
 To get started with SimpleJMX, you will need to download the jar file.  The @uref{http://256.com/sources/simplejmx/releases/, SimpleJMX
 release page} is the default repository but the jars are also available from the @uref{http://repo1.maven.org/maven2/com/j256/simplejmx/,
-central maven repository} and from @uref{http://sourceforge.net/projects/simplejmx/files/, Sourceforge}.
+central maven repository}.
 
-The code works with Java 5 or later.
+The code works with Java 6 or later.
 
 @c ----------------------------------------------------------------
 @node Naming Objects, JmxResource Annotation, Downloading, Using

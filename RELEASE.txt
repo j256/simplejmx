@@ -1,8 +1,8 @@
-===============================================================================
-This is documentation is only for the maintainers who need to release SimpleJmx
-===============================================================================
+=====================================================================
+This is documentation is only for the maintainers who need to release
+=====================================================================
 
-To release SimpleJmx:
+To release:
 
 1) Run tests
 
@@ -41,7 +41,7 @@ To release SimpleJmx:
 
 	mvn -P st release:perform -DconnectionUrl=scm:svn:scm:svn:https://svn.code.sf.net/p/simplejmx/code/tags/simpleJmx-X.X
 
-8) Update the simplejmx website:
+8) Update the website:
 
 	- cd /var/www/256.com/sources/simplejmx/releases
 	- sh get_release.sh  [enter release number]
