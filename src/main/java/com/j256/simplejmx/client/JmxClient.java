@@ -50,31 +50,27 @@ public class JmxClient {
 	}
 
 	/**
-	 * Connect the client to a JMX server using the full JMX URL format. The URL should look something like:
-	 * 
 	 * <p>
+	 * Connect the client to a JMX server using the full JMX URL format. The URL should look something like:
+	 * </p>
 	 * 
 	 * <pre>
 	 * service:jmx:rmi:///jndi/rmi://hostName:portNumber/jmxrmi
 	 * </pre>
-	 * 
-	 * </p>
 	 */
 	public JmxClient(String jmxUrl) throws JMException {
 		this(jmxUrl, null, null);
 	}
 
 	/**
+	 * <p>
 	 * Connect the client to a JMX server using the full JMX URL format with username/password credentials. The URL
 	 * should look something like:
-	 * 
-	 * <p>
+	 * </p>
 	 * 
 	 * <pre>
 	 * service:jmx:rmi:///jndi/rmi://hostName:portNumber/jmxrmi
 	 * </pre>
-	 * 
-	 * </p>
 	 */
 	public JmxClient(String jmxUrl, String userName, String password) throws JMException {
 		if (jmxUrl == null) {

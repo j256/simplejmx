@@ -340,7 +340,7 @@ public class JmxServer {
 	 */
 	public synchronized void unregisterThrow(Object obj) throws JMException {
 		if (obj instanceof PublishAllBeanWrapper) {
-			unregisterThrow(ObjectNameUtil.makeObjectName(((PublishAllBeanWrapper)obj).getJmxResourceInfo()));
+			unregisterThrow(ObjectNameUtil.makeObjectName(((PublishAllBeanWrapper) obj).getJmxResourceInfo()));
 		} else {
 			unregisterThrow(ObjectNameUtil.makeObjectName(obj));
 		}
@@ -414,16 +414,14 @@ public class JmxServer {
 	}
 
 	/**
+	 * <p>
 	 * Optional service URL which is used to specify the connection endpoints. You should not use this if you are
 	 * setting the address or the ports directly. The format is something like:
-	 * 
-	 * <p>
+	 * </p>
 	 * 
 	 * <pre>
 	 * service:jmx:rmi://your-server-name:server-port/jndi/rmi://registry-host:registry-port/jmxrmi
 	 * </pre>
-	 * 
-	 * </p>
 	 * 
 	 * <p>
 	 * <tt>your-server-name</tt> could be an IP of an interface or just localhost. <tt>registry-host</tt> can also be an

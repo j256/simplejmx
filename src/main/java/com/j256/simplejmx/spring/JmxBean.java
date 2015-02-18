@@ -15,6 +15,7 @@ import com.j256.simplejmx.common.JmxSelfNaming;
  * 
  * <p>
  * For example:
+ * </p>
  * 
  * <pre>
  * &lt;!-- some random bean defined in your spring files --&gt;
@@ -58,8 +59,6 @@ import com.j256.simplejmx.common.JmxSelfNaming;
  *    &lt;property name="target" ref="jmxServer" /&gt;
  * &lt;/bean&gt;
  * </pre>
- * 
- * </p>
  * 
  * @author graywatson
  */

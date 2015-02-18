@@ -19,22 +19,17 @@ import java.lang.annotation.Target;
  * the "getXxx()" method must not return void and must have no arguments. {@code isXxx()} is allowed if it returns
  * boolean or Boolean and the method has no arguments. The "setXxx()" method must return void and must take a single
  * argument -- the same argument as the getter returns.
- * 
  * </p>
- * 
- * <p>
  * 
  * <pre>
  * &#64;JmxAttributeMethod(description = "Number of times our cache was hit")
  * public int getCacheHitCount() {
  * </pre>
  * 
- * </p>
- * 
  * @author graywatson
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD })
+@Target(ElementType.METHOD)
 public @interface JmxAttributeMethod {
 
 	/**

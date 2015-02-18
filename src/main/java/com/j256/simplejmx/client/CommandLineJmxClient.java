@@ -60,15 +60,14 @@ public class CommandLineJmxClient {
 	}
 
 	/**
+	 * <p>
 	 * Create a command line interface connected to a JMX server using the full JMX URL format. The URL should look
 	 * something like:
-	 * <p>
+	 * </p>
 	 * 
 	 * <pre>
 	 * service:jmx:rmi:///jndi/rmi://hostName:portNumber/jmxrmi
 	 * </pre>
-	 * 
-	 * </p>
 	 */
 	public CommandLineJmxClient(String jmxUrl) throws JMException {
 		jmxClient = new JmxClient(jmxUrl);

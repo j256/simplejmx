@@ -15,7 +15,7 @@ import com.j256.simplejmx.server.JmxServer;
  * @author graywatson
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE })
+@Target(ElementType.TYPE)
 public @interface JmxResource {
 
 	/**
@@ -46,13 +46,12 @@ public @interface JmxResource {
 	 * 
 	 * <p>
 	 * The following are basically synonymous:
+	 * </p>
 	 * 
 	 * <pre>
 	 * fieldValues = { "Database", "Connections" })
 	 * fieldValues = { "00=Database", "01=Connections" })
 	 * </pre>
-	 * 
-	 * </p>
 	 * 
 	 * <p>
 	 * If the object implements {@link JmxSelfNaming} then this would be replaced by
