@@ -1,3 +1,6 @@
+1.13: ?/?/20??
+	* Small tweaks to web output.
+
 1.12: 9/2/2014
 	* Fixed the handling of base classes by removing duplicate fields and methods.  Sigh.
 

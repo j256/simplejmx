@@ -41,7 +41,7 @@ public class JmxWebHandler extends AbstractHandler {
 	private static final String COMMAND_ASSIGN_ATTRIBUTE = "a";
 	private static final String COMMAND_INVOKE_OPERATION = "o";
 	private static final String COMMAND_SHOW_ALL_BEANS = "s";
-	private static final String PARAM_ATTRIBUTE_VALUE = "v";
+	private static final String PARAM_ATTRIBUTE_VALUE = "val";
 	private static final String PARAM_OPERATION_PREFIX = "p";
 	private static final String PARAM_TEXT_ONLY = "t";
 
@@ -246,10 +246,11 @@ public class JmxWebHandler extends AbstractHandler {
 			writer.append("<tr><td title='" + makeHtmlSafe(attribute.getDescription()) + "'> " + name + " </td>");
 			writer.append("<td> " + ClientUtils.displayType(attribute.getType(), value) + " </td>");
 			if (attribute.isWritable()) {
-				writer.append("<form action='/" + COMMAND_ASSIGN_ATTRIBUTE + "/" + makeHtmlSafe(objectName.toString())
+				writer.append("\n<form action='/" + COMMAND_ASSIGN_ATTRIBUTE + "/" + makeHtmlSafe(objectName.toString())
 						+ "/" + makeHtmlSafe(name) + "' name='" + makeHtmlSafe(name) + "'>\n");
 				writer.append("<td>");
-				writer.append("<input name='" + PARAM_ATTRIBUTE_VALUE + "' value='" + makeHtmlSafe(valueString) + "' >");
+				writer.append("<input name='" + PARAM_ATTRIBUTE_VALUE + "' value='" + makeHtmlSafe(valueString) + "' />");
+				writer.append("<input type='submit' value='Set Value' />");
 				writer.append("</td>");
 				writer.append("</form>\n");
 			} else {
