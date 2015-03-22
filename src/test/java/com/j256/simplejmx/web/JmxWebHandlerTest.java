@@ -62,7 +62,7 @@ public class JmxWebHandlerTest {
 
 		HtmlForm form = page.getFormByName("Verbose");
 		assertNotNull(form);
-		HtmlInput input = form.getInputByName("v");
+		HtmlInput input = form.getInputByName("val");
 		assertEquals("false", input.getValueAttribute());
 		assertNotNull(input);
 		input.setValueAttribute("true");
@@ -76,7 +76,7 @@ public class JmxWebHandlerTest {
 
 		form = page.getFormByName("Verbose");
 		assertNotNull(form);
-		input = form.getInputByName("v");
+		input = form.getInputByName("val");
 		assertEquals("true", input.getValueAttribute());
 
 		String operation = "gc";
@@ -143,18 +143,18 @@ public class JmxWebHandlerTest {
 		page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/a/" + beanName + "/Verbose");
 		assertTrue(page.asText().contains("No value parameter specified"));
 
-		page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/a/bad-name/Verbose?v=foo");
+		page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/a/bad-name/Verbose?val=foo");
 		assertTrue(page.asText().contains("Invalid object name"));
 
-		page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/a/not:name=found/Verbose?v=foo");
+		page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/a/not:name=found/Verbose?val=foo");
 		assertTrue(page.asText().contains("Could not get mbean info"));
 
-		page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/a/" + beanName + "/notFound?v=foo");
+		page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/a/" + beanName + "/notFound?val=foo");
 		assertTrue(page.asText().contains("Cannot find attribute"));
 
 		page =
 				webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/a/" + beanName
-						+ "/ObjectPendingFinalizationCount?v=foo");
+						+ "/ObjectPendingFinalizationCount?val=foo");
 		assertTrue(page.asText().contains("Could not set attribute"));
 
 		/* invoke errors */
