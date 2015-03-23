@@ -16,6 +16,10 @@ public class JmxAttributeMethodInfo {
 		// for spring
 	}
 
+	public JmxAttributeMethodInfo(String methodName) {
+		this.methodName = methodName;
+	}
+
 	public JmxAttributeMethodInfo(String methodName, String description) {
 		this.methodName = methodName;
 		this.description = description;

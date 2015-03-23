@@ -23,6 +23,10 @@ public class JmxOperationInfo {
 		// for spring
 	}
 
+	public JmxOperationInfo(String methodName) {
+		this.methodName = methodName;
+	}
+
 	public JmxOperationInfo(String methodName, String[] parameterNames, String[] parameterDescriptions,
 			OperationAction action, String description) {
 		this.methodName = methodName;

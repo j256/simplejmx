@@ -17,6 +17,10 @@ public class JmxAttributeFieldInfo {
 		// for spring
 	}
 
+	public JmxAttributeFieldInfo(String fieldName) {
+		this.fieldName = fieldName;
+	}
+
 	public JmxAttributeFieldInfo(String fieldName, boolean isReadible, boolean isWritable, String description) {
 		this.fieldName = fieldName;
 		this.isReadible = isReadible;

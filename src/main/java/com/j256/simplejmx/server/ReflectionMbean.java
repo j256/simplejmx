@@ -532,7 +532,7 @@ public class ReflectionMbean implements DynamicMBean {
 
 		public AttributeMethodInfo(String varName, String description, Method getterMethod, Method setterMethod) {
 			this.varName = varName;
-			if (description == null || description.length() == 0) {
+			if (isEmpty(description)) {
 				this.description = varName + " attribute";
 			} else {
 				this.description = description;

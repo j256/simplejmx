@@ -20,8 +20,8 @@ import com.j256.simplejmx.server.PublishAllBeanWrapper;
 
 /**
  * Utility class designed to be used with Spring which runs through and discovers any beans that need to be registered
- * with the JmxServer. This looks for beans annotated with {@link JmxResource}, that extend {@link JmxSelfNaming}, that
- * are of type {@link JmxBean}, or are of type {@link PublishAllBeanWrapper}.
+ * with the {@link JmxServer}. This looks for beans that are of type {@link JmxBean}, that are of type
+ * {@link PublishAllBeanWrapper}, that implement {@link JmxSelfNaming}, or that are annotated with {@link JmxResource},
  * 
  * <p>
  * <b>NOTE:</b> This will only compile if com.springframework jar(s) are available to the application. Otherwise it will
@@ -46,11 +46,8 @@ public class BeanPublisher implements InitializingBean, ApplicationContextAware,
 			}
 			// we handle @JmxResource annotations or JmxSelfNaming
 			ObjectName objectName = null;
-			if (bean instanceof JmxSelfNaming) {
-				objectName = jmxServer.register((JmxSelfNaming) bean);
-			} else if (bean.getClass().isAnnotationPresent(JmxResource.class)) {
-				objectName = jmxServer.register(bean);
-			} else if (bean instanceof JmxBean) {
+			// check for more specific classes first
+			if (bean instanceof JmxBean) {
 				JmxBean jmxBean = (JmxBean) bean;
 				objectName =
 						jmxServer.register(jmxBean.getTarget(), jmxBean.getJmxResourceInfo(),
@@ -58,6 +55,10 @@ public class BeanPublisher implements InitializingBean, ApplicationContextAware,
 								jmxBean.getOperationInfos());
 			} else if (bean instanceof PublishAllBeanWrapper) {
 				objectName = jmxServer.register((PublishAllBeanWrapper) bean);
+			} else if (bean instanceof JmxSelfNaming) {
+				objectName = jmxServer.register((JmxSelfNaming) bean);
+			} else if (bean.getClass().isAnnotationPresent(JmxResource.class)) {
+				objectName = jmxServer.register(bean);
 			}
 			if (objectName != null) {
 				registeredBeans.add(objectName);
