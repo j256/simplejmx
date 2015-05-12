@@ -11,18 +11,22 @@ public class ServerConnector extends AbstractConnector {
 		// noop
 	}
 
+	@Override
 	public void open() {
 		// noop
 	}
 
+	@Override
 	public void close() {
 		// noop
 	}
 
+	@Override
 	public int getLocalPort() {
 		return 0;
 	}
 
+	@Override
 	public Object getConnection() {
 		return null;
 	}

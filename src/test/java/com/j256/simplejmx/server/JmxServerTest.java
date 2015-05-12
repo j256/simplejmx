@@ -613,12 +613,15 @@ public class JmxServerTest {
 		public int getFoo() {
 			return FOO_VALUE;
 		}
+		@Override
 		public String getJmxDomainName() {
 			return DOMAIN_NAME;
 		}
+		@Override
 		public String getJmxBeanName() {
 			return OBJECT_NAME;
 		}
+		@Override
 		public JmxFolderName[] getJmxFolderNames() {
 			return null;
 		}

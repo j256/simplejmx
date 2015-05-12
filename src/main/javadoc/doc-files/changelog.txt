@@ -1,6 +1,8 @@
 1.13: ?/?/20??
 	* Small tweaks to web output.
 	* Added some improvements to JmxBean to be easier to configure.
+	* Added @PostConstruct and @PreDestroy annotations to spring support beans.
+	* Moved to requiring Java 1.6.
 
 1.12: 9/2/2014
 	* Fixed the handling of base classes by removing duplicate fields and methods.  Sigh.

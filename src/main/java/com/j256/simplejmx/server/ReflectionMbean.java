@@ -70,10 +70,12 @@ public class ReflectionMbean implements DynamicMBean {
 		this.mbeanInfo = buildMbeanInfo(attributeFieldInfos, attributeMethodInfos, operationInfos, ignoreErrors);
 	}
 
+	@Override
 	public MBeanInfo getMBeanInfo() {
 		return mbeanInfo;
 	}
 
+	@Override
 	public Object getAttribute(String attributeName) throws AttributeNotFoundException, ReflectionException {
 		AttributeMethodInfo methodInfo = attributeMethodMap.get(attributeName);
 		if (methodInfo == null) {
@@ -102,6 +104,7 @@ public class ReflectionMbean implements DynamicMBean {
 		}
 	}
 
+	@Override
 	public AttributeList getAttributes(String[] attributeNames) {
 		AttributeList returnList = new AttributeList();
 		for (String name : attributeNames) {
@@ -114,6 +117,7 @@ public class ReflectionMbean implements DynamicMBean {
 		return returnList;
 	}
 
+	@Override
 	public void setAttribute(Attribute attribute) throws AttributeNotFoundException, ReflectionException {
 		AttributeMethodInfo methodInfo = attributeMethodMap.get(attribute.getName());
 		if (methodInfo == null) {
@@ -140,6 +144,7 @@ public class ReflectionMbean implements DynamicMBean {
 		}
 	}
 
+	@Override
 	public AttributeList setAttributes(AttributeList attributes) {
 		AttributeList returnList = new AttributeList(attributes.size());
 		for (Attribute attribute : attributes.asList()) {
@@ -154,6 +159,7 @@ public class ReflectionMbean implements DynamicMBean {
 		return returnList;
 	}
 
+	@Override
 	public Object invoke(String actionName, Object[] params, String[] signatureTypes) throws MBeanException,
 			ReflectionException {
 		Method method = operationMethodMap.get(new NameParams(actionName, signatureTypes));

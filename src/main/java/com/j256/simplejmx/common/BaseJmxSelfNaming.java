@@ -8,14 +8,17 @@ package com.j256.simplejmx.common;
  */
 public class BaseJmxSelfNaming implements JmxSelfNaming {
 
+	@Override
 	public String getJmxDomainName() {
 		return null;
 	}
 
+	@Override
 	public String getJmxBeanName() {
 		return null;
 	}
 
+	@Override
 	public JmxFolderName[] getJmxFolderNames() {
 		return null;
 	}

@@ -15,6 +15,7 @@ public class Jetty8ConnectorFactory implements JettyConnectorFactory {
 	private static final int WEB_SERVER_MIN_THREADS = 1;
 	private static final int WEB_SERVER_MAX_THREADS = 5;
 
+	@Override
 	public Connector buildConnector(Server server, int serverPort) {
 		// create the NIO connector
 		SelectChannelConnector connector = new SelectChannelConnector();

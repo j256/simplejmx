@@ -65,6 +65,7 @@ public class JmxWebHandler extends AbstractHandler {
 		charIsMapped['?'] = true;
 	}
 
+	@Override
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(response.getOutputStream()));
@@ -540,14 +541,14 @@ public class JmxWebHandler extends AbstractHandler {
 	private void appendLink(BufferedWriter writer, boolean textOnly, String url, String name, String title, String text)
 			throws IOException {
 		if (!textOnly) {
-			writer.append("<a href='" + url + "' ");
+			writer.append("<a href='").append(url).append("' ");
 			if (name != null) {
-				writer.append("name='" + makeHtmlSafe(name) + "' ");
+				writer.append("name='").append(makeHtmlSafe(name)).append("' ");
 			}
 			if (title != null) {
-				writer.append("title='" + makeHtmlSafe(title) + "' ");
+				writer.append("title='").append(makeHtmlSafe(title)).append("' ");
 			}
-			writer.append(">");
+			writer.append('>');
 		}
 		writer.append(text);
 		if (!textOnly) {
@@ -599,9 +600,11 @@ public class JmxWebHandler extends AbstractHandler {
 		public DomainQueryExp(String domain) {
 			this.domain = domain;
 		}
+		@Override
 		public void setMBeanServer(MBeanServer s) {
 			// no-op
 		}
+		@Override
 		public boolean apply(ObjectName name) {
 			return domain.equals(name.getDomain());
 		}
@@ -611,6 +614,7 @@ public class JmxWebHandler extends AbstractHandler {
 	 * Compares two ObjectNames.
 	 */
 	private static class ObjectNameComparator implements Comparator<ObjectName> {
+		@Override
 		public int compare(ObjectName o1, ObjectName o2) {
 			return o1.toString().compareTo(o2.toString());
 		}

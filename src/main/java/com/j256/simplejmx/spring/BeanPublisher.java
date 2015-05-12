@@ -36,6 +36,7 @@ public class BeanPublisher implements InitializingBean, ApplicationContextAware,
 	private JmxServer jmxServer;
 	private Set<ObjectName> registeredBeans = new HashSet<ObjectName>();
 
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		// do the annotations
 		Map<String, Object> beans = applicationContext.getBeansOfType(null);
@@ -66,12 +67,14 @@ public class BeanPublisher implements InitializingBean, ApplicationContextAware,
 		}
 	}
 
+	@Override
 	public void destroy() {
 		for (ObjectName objectName : registeredBeans) {
 			jmxServer.unregister(objectName);
 		}
 	}
 
+	@Override
 	@Required
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;

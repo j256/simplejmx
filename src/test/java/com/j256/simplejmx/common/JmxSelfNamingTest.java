@@ -54,14 +54,17 @@ public class JmxSelfNamingTest {
 		@JmxAttributeField
 		public long foo = 10;
 
+		@Override
 		public String getJmxDomainName() {
 			return JMX_SELF_NAMING_DOMAIN_NAME;
 		}
 
+		@Override
 		public String getJmxBeanName() {
 			return JMX_SELF_NAMING_BEAN_NAME;
 		}
 
+		@Override
 		public JmxFolderName[] getJmxFolderNames() {
 			return JMX_SELF_NAMING_FOLDERS;
 		}

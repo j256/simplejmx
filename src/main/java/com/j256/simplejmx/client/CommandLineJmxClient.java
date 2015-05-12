@@ -79,6 +79,7 @@ public class CommandLineJmxClient {
 	public void runCommands(final String[] commands) throws IOException {
 		doLines(0, new LineReader() {
 			private int commandC = 0;
+			@Override
 			public String getNextLine(String prompt) {
 				if (commandC >= commands.length) {
 					return null;
@@ -96,6 +97,7 @@ public class CommandLineJmxClient {
 		final BufferedReader reader = new BufferedReader(new FileReader(batchFile));
 		try {
 			doLines(0, new LineReader() {
+				@Override
 				public String getNextLine(String prompt) throws IOException {
 					return reader.readLine();
 				}
@@ -113,6 +115,7 @@ public class CommandLineJmxClient {
 		try {
 			System.out.println("Running jmx client interface.  Type '" + HELP_COMMAND + "' for help.");
 			doLines(0, new LineReader() {
+				@Override
 				public String getNextLine(String prompt) throws IOException {
 					System.out.print(prompt);
 					System.out.flush();
@@ -319,6 +322,7 @@ public class CommandLineJmxClient {
 		final BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 		try {
 			doLines(levelC + 1, new LineReader() {
+				@Override
 				public String getNextLine(String prompt) throws IOException {
 					return reader.readLine();
 				}
@@ -344,7 +348,7 @@ public class CommandLineJmxClient {
 		for (MBeanAttributeInfo info : attrs) {
 			StringBuilder infoString = new StringBuilder();
 			infoString.append("  ").append(info.getName());
-			infoString.append("(");
+			infoString.append('(');
 			boolean comma = false;
 			if (info.isReadable()) {
 				infoString.append("get");
@@ -357,7 +361,7 @@ public class CommandLineJmxClient {
 				infoString.append("set ").append(info.getType());
 				comma = true;
 			}
-			infoString.append(")");
+			infoString.append(')');
 			System.out.println(infoString.toString());
 		}
 	}

@@ -86,14 +86,17 @@ public class JmxIntegrationTest {
 
 		int value = 0;
 
+		@Override
 		public String getJmxDomainName() {
 			return null;
 		}
 
+		@Override
 		public String getJmxBeanName() {
 			return null;
 		}
 
+		@Override
 		public JmxFolderName[] getJmxFolderNames() {
 			return new JmxFolderName[] { new JmxFolderName("Sub") };
 		}
@@ -123,14 +126,17 @@ public class JmxIntegrationTest {
 			this.jmxServer = jmxServer;
 		}
 
+		@Override
 		public String getJmxDomainName() {
 			return null;
 		}
 
+		@Override
 		public JmxFolderName[] getJmxFolderNames() {
 			return new JmxFolderName[] { new JmxFolderName("00", "AnotherObjects") };
 		}
 
+		@Override
 		public String getJmxBeanName() {
 			return Integer.toString(System.identityHashCode(this));
 		}

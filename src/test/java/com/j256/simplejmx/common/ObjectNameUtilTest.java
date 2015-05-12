@@ -122,12 +122,15 @@ public class ObjectNameUtilTest {
 
 	@JmxResource
 	protected static class SelfNamingNoDescription implements JmxSelfNaming {
+		@Override
 		public String getJmxDomainName() {
 			return null;
 		}
+		@Override
 		public String getJmxBeanName() {
 			return null;
 		}
+		@Override
 		public JmxFolderName[] getJmxFolderNames() {
 			return null;
 		}
@@ -135,12 +138,15 @@ public class ObjectNameUtilTest {
 
 	@JmxResource(beanName = OBJECT_NAME)
 	protected static class SelfNamingUseJmxResourceObjectName implements JmxSelfNaming {
+		@Override
 		public String getJmxDomainName() {
 			return DOMAIN_NAME;
 		}
+		@Override
 		public String getJmxBeanName() {
 			return null;
 		}
+		@Override
 		public JmxFolderName[] getJmxFolderNames() {
 			return null;
 		}
@@ -152,12 +158,15 @@ public class ObjectNameUtilTest {
 
 	@JmxResource(domainName = DOMAIN_NAME)
 	protected static class SelfNamingUseObjectClassForName implements JmxSelfNaming {
+		@Override
 		public String getJmxDomainName() {
 			return null;
 		}
+		@Override
 		public String getJmxBeanName() {
 			return null;
 		}
+		@Override
 		public JmxFolderName[] getJmxFolderNames() {
 			return null;
 		}
@@ -174,12 +183,15 @@ public class ObjectNameUtilTest {
 
 	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	protected static class JmxFolderNameField implements JmxSelfNaming {
+		@Override
 		public String getJmxDomainName() {
 			return null;
 		}
+		@Override
 		public String getJmxBeanName() {
 			return null;
 		}
+		@Override
 		public JmxFolderName[] getJmxFolderNames() {
 			return new JmxFolderName[] { new JmxFolderName(FIELD_NAME1, FOLDER_NAME1),
 					new JmxFolderName(FIELD_NAME2, FOLDER_NAME2) };
@@ -188,12 +200,15 @@ public class ObjectNameUtilTest {
 
 	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	protected static class NoJmxFolderNameField implements JmxSelfNaming {
+		@Override
 		public String getJmxDomainName() {
 			return null;
 		}
+		@Override
 		public String getJmxBeanName() {
 			return null;
 		}
+		@Override
 		public JmxFolderName[] getJmxFolderNames() {
 			return new JmxFolderName[] { new JmxFolderName(FOLDER_NAME1), new JmxFolderName(FOLDER_NAME2) };
 		}
@@ -201,12 +216,15 @@ public class ObjectNameUtilTest {
 
 	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME, folderNames = { FOLDER_NAME1 })
 	protected static class FoldersFromAnnotationWithSelfNaming implements JmxSelfNaming {
+		@Override
 		public String getJmxDomainName() {
 			return null;
 		}
+		@Override
 		public String getJmxBeanName() {
 			return "FoldersFromAnnotationWithSelfNaming";
 		}
+		@Override
 		public JmxFolderName[] getJmxFolderNames() {
 			return null;
 		}
@@ -214,13 +232,16 @@ public class ObjectNameUtilTest {
 
 	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME, folderNames = { FOLDER_NAME1 })
 	protected static class FoldersFromSelfNaming implements JmxSelfNaming {
+		@Override
 		public String getJmxDomainName() {
 			return null;
 		}
+		@Override
 		public String getJmxBeanName() {
 			return "FoldersFromSelfNaming";
 		}
 		// NOTE: this overrides the folders in the @JmxResource
+		@Override
 		public JmxFolderName[] getJmxFolderNames() {
 			return new JmxFolderName[] { new JmxFolderName(FOLDER_NAME2) };
 		}
@@ -236,24 +257,30 @@ public class ObjectNameUtilTest {
 	}
 
 	protected static class NoDomainInfo implements JmxSelfNaming {
+		@Override
 		public String getJmxDomainName() {
 			return null;
 		}
+		@Override
 		public String getJmxBeanName() {
 			return null;
 		}
+		@Override
 		public JmxFolderName[] getJmxFolderNames() {
 			return null;
 		}
 	}
 
 	protected static class NoObjectNameInfo implements JmxSelfNaming {
+		@Override
 		public String getJmxDomainName() {
 			return "NoObjectNameInfo";
 		}
+		@Override
 		public String getJmxBeanName() {
 			return null;
 		}
+		@Override
 		public JmxFolderName[] getJmxFolderNames() {
 			return null;
 		}

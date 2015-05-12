@@ -43,6 +43,7 @@ public class JmxResourceInfo implements JmxSelfNaming {
 		this.jmxDescription = jmxDescription;
 	}
 
+	@Override
 	public String getJmxDomainName() {
 		return jmxDomainName;
 	}
@@ -56,6 +57,7 @@ public class JmxResourceInfo implements JmxSelfNaming {
 		this.jmxDomainName = jmxDomainName;
 	}
 
+	@Override
 	public String getJmxBeanName() {
 		return jmxBeanName;
 	}
@@ -69,6 +71,7 @@ public class JmxResourceInfo implements JmxSelfNaming {
 		this.jmxBeanName = jmxBeanName;
 	}
 
+	@Override
 	public JmxFolderName[] getJmxFolderNames() {
 		return jmxFolderNames;
 	}
