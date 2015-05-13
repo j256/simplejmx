@@ -68,6 +68,7 @@ public class RandomObjectExample {
 			// do your other code here...
 			// we just sleep forever to let the server do its stuff
 			System.out.println("Sleeping for a while to let the server do its stuff");
+			System.out.println("JMX server on port " + JMX_PORT);
 			Thread.sleep(1000000000);
 
 		} finally {
