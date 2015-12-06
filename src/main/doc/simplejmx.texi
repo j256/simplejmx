@@ -149,6 +149,7 @@ For more extensive instructions, @pxref{Using}.
 * Using With Spring ::          Using SimpleJMX with the Spring framework.
 * Exposing via HTTP ::          Using the internal web server to expose JMX beans.
 * Using JVM JMX Server ::       Using the JVM platform JMX server.
+* Maven ::                      How to use with Maven.
 @end menu
 
 @c ----------------------------------------------------------------
@@ -806,7 +807,7 @@ browser.
 Take a look at the web-server example program to see working code that uses this class.  @xref{web server example}.
 
 @c ----------------------------------------------------------------
-@node Using JVM JMX Server, Examples, Exposing via HTTP, Using
+@node Using JVM JMX Server, Maven, Exposing via HTTP, Using
 @section Using the JVM Platform JMX Server
 
 @cindex firewall
@@ -873,7 +874,23 @@ JmxServer jmxServer = new JmxServer(true);
 There is also a @code{jmxServer.setUsePlatformMBeanServer(true)} method to use with Spring injection.
 
 @c ----------------------------------------------------------------
-@node Examples, License, Using JVM JMX Server, Top
+@node Maven, Examples, Using JVM JMX Server, Using
+@section Using With Maven
+
+@cindex Maven, use with
+@cindex pom.xml dependency
+To use SimpleJMX with maven, include the following dependency in your @file{pom.xml} file:
+
+@example
+<dependency>
+	<groupId>com.j256.simplejmx</groupId>
+	<artifactId>simplejmx</artifactId>
+	<version>@value{simplejmx_version}</version>
+</dependency>
+@end example 
+
+@c ----------------------------------------------------------------
+@node Examples, License, Maven, Top
 @chapter Example Code
 
 @cindex examples of code

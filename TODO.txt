@@ -9,11 +9,12 @@ Used to maintain requested features or future work.
 	- username/password map?
 	- SSL support
 
-- add support for the Descriptor information on a class, method, or field basis:
+- add support for the javax.management.Descriptor information on a class, method, or field basis:
 	- defaultValue
 	- deprecated
 	- enabled
 	- units
+	- how would these be used?
 
 - have the JMX client be able to access a bean by its class.
 	- it would use the annotations to determine the domain and object-name
