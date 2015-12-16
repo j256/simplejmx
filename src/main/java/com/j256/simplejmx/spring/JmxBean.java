@@ -28,7 +28,7 @@ import com.j256.simplejmx.common.JmxSelfNaming;
  * &lt;/bean&gt;
  * 
  * &lt;!-- publish information about that bean via JMX --&gt;
- * &lt;bean id="jmxServerJmx" class="com.j256.simplejmx.spring.JmxBean"&gt;
+ * &lt;bean id="someBeanJmx" class="com.j256.simplejmx.spring.JmxBean"&gt;
  *    &lt;!-- helps build the ObjectName --&gt;
  *    &lt;property name="jmxResourceInfo"&gt;
  *       &lt;bean class="com.j256.simplejmx.common.JmxResourceInfo"&gt;

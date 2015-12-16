@@ -30,7 +30,8 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import com.j256.simplejmx.client.ClientUtils;
 
 /**
- * Simple web handler that displays JMX information for a HTTP request. See {@link JmxWebServer}.
+ * Simple web handler that displays JMX information for a HTTP request. See {@link JmxWebServer}. This uses the
+ * {@link ManagementFactory#getPlatformMBeanServer()} call to front the published JMX domains and beans.
  * 
  * @author graywatson
  */
@@ -247,10 +248,12 @@ public class JmxWebHandler extends AbstractHandler {
 			writer.append("<tr><td title='" + makeHtmlSafe(attribute.getDescription()) + "'> " + name + " </td>");
 			writer.append("<td> " + ClientUtils.displayType(attribute.getType(), value) + " </td>");
 			if (attribute.isWritable()) {
-				writer.append("\n<form action='/" + COMMAND_ASSIGN_ATTRIBUTE + "/" + makeHtmlSafe(objectName.toString())
-						+ "/" + makeHtmlSafe(name) + "' name='" + makeHtmlSafe(name) + "'>\n");
+				writer.append("\n<form action='/" + COMMAND_ASSIGN_ATTRIBUTE + "/"
+						+ makeHtmlSafe(objectName.toString()) + "/" + makeHtmlSafe(name) + "' name='"
+						+ makeHtmlSafe(name) + "'>\n");
 				writer.append("<td>");
-				writer.append("<input name='" + PARAM_ATTRIBUTE_VALUE + "' value='" + makeHtmlSafe(valueString) + "' />");
+				writer.append("<input name='" + PARAM_ATTRIBUTE_VALUE + "' value='" + makeHtmlSafe(valueString)
+						+ "' />");
 				writer.append("<input type='submit' value='Set Value' />");
 				writer.append("</td>");
 				writer.append("</form>\n");
