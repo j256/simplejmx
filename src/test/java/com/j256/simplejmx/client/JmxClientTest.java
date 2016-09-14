@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 
@@ -14,6 +15,7 @@ import javax.management.MBeanOperationInfo;
 import javax.management.MBeanParameterInfo;
 import javax.management.ObjectName;
 
+import com.sun.jmx.remote.util.EnvHelp;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -81,6 +83,16 @@ public class JmxClientTest {
 	@Test
 	public void testHostPort() throws Exception {
 		JmxClient client = new JmxClient("localhost", JMX_PORT);
+		try {
+			client.getAttribute(objectName, "x");
+		} finally {
+			client.closeThrow();
+		}
+	}
+
+	@Test
+	public void testHostPortEnvironment() throws Exception {
+		JmxClient client = new JmxClient("localhost", JMX_PORT, Collections.<String,Object> singletonMap(EnvHelp.CLIENT_CONNECTION_CHECK_PERIOD, 5000L));
 		try {
 			client.getAttribute(objectName, "x");
 		} finally {
