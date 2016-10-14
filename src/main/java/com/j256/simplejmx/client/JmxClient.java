@@ -29,7 +29,7 @@ import com.j256.simplejmx.common.ObjectNameUtil;
  * 
  * @author graywatson
  */
-public class JmxClient {
+public class JmxClient implements AutoCloseable {
 
 	private JMXConnector jmxConnector;
 	private JMXServiceURL serviceUrl;
