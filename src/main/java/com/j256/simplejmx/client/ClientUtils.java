@@ -42,8 +42,8 @@ public class ClientUtils {
 			try {
 				return constr.newInstance(new Object[] { string });
 			} catch (Exception e) {
-				throw new IllegalArgumentException("Could not get new instance using string constructor for type "
-						+ typeString);
+				throw new IllegalArgumentException(
+						"Could not get new instance using string constructor for type " + typeString);
 			}
 		}
 	}
