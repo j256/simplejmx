@@ -4,8 +4,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.management.JMException;
@@ -175,11 +178,17 @@ public class JmxClientTest {
 	public void testGetOperationsInfo() throws Exception {
 		MBeanOperationInfo[] infos = client.getOperationsInfo(objectName);
 		assertEquals(13, infos.length);
-		assertEquals("times", infos[0].getName());
-		assertEquals("shortToString", infos[1].getName());
-		assertEquals("byteToString", infos[2].getName());
-		assertEquals("charToString", infos[3].getName());
-		assertEquals("doThrow", infos[4].getName());
+		Set<String> expectedNames =
+				new HashSet<String>(Arrays.asList("times", "shortToString", "byteToString", "charToString", "doThrow"));
+
+		// orders seem to change
+		for (MBeanOperationInfo info : infos) {
+			expectedNames.remove(info.getName());
+		}
+
+		for (String expectedName : expectedNames) {
+			fail("should have matched " + expectedName);
+		}
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -458,66 +467,82 @@ public class JmxClientTest {
 	@JmxResource(domainName = JMX_DOMAIN)
 	protected static class JmxClientTestObject {
 		int x;
+
 		@JmxAttributeMethod
 		public void setX(int x) {
 			this.x = x;
 		}
+
 		@JmxAttributeMethod
 		public int getX() {
 			return x;
 		}
+
 		@JmxAttributeMethod
 		public String getNull() {
 			return null;
 		}
+
 		@JmxOperation
 		public long times(short x1, int x2) {
 			return x1 * x2;
 		}
+
 		@JmxOperation
 		public void doThrow() {
 			throw new RuntimeException("throw away!");
 		}
+
 		@JmxOperation
 		public Object returnNull() {
 			return null;
 		}
+
 		@JmxOperation
 		public Object returnNull(int anotherArg) {
 			return null;
 		}
+
 		@JmxOperation
 		public String dateToString(Date date) {
 			return date.toString();
 		}
+
 		@JmxOperation
 		public String booleanToString(boolean booleanVal) {
 			return Boolean.toString(booleanVal);
 		}
+
 		@JmxOperation
 		public String charToString(char charVal) {
 			return Character.toString(charVal);
 		}
+
 		@JmxOperation
 		public String byteToString(byte byteVal) {
 			return Byte.toString(byteVal);
 		}
+
 		@JmxOperation
 		public String shortToString(short shortVal) {
 			return Short.toString(shortVal);
 		}
+
 		@JmxOperation
 		public String intToString(int intVal) {
 			return Integer.toString(intVal);
 		}
+
 		@JmxOperation
 		public String longToString(long longVal) {
 			return Long.toString(longVal);
 		}
+
 		@JmxOperation
 		public String floatToString(float floatVal) {
 			return Float.toString(floatVal);
 		}
+
 		@JmxOperation
 		public String doubleToString(double doubleVal) {
 			return Double.toString(doubleVal);
@@ -527,14 +552,17 @@ public class JmxClientTest {
 	@JmxResource(domainName = JMX_DOMAIN)
 	protected static class JmxClientTestAnotherObject {
 		int y;
+
 		@JmxAttributeMethod
 		public int getY() {
 			return y;
 		}
+
 		@JmxAttributeMethod
 		public void setY(int y) {
 			this.y = y;
 		}
+
 		@JmxOperation
 		public long timesTwo(short y1, int y2) {
 			return y1 * y2;
