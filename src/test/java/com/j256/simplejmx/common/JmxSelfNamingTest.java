@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 
 import javax.management.JMException;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import com.j256.simplejmx.client.JmxClient;
@@ -23,12 +24,13 @@ public class JmxSelfNamingTest {
 	public void testGetAll() throws Exception {
 		int port = 8000;
 		JmxServer server = new JmxServer(port);
+		JmxClient client = null;
 		try {
 			server.start();
 			OurJmxObject jmxObject = new OurJmxObject();
 			server.register(jmxObject);
 
-			JmxClient client = new JmxClient(port);
+			client = new JmxClient(port);
 			try {
 				client.getAttribute(
 						ObjectNameUtil.makeObjectName(JMX_RESOURCE_DOMAIN_NAME, JMX_RESOURCE_BEAN_NAME, new String[] {
@@ -43,6 +45,7 @@ public class JmxSelfNamingTest {
 							JMX_SELF_NAMING_BEAN_NAME, new String[] { "zing" }), "foo");
 			assertEquals(jmxObject.foo, value);
 		} finally {
+			IOUtils.closeQuietly(client);
 			server.stop();
 		}
 	}

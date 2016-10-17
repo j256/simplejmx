@@ -70,16 +70,17 @@ public class JmxClientTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testNullUrl() throws Exception {
-		new JmxClient(null);
+		new JmxClient(null).close();
 	}
 
 	@Test(expected = JMException.class)
 	public void testInvalidUrl() throws Exception {
-		new JmxClient("invalid url");
+		new JmxClient("invalid url").close();
 	}
 
 	@Test
 	public void testHostPort() throws Exception {
+		@SuppressWarnings("resource")
 		JmxClient client = new JmxClient("localhost", JMX_PORT);
 		try {
 			client.getAttribute(objectName, "x");
@@ -156,6 +157,7 @@ public class JmxClientTest {
 
 	@Test
 	public void testGetAttributeInfoUnknown() throws Exception {
+		@SuppressWarnings("resource")
 		JmxClient client = new JmxClient(JMX_PORT);
 		try {
 			assertNull(client.getAttributeInfo(objectName, "not-known"));

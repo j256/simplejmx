@@ -13,6 +13,7 @@ import javax.management.JMException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.ReflectionException;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,7 +55,7 @@ public class ReflectionMbeanTest {
 	@Test
 	public void testRegister() throws Exception {
 		TestObject obj = new TestObject();
-		JmxClient client;
+		JmxClient client = null;
 		try {
 			client = new JmxClient(DEFAULT_PORT);
 			server.register(obj);
@@ -88,6 +89,7 @@ public class ReflectionMbeanTest {
 			}
 
 		} finally {
+			IOUtils.closeQuietly(client);
 			server.unregister(obj);
 		}
 	}
@@ -95,7 +97,7 @@ public class ReflectionMbeanTest {
 	@Test
 	public void testGetAttributes() throws Exception {
 		TestObject obj = new TestObject();
-		JmxClient client;
+		JmxClient client = null;
 		try {
 			client = new JmxClient(DEFAULT_PORT);
 			server.register(obj);
@@ -106,6 +108,7 @@ public class ReflectionMbeanTest {
 			assertEquals(int.class.toString(), attributes[0].getType());
 
 		} finally {
+			IOUtils.closeQuietly(client);
 			server.unregister(obj);
 		}
 	}
@@ -175,14 +178,16 @@ public class ReflectionMbeanTest {
 	@Test
 	public void testMultiOperationSameName() throws Exception {
 		MultiOperationSameName obj = new MultiOperationSameName();
+		JmxClient client = null;
 		try {
 			server.register(obj);
-			JmxClient client = new JmxClient(DEFAULT_PORT);
+			client = new JmxClient(DEFAULT_PORT);
 			int x = 1002;
 			assertEquals(x, client.invokeOperation(DOMAIN_NAME, OBJECT_NAME, "assignX", x));
 			int y = 2934;
 			assertEquals(y, client.invokeOperation(DOMAIN_NAME, OBJECT_NAME, "assignX", x, y));
 		} finally {
+			IOUtils.closeQuietly(client);
 			server.unregister(obj);
 		}
 	}
@@ -190,9 +195,10 @@ public class ReflectionMbeanTest {
 	@Test
 	public void testAttributeFieldGets() throws Exception {
 		AttributeField attributeField = new AttributeField();
+		JmxClient client = null;
 		try {
 			server.register(attributeField);
-			JmxClient client = new JmxClient(DEFAULT_PORT);
+			client = new JmxClient(DEFAULT_PORT);
 			assertEquals(READ_ONLY_DEFAULT, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "readOnly"));
 			assertEquals(READ_WRITE_DEFAULT, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "readWrite"));
 			try {
@@ -214,6 +220,7 @@ public class ReflectionMbeanTest {
 				// expected
 			}
 		} finally {
+			IOUtils.closeQuietly(client);
 			server.unregister(attributeField);
 		}
 	}
@@ -448,10 +455,12 @@ public class ReflectionMbeanTest {
 	@JmxResource(description = "Test object", domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	protected static class MultiOperationSameName {
 		int x;
+
 		@JmxOperation(description = "Do stuff")
 		public int assignX(int x) {
 			return x;
 		}
+
 		@JmxOperation(description = "Do stuff")
 		public int assignX(int x, int y) {
 			return y;
@@ -461,10 +470,12 @@ public class ReflectionMbeanTest {
 	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	protected static class IsMethod {
 		boolean flag;
+
 		@JmxAttributeMethod
 		public boolean isFlag() {
 			return flag;
 		}
+
 		@JmxAttributeMethod
 		public void setFlag(boolean flag) {
 			this.flag = flag;
@@ -485,10 +496,12 @@ public class ReflectionMbeanTest {
 		int notPrivate;
 		@SuppressWarnings("unused")
 		private int noAnnotation = 4;
+
 		@JmxOperation(description = "Do stuff")
 		public int assignX(int x) {
 			return x;
 		}
+
 		@JmxOperation(description = "Do stuff")
 		public int assignX(int x, int y) {
 			return y;

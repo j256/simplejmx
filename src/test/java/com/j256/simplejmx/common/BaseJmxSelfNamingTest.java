@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 
 import javax.management.JMException;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import com.j256.simplejmx.client.JmxClient;
@@ -21,12 +22,13 @@ public class BaseJmxSelfNamingTest {
 	public void testOverrideOne() throws Exception {
 		int port = 8000;
 		JmxServer server = new JmxServer(port);
+		JmxClient client = null;
 		try {
 			server.start();
 			OurJmxObject jmxObject = new OurJmxObject();
 			server.register(jmxObject);
 
-			JmxClient client = new JmxClient(port);
+			client = new JmxClient(port);
 			try {
 				client.getAttribute(ObjectNameUtil.makeObjectName(DOMAIN_NAME, JMX_RESOURCE_BEAN_NAME), "foo");
 				fail("should have thrown");
@@ -34,11 +36,11 @@ public class BaseJmxSelfNamingTest {
 				// expected
 			}
 
-			long value =
-					(Long) client.getAttribute(ObjectNameUtil.makeObjectName(DOMAIN_NAME, JMX_SELF_NAMING_BEAN_NAME),
-							"foo");
+			long value = (Long) client
+					.getAttribute(ObjectNameUtil.makeObjectName(DOMAIN_NAME, JMX_SELF_NAMING_BEAN_NAME), "foo");
 			assertEquals(jmxObject.foo, value);
 		} finally {
+			IOUtils.closeQuietly(client);
 			server.stop();
 		}
 	}
@@ -47,17 +49,18 @@ public class BaseJmxSelfNamingTest {
 	public void testOverrideNone() throws Exception {
 		int port = 8000;
 		JmxServer server = new JmxServer(port);
+		JmxClient client = null;
 		try {
 			server.start();
 			OurJmxObjectNoOverride jmxObject = new OurJmxObjectNoOverride();
 			server.register(jmxObject);
 
-			JmxClient client = new JmxClient(port);
-			long value =
-					(Long) client.getAttribute(ObjectNameUtil.makeObjectName(DOMAIN_NAME, JMX_RESOURCE_BEAN_NAME),
-							"foo");
+			client = new JmxClient(port);
+			long value = (Long) client.getAttribute(ObjectNameUtil.makeObjectName(DOMAIN_NAME, JMX_RESOURCE_BEAN_NAME),
+					"foo");
 			assertEquals(jmxObject.foo, value);
 		} finally {
+			IOUtils.closeQuietly(client);
 			server.stop();
 		}
 	}
