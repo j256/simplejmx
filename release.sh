@@ -94,7 +94,7 @@ fi
 ver=`grep '^@set $LIBRARY_version' src/main/doc/$LIBRARY.texi | cut -f3 -d' '`
 if [ "$release" != "$ver" ]; then
 	/bin/echo "$LIBRARY.texi version seems wrong:"
-	grep '^@set $LIBRARY_version' src/main/doc/$LIBRARY.texi
+	grep "^@set $LIBRARY_version" src/main/doc/$LIBRARY.texi
 	/bin/echo -n "Press control-c to quit otherwise return.  [ok] "
 	read cont
 fi
