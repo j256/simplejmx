@@ -7,7 +7,7 @@
 	<version>1.14-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Simple JMX</name>
-	<url>http://256.com/sources/simplejmx/</url>
+	<url>http://256stuff.com/sources/simplejmx/</url>
 	<description>Simple JMX Classes</description>
 	<licenses>
 		<license>
@@ -38,9 +38,9 @@
 		<developer>
 			<id>gray</id>
 			<name>Gray Watson</name>
-			<url>http://256.com/gray/</url>
-			<organization>256.com</organization>
-			<organizationUrl>http://256.com/</organizationUrl>
+			<url>http://256stuff.com/gray/</url>
+			<organization>256stuff.com</organization>
+			<organizationUrl>http://256stuff.com/</organizationUrl>
 			<roles>
 				<role>architect</role>
 				<role>developer</role>
