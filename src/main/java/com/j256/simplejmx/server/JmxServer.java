@@ -48,6 +48,7 @@ public class JmxServer {
 	private RMIServerSocketFactory serverSocketFactory;
 	private boolean serverHostNamePropertySet = false;
 	private String serviceUrl;
+	private Map<String, Object> envMap = new HashMap<String, Object>();
 
 	/**
 	 * Create a JMX server that will be set with the port using setters. Used with spring. You must at least specify the
@@ -448,6 +449,23 @@ public class JmxServer {
 	public int getRegisteredCount() {
 		return registeredCount;
 	}
+	
+	/**
+	 * Gets the map used with the {@link JMXConnectorServerFactory}
+	 */
+	public Map<String, Object> getEnvironmentMap()
+	{
+		return envMap;
+	}
+
+	/**
+	 * Sets the map used with the {@link JMXConnectorServerFactory}
+	 */
+	public void setEnvironmentMap( Map<String, Object> environmentMap )
+	{
+		this.envMap = environmentMap;
+	}
+
 
 	private String getObjectDescription(Object obj) {
 		Class<? extends Object> clazz = obj.getClass();
@@ -533,9 +551,10 @@ public class JmxServer {
 			throw createJmException("Malformed service url created " + serviceUrl, e);
 		}
 
-		Map<String, Object> envMap = null;
+		
 		if (serverSocketFactory != null) {
-			envMap = new HashMap<String, Object>();
+			if (envMap == null)
+				envMap = new HashMap<String, Object>();
 			envMap.put(RMIConnectorServer.RMI_SERVER_SOCKET_FACTORY_ATTRIBUTE, serverSocketFactory);
 		}
 		/*
