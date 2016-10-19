@@ -18,7 +18,7 @@ public class ClientUtils {
 			return Boolean.parseBoolean(string);
 		} else if (typeString.equals("char") || typeString.equals("java.lang.Character")) {
 			if (string.length() == 0) {
-				// not sure what to do here ffee
+				// not sure what to do here
 				return '\0';
 			} else {
 				return string.toCharArray()[0];
