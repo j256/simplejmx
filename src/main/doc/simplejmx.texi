@@ -954,7 +954,7 @@ DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING F
 WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE
 USE OR PERFORMANCE OF THIS SOFTWARE.
 
-The author may be contacted via @uref{http://256.com/sources/simplejmx/}
+The author may be contacted via the @uref{http://256.com/sources/simplejmx/, SimpleJMX home page}.
 
 @c ----------------------------------------------------------------
 @node Index of Concepts,, License, Top

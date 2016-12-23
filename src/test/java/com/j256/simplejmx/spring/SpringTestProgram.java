@@ -7,7 +7,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * Spring is optional and will only work if you have a dependency on and import the Spring jar(s) in your project.
  * 
  * <p>
- * <b>NOTE:</b> This is posted on the http://256.com/sources/simplejmx/ website.
+ * <b>NOTE:</b> This is posted on the http://256stuff.com/sources/simplejmx/ website.
  * </p>
  * 
  * @author graywatson

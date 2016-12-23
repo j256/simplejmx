@@ -14,7 +14,7 @@ import com.j256.simplejmx.server.PublishAllBeanWrapper;
  * may also want to take a look at the {@link PublishAllExample} example which uses the {@link PublishAllBeanWrapper}.
  * 
  * <p>
- * <b>NOTE:</b> For more details, see the SimpleJMX website: http://256.com/sources/simplejmx/
+ * <b>NOTE:</b> For more details, see the SimpleJMX website: http://256stuff.com/sources/simplejmx/
  * </p>
  * 
  * @author graywatson

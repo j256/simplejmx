@@ -509,7 +509,7 @@ public class JmxWebHandler extends AbstractHandler {
 		if (!textOnly) {
 			appendLink(writer, false, "?t=1", "text", null, "Text version");
 			writer.append(".  Produced by ");
-			appendLink(writer, false, "http://256.com/sources/simplejmx/", "simplejmx", null, "SimpleJMX");
+			appendLink(writer, false, "http://256stuff.com/sources/simplejmx/", "simplejmx", null, "SimpleJMX");
 			appendLine(writer, false, null);
 			writer.append("</body></html>\n");
 		}
