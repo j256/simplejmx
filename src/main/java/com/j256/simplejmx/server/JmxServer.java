@@ -10,16 +10,23 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.RMIServerSocketFactory;
 import java.rmi.server.UnicastRemoteObject;
+import java.security.Principal;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.management.JMException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import javax.management.remote.JMXAuthenticator;
 import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXConnectorServerFactory;
+import javax.management.remote.JMXPrincipal;
 import javax.management.remote.JMXServiceURL;
 import javax.management.remote.rmi.RMIConnectorServer;
+import javax.security.auth.Subject;
 
 import com.j256.simplejmx.common.JmxAttributeFieldInfo;
 import com.j256.simplejmx.common.JmxAttributeMethodInfo;
@@ -48,6 +55,118 @@ public class JmxServer {
 	private RMIServerSocketFactory serverSocketFactory;
 	private boolean serverHostNamePropertySet = false;
 	private String serviceUrl;
+	private JMXAuthenticator authenticator;
+	private Map<String, Object> envMap = new HashMap<String, Object>();
+	
+	public static class JmxServerBuilder
+	{
+
+		protected Map<String, Object> envMap = new HashMap<String, Object>();
+		protected InetAddress inetAddress;
+		private RMIServerSocketFactory serverSocketFactory;
+		private JMXAuthenticator authenticator;
+		private MBeanServer mbeanServer;
+		private String serviceUrl;
+		private int serverPort;
+		private int registryPort;
+		private boolean usePlatformServer = false;
+		public static JmxServerBuilder newBuilder()
+		{
+			return new JmxServerBuilder();
+		}
+		
+		private JmxServerBuilder()
+		{
+			
+		}
+		public JmxServerBuilder withServerSocketFactory(RMIServerSocketFactory serverSocketFactory)
+		{
+			this.serverSocketFactory = serverSocketFactory;
+			return this;
+		}
+		public JmxServerBuilder withAuthenticator(JMXAuthenticator authenticator)
+		{
+			this.authenticator = authenticator;
+			return this;
+		}
+		public JmxServerBuilder withPasswordAuthenticator(String username, String password)
+		{
+			this.authenticator = getPasswordAuthenticator( username, password );
+			return this;
+		}
+		public JmxServerBuilder withDefaultServiceUrl()
+		{
+			this.serviceUrl = null;
+			return this;
+		}
+		public JmxServerBuilder withServerPort(int serverPort)
+		{
+			this.serverPort = serverPort;
+			return this;
+		}
+		public JmxServerBuilder withRegistryPort(int registryPort)
+		{
+			this.registryPort = registryPort;
+			return this;
+		}
+		public JmxServerBuilder withMBeanServer(MBeanServer mbeanServer)
+		{
+			this.mbeanServer = mbeanServer;
+			this.usePlatformServer = false;
+			return this;
+		}
+		public JmxServerBuilder withPlatformMBeanServer()
+		{
+			this.mbeanServer = null;
+			this.usePlatformServer = true;
+			return this;
+		}
+		public JmxServerBuilder withServiceUrl(String serviceUrl)
+		{
+			this.serviceUrl = serviceUrl;
+			return this;
+		}
+		public JmxServerBuilder withAddress(InetAddress inetAddress)
+		{
+			this.inetAddress = inetAddress;
+			return this;
+		}
+		public JmxServerBuilder withEnvironmentMap(Map<String, Object> envMap)
+		{
+			this.envMap = envMap;
+			return this;
+		}
+		public JmxServer build()
+		{
+			JmxServer server;
+			if (usePlatformServer)
+			{
+				server = new JmxServer( true );
+				server.setInetAddress( inetAddress );
+				server.setRegistryPort( registryPort );
+				server.setServerPort( serverPort );
+				server.setServerSocketFactory( serverSocketFactory );
+				server.setServiceUrl( serviceUrl );
+			}
+			else if (mbeanServer != null )
+			{
+				server = new JmxServer(mbeanServer);
+			}
+			else
+			{
+
+				server = new JmxServer( registryPort );
+				server.setInetAddress( inetAddress );
+				server.setServerPort( serverPort );
+				server.setServerSocketFactory( serverSocketFactory );
+				server.setServiceUrl( serviceUrl );
+			}
+			
+			server.setAuthenticator( authenticator );
+			server.setEnvironmentMap( envMap );
+			return server;
+		}
+	}
 
 	/**
 	 * Create a JMX server that will be set with the port using setters. Used with spring. You must at least specify the
@@ -138,7 +257,14 @@ public class JmxServer {
 			this.mbeanServer = ManagementFactory.getPlatformMBeanServer();
 		}
 	}
-
+	public void setAuthenticator(JMXAuthenticator authenticator)
+	{
+		this.authenticator = authenticator;
+	}
+	public void setEnvironmentMap(Map<String, Object> envMap)
+	{
+		this.envMap = envMap;
+	}
 	/**
 	 * Start our JMX service. The port must have already been called either in the {@link #JmxServer(int)} constructor
 	 * or the {@link #setRegistryPort(int)} method before this is called.
@@ -448,6 +574,14 @@ public class JmxServer {
 	public int getRegisteredCount() {
 		return registeredCount;
 	}
+	
+	/**
+	 * Gets the map used with the {@link JMXConnectorServerFactory}
+	 */
+	public Map<String, Object> getEnvironmentMap()
+	{
+		return envMap;
+	}
 
 	private String getObjectDescription(Object obj) {
 		Class<? extends Object> clazz = obj.getClass();
@@ -506,6 +640,27 @@ public class JmxServer {
 		if (connector != null) {
 			return;
 		}
+		
+		configureServerPorts();
+		JMXServiceURL url = buildServiceUrl();
+
+		/*
+		 * NOTE: I tried to inject a client socket factory with RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE
+		 * but I could not get it to work. It seemed to require the client to have the LocalSocketFactory class in the
+		 * classpath.
+		 */
+		injectServerSocketFactory();
+		
+
+		if (authenticator != null)
+		{
+			envMap.put(JMXConnectorServer.AUTHENTICATOR, authenticator);
+		}
+		startConnector( url );
+	}
+
+	private void configureServerPorts()
+	{
 		if (serverPort == 0) {
 			/*
 			 * If we aren't specifying an address then we can use the registry-port for both the registry call _and_ the
@@ -514,36 +669,11 @@ public class JmxServer {
 			 */
 			serverPort = registryPort;
 		}
-		String serverHost = "localhost";
-		String registryHost = "";
-		if (inetAddress != null) {
-			String hostAddr = inetAddress.getHostAddress();
-			serverHost = hostAddr;
-			registryHost = hostAddr;
-		}
-		if (serviceUrl == null) {
-			serviceUrl =
-					"service:jmx:rmi://" + serverHost + ":" + serverPort + "/jndi/rmi://" + registryHost + ":"
-							+ registryPort + "/jmxrmi";
-		}
-		JMXServiceURL url;
-		try {
-			url = new JMXServiceURL(serviceUrl);
-		} catch (MalformedURLException e) {
-			throw createJmException("Malformed service url created " + serviceUrl, e);
-		}
+	}
 
-		Map<String, Object> envMap = null;
-		if (serverSocketFactory != null) {
-			envMap = new HashMap<String, Object>();
-			envMap.put(RMIConnectorServer.RMI_SERVER_SOCKET_FACTORY_ATTRIBUTE, serverSocketFactory);
-		}
-		/*
-		 * NOTE: I tried to inject a client socket factory with RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE
-		 * but I could not get it to work. It seemed to require the client to have the LocalSocketFactory class in the
-		 * classpath.
-		 */
-
+	private void startConnector( JMXServiceURL url )
+		throws JMException
+	{
 		try {
 			mbeanServer = ManagementFactory.getPlatformMBeanServer();
 			connector = JMXConnectorServerFactory.newJMXConnectorServer(url, envMap, mbeanServer);
@@ -556,6 +686,38 @@ public class JmxServer {
 			connector = null;
 			throw createJmException("Could not start our Jmx connector server on URL: " + url, e);
 		}
+	}
+
+	private void injectServerSocketFactory()
+	{
+		if (serverSocketFactory != null) {
+			envMap.put(RMIConnectorServer.RMI_SERVER_SOCKET_FACTORY_ATTRIBUTE, serverSocketFactory);
+		}
+	}
+
+	private JMXServiceURL buildServiceUrl()
+		throws JMException
+	{
+		if (serviceUrl == null)
+		{
+			String serverHost = "localhost";
+			String registryHost = "";
+			if (inetAddress != null) {
+				String hostAddr = inetAddress.getHostAddress();
+				serverHost = hostAddr;
+				registryHost = hostAddr;
+			}
+				serviceUrl =
+						"service:jmx:rmi://" + serverHost + ":" + serverPort + "/jndi/rmi://" + registryHost + ":"
+								+ registryPort + "/jmxrmi";
+		}
+		JMXServiceURL url;
+		try {
+			url = new JMXServiceURL(serviceUrl);
+		} catch (MalformedURLException e) {
+			throw createJmException("Malformed service url created " + serviceUrl, e);
+		}
+		return url;
 	}
 
 	private JMException createJmException(String message, Exception e) {
@@ -598,4 +760,38 @@ public class JmxServer {
 			}
 		}
 	}
+	
+	static JMXAuthenticator getPasswordAuthenticator(String username, String password)
+	{
+		JMXAuthenticator authenticator = new JMXAuthenticator()
+		{
+
+			public Subject authenticate(Object credentials)
+			{
+				if (!(credentials instanceof String[]))
+					throw new SecurityException("Bad credentials");
+				String[] creds = (String[]) credentials;
+				if (creds.length != 2)
+					throw new SecurityException("Bad credentials");
+
+				String dusername = creds[0];
+				String dpassword = creds[1];
+
+				if (dpassword == null)
+					dpassword = "";
+
+				if (!username.equals(dusername))
+					throw new SecurityException("Unknown user " + username);
+				if (!password.equals(dpassword))
+					throw new SecurityException("Bad password");
+
+				Set<Principal> principals = new HashSet<>();
+				principals.add(new JMXPrincipal(username));
+				return new Subject(true, principals, Collections.EMPTY_SET, Collections.EMPTY_SET);
+			}
+
+		};
+		return authenticator;
+	}
+
 }

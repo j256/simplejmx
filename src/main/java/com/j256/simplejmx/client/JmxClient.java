@@ -119,6 +119,15 @@ public class JmxClient implements Closeable {
 	public JmxClient(String hostName, int port) throws JMException {
 		this(generalJmxUrlForHostNamePort(hostName, port));
 	}
+	
+
+	/**
+	 * Connect the client to a host and port combination, with a username and password.
+	 */
+	public JmxClient(String hostName, int port, String username, String password) throws JMException {
+		this(generalJmxUrlForHostNamePort(hostName, port), username, password);
+	}
+
 
 	/**
 	 * Connect the client to an address and port combination.
