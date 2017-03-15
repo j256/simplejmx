@@ -3,6 +3,7 @@ package com.j256.simplejmx.server;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -83,9 +84,7 @@ public class PublishAllBeanWrapperTest {
 
 		} finally {
 			server.unregister(resourceInfo);
-			if (client != null) {
-				client.close();
-			}
+			IOUtils.closeQuietly(client);
 		}
 	}
 
@@ -107,9 +106,7 @@ public class PublishAllBeanWrapperTest {
 			assertEquals(3, client.getAttributesInfo(DOMAIN_NAME, OBJECT_NAME).length);
 		} finally {
 			server.unregister(resourceInfo);
-			if (client != null) {
-				client.close();
-			}
+			IOUtils.closeQuietly(client);
 		}
 	}
 
@@ -118,15 +115,19 @@ public class PublishAllBeanWrapperTest {
 	protected static class TestObject {
 		private int foo = FOO_VALUE;
 		public int bar = BAR_VALUE;
+
 		public int getFoo() {
 			return foo;
 		}
+
 		public void setFoo(int foo) {
 			this.foo = foo;
 		}
+
 		public void resetFoo() {
 			this.foo = 0;
 		}
+
 		public void resetFoo(int newValue) {
 			this.foo = newValue;
 		}
@@ -134,9 +135,11 @@ public class PublishAllBeanWrapperTest {
 
 	protected static class SubClassTestObject extends TestObject {
 		private int baz;
+
 		public int getBaz() {
 			return baz;
 		}
+
 		public void setBaz(int baz) {
 			this.baz = baz;
 		}
