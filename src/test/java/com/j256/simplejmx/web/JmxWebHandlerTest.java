@@ -27,6 +27,7 @@ public class JmxWebHandlerTest {
 	public static void beforeClass() throws Exception {
 		webServer = new JmxWebServer(WEB_SERVER_PORT);
 		webServer.start();
+		Thread.sleep(2000);
 	}
 
 	@AfterClass
@@ -36,7 +37,7 @@ public class JmxWebHandlerTest {
 		}
 	}
 
-	@Test
+	@Test(timeout = 10000)
 	public void testSimple() throws Exception {
 		WebClient webClient = new WebClient();
 		HtmlPage page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT);
