@@ -28,12 +28,14 @@ public class JmxWebHandlerTest {
 		webServer = new JmxWebServer(WEB_SERVER_PORT);
 		webServer.start();
 		Thread.sleep(2000);
+		System.out.println("Web server started");
 	}
 
 	@AfterClass
 	public static void afterClass() throws Exception {
 		if (webServer != null) {
 			webServer.stop();
+			System.out.println("Web server stopped");
 		}
 	}
 
@@ -42,6 +44,8 @@ public class JmxWebHandlerTest {
 		WebClient webClient = new WebClient();
 		HtmlPage page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT);
 		assertTrue(page.asText().contains("JMX Domains"));
+		System.out.println("Got first page");
+
 		String domain = "java.lang";
 		HtmlAnchor anchor = page.getAnchorByText(domain);
 		assertNotNull(anchor);
@@ -100,6 +104,7 @@ public class JmxWebHandlerTest {
 		WebClient webClient = new WebClient();
 		HtmlPage page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/s");
 		assertTrue(page.asText().contains("All Beans"));
+		System.out.println("Got first page");
 
 		String beanName = "java.lang:type=Memory";
 		HtmlAnchor anchor = page.getAnchorByText(beanName);
