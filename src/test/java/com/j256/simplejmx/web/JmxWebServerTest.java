@@ -11,10 +11,11 @@ public class JmxWebServerTest {
 
 	private static final int WEB_SERVER_PORT = 8080;
 
-	@Test
+	@Test(timeout = 10000)
 	public void testBasic() throws Exception {
 		JmxWebServer webServer = new JmxWebServer(WEB_SERVER_PORT);
 		webServer.start();
+		Thread.sleep(2000);
 		try {
 			testServer();
 		} finally {
@@ -22,11 +23,12 @@ public class JmxWebServerTest {
 		}
 	}
 
-	@Test
+	@Test(timeout = 10000)
 	public void testSpring() throws Exception {
 		JmxWebServer webServer = new JmxWebServer();
 		webServer.setServerPort(WEB_SERVER_PORT);
 		webServer.start();
+		Thread.sleep(2000);
 		try {
 			testServer();
 		} finally {
