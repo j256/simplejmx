@@ -14,8 +14,8 @@ import javax.management.MBeanAttributeInfo;
 import javax.management.ReflectionException;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.j256.simplejmx.client.JmxClient;
@@ -36,16 +36,16 @@ public class ReflectionMbeanTest {
 	private static final int WRITE_ONLY_DEFAULT = 623423;
 	private static final int NEITHER_DEFAULT = 7985547;
 
-	private JmxServer server;
+	private static JmxServer server;
 
-	@Before
-	public void before() throws Exception {
+	@BeforeClass
+	public static void before() throws Exception {
 		server = new JmxServer(DEFAULT_PORT);
 		server.start();
 	}
 
-	@After
-	public void after() {
+	@AfterClass
+	public static void after() {
 		if (server != null) {
 			server.stop();
 			server = null;
