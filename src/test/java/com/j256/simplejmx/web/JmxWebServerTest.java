@@ -9,7 +9,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 public class JmxWebServerTest {
 
-	private static final int WEB_SERVER_PORT = 8081;
+	private static final int WEB_SERVER_PORT = 8080;
 
 	@Test(timeout = 10000)
 	public void testBasic() throws Exception {

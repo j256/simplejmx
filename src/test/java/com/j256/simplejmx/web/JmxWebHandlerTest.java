@@ -5,6 +5,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.net.InetAddress;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -42,7 +44,7 @@ public class JmxWebHandlerTest {
 	@Test(timeout = 10000)
 	public void testSimple() throws Exception {
 		WebClient webClient = new WebClient();
-		HtmlPage page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT);
+		HtmlPage page = webClient.getPage("http://" + InetAddress.getLocalHost() + ":" + WEB_SERVER_PORT);
 		assertTrue(page.asText().contains("JMX Domains"));
 		System.err.println("Got first page");
 
@@ -99,10 +101,10 @@ public class JmxWebHandlerTest {
 		assertEquals(operation + " method successfully invoked.\n", textPage.getContent());
 	}
 
-	@Test
+	@Test(timeout = 10000)
 	public void testOtherStuff() throws Exception {
 		WebClient webClient = new WebClient();
-		HtmlPage page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/s");
+		HtmlPage page = webClient.getPage("http://" + InetAddress.getLocalHost() + ":" + WEB_SERVER_PORT + "/s");
 		assertTrue(page.asText().contains("All Beans"));
 		System.err.println("Got first page");
 
@@ -158,9 +160,8 @@ public class JmxWebHandlerTest {
 		page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/a/" + beanName + "/notFound?val=foo");
 		assertTrue(page.asText().contains("Cannot find attribute"));
 
-		page =
-				webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/a/" + beanName
-						+ "/ObjectPendingFinalizationCount?val=foo");
+		page = webClient.getPage(
+				"http://localhost:" + WEB_SERVER_PORT + "/a/" + beanName + "/ObjectPendingFinalizationCount?val=foo");
 		assertTrue(page.asText().contains("Could not set attribute"));
 
 		/* invoke errors */
