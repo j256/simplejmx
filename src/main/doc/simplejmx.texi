@@ -6,9 +6,9 @@
 @c %**end of header
 
 @c ----------------------------------------------------------------
-@set simplejmx_version 1.13
-@set simplejmx_year 2016
-@set simplejmx_date October @value{simplejmx_year}
+@set simplejmx_version 1.14
+@set simplejmx_year 2017
+@set simplejmx_date March @value{simplejmx_year}
 @set package SimpleJMX
 @c ----------------------------------------------------------------
 

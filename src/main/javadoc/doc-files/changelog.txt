@@ -1,4 +1,5 @@
-1.14: X/X/2017
+1.14: 3/16/2017
+	* Ton of improvements to tests to get them to work with circle-ci and (I suspect) other systems.
 	* Added optional address to the jmx web server constructor.
 
 1.13: 10/17/2016
