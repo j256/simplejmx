@@ -32,7 +32,7 @@ import com.j256.simplejmx.common.ObjectNameUtil;
 
 public class JmxServerTest {
 
-	private static final int DEFAULT_PORT = 5256;
+	private static final int DEFAULT_PORT = 5260;
 	private static final String DOMAIN_NAME = "j256";
 	private static final String OBJECT_NAME = "testObject";
 	private static final int FOO_VALUE = 1459243;
