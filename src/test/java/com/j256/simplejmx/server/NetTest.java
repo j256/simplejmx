@@ -84,7 +84,6 @@ public class NetTest {
 				if (socket != null) {
 					socket.close();
 				}
-				serverSocket.close();
 			}
 		}
 	}
