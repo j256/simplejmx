@@ -303,9 +303,8 @@ public class JmxServer {
 		}
 		ReflectionMbean mbean;
 		try {
-			mbean =
-					new ReflectionMbean(obj, description, attributeFieldInfos, attributeMethodInfos, operationInfos,
-							false);
+			mbean = new ReflectionMbean(obj, description, attributeFieldInfos, attributeMethodInfos, operationInfos,
+					false);
 		} catch (Exception e) {
 			throw createJmException("Could not build MBean object for: " + obj, e);
 		}
@@ -522,9 +521,8 @@ public class JmxServer {
 			registryHost = hostAddr;
 		}
 		if (serviceUrl == null) {
-			serviceUrl =
-					"service:jmx:rmi://" + serverHost + ":" + serverPort + "/jndi/rmi://" + registryHost + ":"
-							+ registryPort + "/jmxrmi";
+			serviceUrl = "service:jmx:rmi://" + serverHost + ":" + serverPort + "/jndi/rmi://" + registryHost + ":"
+					+ registryPort + "/jmxrmi";
 		}
 		JMXServiceURL url;
 		try {
