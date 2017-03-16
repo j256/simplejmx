@@ -59,19 +59,25 @@ public class JmxServerTest {
 	@Test
 	public void testJmxServerStartStopStart() throws Exception {
 		server = new JmxServer(serverAddress, differentPost.incrementAndGet());
-		server.stop();
-		server.start();
+		try {
+			server.stop();
+			server.start();
+		} finally {
+			server.stop();
+		}
 	}
 
 	@Test(expected = JMException.class)
 	public void testJmxServerDoubleInstance() throws Exception {
 		int port = differentPost.incrementAndGet();
 		JmxServer first = new JmxServer(serverAddress, port);
+		JmxServer second = new JmxServer(serverAddress, port);
 		try {
 			first.start();
-			new JmxServer(serverAddress, port).start();
+			second.start();
 		} finally {
 			first.stop();
+			second.stop();
 		}
 	}
 
