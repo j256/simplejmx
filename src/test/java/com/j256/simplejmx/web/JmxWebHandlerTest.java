@@ -29,15 +29,14 @@ public class JmxWebHandlerTest {
 	public static void beforeClass() throws Exception {
 		webServer = new JmxWebServer(InetAddress.getByName("localhost"), WEB_SERVER_PORT);
 		webServer.start();
-		System.err.println("Web server started");
 		Thread.sleep(2000);
 	}
 
 	@AfterClass
 	public static void afterClass() throws Exception {
+		// Thread.sleep(100000);
 		if (webServer != null) {
 			webServer.stop();
-			System.err.println("Web server stopped");
 		}
 	}
 
@@ -46,7 +45,6 @@ public class JmxWebHandlerTest {
 		WebClient webClient = new WebClient();
 		HtmlPage page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT);
 		assertTrue(page.asText().contains("JMX Domains"));
-		System.err.println("Got first page");
 
 		String domain = "java.lang";
 		HtmlAnchor anchor = page.getAnchorByText(domain);
@@ -104,12 +102,16 @@ public class JmxWebHandlerTest {
 	@Test(timeout = 10000)
 	public void testOtherStuff() throws Exception {
 		WebClient webClient = new WebClient();
-		HtmlPage page = webClient.getPage("http://" + InetAddress.getLocalHost() + ":" + WEB_SERVER_PORT + "/s");
+		HtmlPage page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT);
+		assertTrue(page.asText().contains("Show all beans"));
+
+		HtmlAnchor anchor = page.getAnchorByText("Show all beans.");
+		assertNotNull(anchor);
+		page = anchor.click();
 		assertTrue(page.asText().contains("All Beans"));
-		System.err.println("Got first page");
 
 		String beanName = "java.lang:type=Memory";
-		HtmlAnchor anchor = page.getAnchorByText(beanName);
+		anchor = page.getAnchorByText(beanName);
 		page = anchor.click();
 		assertTrue(page.asText().contains("Information about object " + beanName));
 
