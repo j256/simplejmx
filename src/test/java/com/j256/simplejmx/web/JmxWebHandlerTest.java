@@ -48,6 +48,7 @@ public class JmxWebHandlerTest {
 		WebClient webClient = new WebClient();
 		HtmlPage page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT);
 		assertTrue(page.asText().contains("JMX Domains"));
+		System.err.println("Got first page");
 
 		String domain = "java.lang";
 		HtmlAnchor anchor = page.getAnchorByText(domain);
