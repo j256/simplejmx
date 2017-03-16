@@ -33,7 +33,10 @@ public class BaseJmxSelfNamingTest {
 
 			client = new JmxClient(address, port);
 			try {
-				client.getAttribute(ObjectNameUtil.makeObjectName(DOMAIN_NAME, JMX_RESOURCE_BEAN_NAME), "foo");
+				long value = (Long) client
+						.getAttribute(ObjectNameUtil.makeObjectName(DOMAIN_NAME, JMX_RESOURCE_BEAN_NAME), "foo");
+				// should not get here
+				System.err.println("Got value " + value);
 				fail("should have thrown");
 			} catch (JMException e) {
 				// expected
