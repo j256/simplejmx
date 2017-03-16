@@ -4,8 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.j256.simplejmx.client.JmxClient;
@@ -19,16 +19,16 @@ public class PublishAllBeanWrapperTest {
 	private static final int FOO_VALUE = 1459243;
 	private static final int BAR_VALUE = 1423459243;
 
-	private JmxServer server;
+	private static JmxServer server;
 
-	@Before
-	public void before() throws Exception {
+	@BeforeClass
+	public static void beforeClass() throws Exception {
 		server = new JmxServer(DEFAULT_PORT);
 		server.start();
 	}
 
-	@After
-	public void after() {
+	@AfterClass
+	public static void afterClass() {
 		if (server != null) {
 			server.stop();
 			server = null;

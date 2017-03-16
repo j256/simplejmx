@@ -2,6 +2,8 @@ package com.j256.simplejmx.server;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -56,6 +58,23 @@ public class NetTest {
 		int numBytes = socket.getInputStream().read(bytes);
 		assertTrue(numBytes > 0);
 		System.out.println("Got " + new String(bytes, 0, numBytes));
+	}
+
+	@Test
+	public void testEtcHosts() throws Exception {
+		BufferedReader reader = new BufferedReader(new FileReader("/etc/hosts"));
+		try {
+			System.out.println("Contents of /etc/hosts");
+			while (true) {
+				String line = reader.readLine();
+				if (line == null) {
+					break;
+				}
+				System.out.println(line);
+			}
+		} finally {
+			reader.close();
+		}
 	}
 
 	private static class OurServer implements Runnable {
