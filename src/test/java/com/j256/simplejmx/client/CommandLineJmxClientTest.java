@@ -27,14 +27,15 @@ public class CommandLineJmxClientTest {
 	private static JmxServer server;
 	private static CommandLineJmxClient client;
 	private static String objectNameString;
+	private static CommandLineJmxClientTestObject testObj;
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
 		InetAddress address = InetAddress.getByName("localhost");
 		server = new JmxServer(InetAddress.getByName("localhost"), JMX_PORT);
 		server.start();
-		CommandLineJmxClientTestObject obj = new CommandLineJmxClientTestObject();
-		server.register(obj);
+		testObj = new CommandLineJmxClientTestObject();
+		server.register(testObj);
 		client = new CommandLineJmxClient(address, JMX_PORT);
 		objectNameString = JMX_DOMAIN + ":name=" + CommandLineJmxClientTestObject.class.getSimpleName();
 	}
@@ -164,9 +165,10 @@ public class CommandLineJmxClientTest {
 
 	@Test
 	public void testGetAttribute() throws Exception {
+		int value = 456;
+		testObj.x = value;
 		String output = getClientOutput(client, "get " + objectNameString + " x");
-		assertTrue(output, output.matches("(?s).*get 'x' in \\d+ms = 0.*"));
-
+		assertTrue(output, output.matches("(?s).*get 'x' in \\d+ms = " + value + ".*"));
 	}
 
 	@Test
@@ -473,7 +475,7 @@ public class CommandLineJmxClientTest {
 
 	@JmxResource(domainName = JMX_DOMAIN)
 	protected static class CommandLineJmxClientTestObject {
-		int x;
+		volatile int x;
 
 		@JmxAttributeMethod
 		public void setX(int x) {
