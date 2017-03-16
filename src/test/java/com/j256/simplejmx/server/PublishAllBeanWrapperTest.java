@@ -3,6 +3,8 @@ package com.j256.simplejmx.server;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.net.InetAddress;
+
 import org.apache.commons.io.IOUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -20,10 +22,12 @@ public class PublishAllBeanWrapperTest {
 	private static final int BAR_VALUE = 1423459243;
 
 	private static JmxServer server;
+	private static InetAddress serverAddress;
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-		server = new JmxServer(DEFAULT_PORT);
+		serverAddress = InetAddress.getByName("127.0.0.1");
+		server = new JmxServer(serverAddress, DEFAULT_PORT);
 		server.start();
 	}
 
@@ -42,7 +46,7 @@ public class PublishAllBeanWrapperTest {
 		PublishAllBeanWrapper publishAll = new PublishAllBeanWrapper(obj, resourceInfo);
 		JmxClient client = null;
 		try {
-			client = new JmxClient(DEFAULT_PORT);
+			client = new JmxClient(serverAddress, DEFAULT_PORT);
 			server.register(publishAll);
 
 			assertEquals(FOO_VALUE, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo"));
@@ -95,7 +99,7 @@ public class PublishAllBeanWrapperTest {
 		PublishAllBeanWrapper publishAll = new PublishAllBeanWrapper(obj, resourceInfo);
 		JmxClient client = null;
 		try {
-			client = new JmxClient(DEFAULT_PORT);
+			client = new JmxClient(serverAddress, DEFAULT_PORT);
 			server.register(publishAll);
 
 			obj.bar = 37634345;
