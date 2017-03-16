@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -42,7 +43,8 @@ public class JmxClientTest {
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-		server = new JmxServer(JMX_PORT);
+		InetAddress address = InetAddress.getByName("localhost");
+		server = new JmxServer(address, JMX_PORT);
 		server.start();
 		JmxClientTestObject obj = new JmxClientTestObject();
 		server.register(obj);
@@ -54,8 +56,8 @@ public class JmxClientTest {
 		anotherBeanName = JmxClientTestAnotherObject.class.getSimpleName();
 		anotherObjectName = ObjectNameUtil.makeObjectName(JMX_DOMAIN, anotherBeanName);
 
-		client = new JmxClient(JMX_PORT);
-		closedClient = new JmxClient(JMX_PORT);
+		client = new JmxClient(address, JMX_PORT);
+		closedClient = new JmxClient(address, JMX_PORT);
 		closedClient.closeThrow();
 	}
 
@@ -160,13 +162,7 @@ public class JmxClientTest {
 
 	@Test
 	public void testGetAttributeInfoUnknown() throws Exception {
-		@SuppressWarnings("resource")
-		JmxClient client = new JmxClient(JMX_PORT);
-		try {
-			assertNull(client.getAttributeInfo(objectName, "not-known"));
-		} finally {
-			client.closeThrow();
-		}
+		assertNull(client.getAttributeInfo(objectName, "not-known"));
 	}
 
 	@Test(expected = IllegalArgumentException.class)

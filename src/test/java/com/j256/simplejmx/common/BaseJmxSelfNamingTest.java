@@ -3,6 +3,8 @@ package com.j256.simplejmx.common;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.net.InetAddress;
+
 import javax.management.JMException;
 
 import org.apache.commons.io.IOUtils;
@@ -21,14 +23,15 @@ public class BaseJmxSelfNamingTest {
 	@Test
 	public void testOverrideOne() throws Exception {
 		int port = 8000;
-		JmxServer server = new JmxServer(port);
+		InetAddress address = InetAddress.getByName("127.0.0.1");
+		JmxServer server = new JmxServer(address, port);
 		JmxClient client = null;
 		try {
 			server.start();
 			OurJmxObject jmxObject = new OurJmxObject();
 			server.register(jmxObject);
 
-			client = new JmxClient(port);
+			client = new JmxClient(address, port);
 			try {
 				client.getAttribute(ObjectNameUtil.makeObjectName(DOMAIN_NAME, JMX_RESOURCE_BEAN_NAME), "foo");
 				fail("should have thrown");
@@ -48,14 +51,15 @@ public class BaseJmxSelfNamingTest {
 	@Test
 	public void testOverrideNone() throws Exception {
 		int port = 8000;
-		JmxServer server = new JmxServer(port);
+		InetAddress address = InetAddress.getByName("127.0.0.1");
+		JmxServer server = new JmxServer(address, port);
 		JmxClient client = null;
 		try {
 			server.start();
 			OurJmxObjectNoOverride jmxObject = new OurJmxObjectNoOverride();
 			server.register(jmxObject);
 
-			client = new JmxClient(port);
+			client = new JmxClient(address, port);
 			long value = (Long) client.getAttribute(ObjectNameUtil.makeObjectName(DOMAIN_NAME, JMX_RESOURCE_BEAN_NAME),
 					"foo");
 			assertEquals(jmxObject.foo, value);

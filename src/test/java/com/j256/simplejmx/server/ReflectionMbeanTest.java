@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.net.InetAddress;
 import java.util.List;
 
 import javax.management.Attribute;
@@ -26,7 +27,7 @@ import com.j256.simplejmx.common.JmxResource;
 
 public class ReflectionMbeanTest {
 
-	private static final int DEFAULT_PORT = 5256;
+	private static final int DEFAULT_PORT = 5257;
 	private static final String DOMAIN_NAME = "j256";
 	private static final String OBJECT_NAME = "ReflectionMbeanTest";
 	private static final int FOO_VALUE = 1459243;
@@ -37,10 +38,12 @@ public class ReflectionMbeanTest {
 	private static final int NEITHER_DEFAULT = 7985547;
 
 	private static JmxServer server;
+	private static InetAddress serverAddress;
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-		server = new JmxServer(DEFAULT_PORT);
+		serverAddress = InetAddress.getByName("127.0.0.1");
+		server = new JmxServer(serverAddress, DEFAULT_PORT);
 		server.start();
 	}
 
@@ -57,7 +60,7 @@ public class ReflectionMbeanTest {
 		TestObject obj = new TestObject();
 		JmxClient client = null;
 		try {
-			client = new JmxClient(DEFAULT_PORT);
+			client = new JmxClient(serverAddress, DEFAULT_PORT);
 			server.register(obj);
 
 			try {
@@ -99,7 +102,7 @@ public class ReflectionMbeanTest {
 		TestObject obj = new TestObject();
 		JmxClient client = null;
 		try {
-			client = new JmxClient(DEFAULT_PORT);
+			client = new JmxClient(serverAddress, DEFAULT_PORT);
 			server.register(obj);
 
 			MBeanAttributeInfo[] attributes = client.getAttributesInfo(DOMAIN_NAME, OBJECT_NAME);
@@ -181,7 +184,7 @@ public class ReflectionMbeanTest {
 		JmxClient client = null;
 		try {
 			server.register(obj);
-			client = new JmxClient(DEFAULT_PORT);
+			client = new JmxClient(serverAddress, DEFAULT_PORT);
 			int x = 1002;
 			assertEquals(x, client.invokeOperation(DOMAIN_NAME, OBJECT_NAME, "assignX", x));
 			int y = 2934;
@@ -198,7 +201,7 @@ public class ReflectionMbeanTest {
 		JmxClient client = null;
 		try {
 			server.register(attributeField);
-			client = new JmxClient(DEFAULT_PORT);
+			client = new JmxClient(serverAddress, DEFAULT_PORT);
 			assertEquals(READ_ONLY_DEFAULT, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "readOnly"));
 			assertEquals(READ_WRITE_DEFAULT, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "readWrite"));
 			try {
@@ -228,7 +231,7 @@ public class ReflectionMbeanTest {
 	@Test
 	public void testAttributeFieldSets() throws Exception {
 		AttributeField attributeField = new AttributeField();
-		JmxClient client = new JmxClient(DEFAULT_PORT);
+		JmxClient client = new JmxClient(serverAddress, DEFAULT_PORT);
 		try {
 			server.register(attributeField);
 			try {
@@ -266,7 +269,7 @@ public class ReflectionMbeanTest {
 	@Test
 	public void testIsMethod() throws Exception {
 		IsMethod isMethod = new IsMethod();
-		JmxClient client = new JmxClient(DEFAULT_PORT);
+		JmxClient client = new JmxClient(serverAddress, DEFAULT_PORT);
 		try {
 			server.register(isMethod);
 			assertFalse((Boolean) client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "flag"));
@@ -281,7 +284,7 @@ public class ReflectionMbeanTest {
 	@Test(expected = AttributeNotFoundException.class)
 	public void testUnknownSetter() throws Exception {
 		TestObject testObj = new TestObject();
-		JmxClient client = new JmxClient(DEFAULT_PORT);
+		JmxClient client = new JmxClient(serverAddress, DEFAULT_PORT);
 		try {
 			server.register(testObj);
 			client.setAttribute(DOMAIN_NAME, OBJECT_NAME, "unknown-attribute", 1);
@@ -294,7 +297,7 @@ public class ReflectionMbeanTest {
 	@Test(expected = ReflectionException.class)
 	public void testGetThrows() throws Exception {
 		AttributeThrows getThrow = new AttributeThrows();
-		JmxClient client = new JmxClient(DEFAULT_PORT);
+		JmxClient client = new JmxClient(serverAddress, DEFAULT_PORT);
 		try {
 			server.register(getThrow);
 			client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "throws");
@@ -307,7 +310,7 @@ public class ReflectionMbeanTest {
 	@Test(expected = ReflectionException.class)
 	public void testSetThrows() throws Exception {
 		AttributeThrows setThrow = new AttributeThrows();
-		JmxClient client = new JmxClient(DEFAULT_PORT);
+		JmxClient client = new JmxClient(serverAddress, DEFAULT_PORT);
 		try {
 			server.register(setThrow);
 			client.setAttribute(DOMAIN_NAME, OBJECT_NAME, "throws", 1);
@@ -320,7 +323,7 @@ public class ReflectionMbeanTest {
 	@Test
 	public void testGetSetMultiple() throws Exception {
 		MultipleAttributes obj = new MultipleAttributes();
-		JmxClient client = new JmxClient(DEFAULT_PORT);
+		JmxClient client = new JmxClient(serverAddress, DEFAULT_PORT);
 		try {
 			server.register(obj);
 			int x = 2134;
@@ -361,7 +364,7 @@ public class ReflectionMbeanTest {
 	@Test
 	public void testAttributeFieldSubClass() throws Exception {
 		SubClassAttributeField obj = new SubClassAttributeField();
-		JmxClient client = new JmxClient(DEFAULT_PORT);
+		JmxClient client = new JmxClient(serverAddress, DEFAULT_PORT);
 		try {
 			server.register(obj);
 

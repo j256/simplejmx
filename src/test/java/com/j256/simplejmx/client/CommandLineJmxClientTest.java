@@ -30,11 +30,12 @@ public class CommandLineJmxClientTest {
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
+		InetAddress address = InetAddress.getByName("localhost");
 		server = new JmxServer(InetAddress.getByName("localhost"), JMX_PORT);
 		server.start();
 		CommandLineJmxClientTestObject obj = new CommandLineJmxClientTestObject();
 		server.register(obj);
-		client = new CommandLineJmxClient("localhost", JMX_PORT);
+		client = new CommandLineJmxClient(address, JMX_PORT);
 		objectNameString = JMX_DOMAIN + ":name=" + CommandLineJmxClientTestObject.class.getSimpleName();
 	}
 
