@@ -27,10 +27,10 @@ public class JmxWebHandlerTest {
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-		webServer = new JmxWebServer(InetAddress.getLocalHost(), WEB_SERVER_PORT);
+		webServer = new JmxWebServer(InetAddress.getByName("localhost"), WEB_SERVER_PORT);
 		webServer.start();
-		Thread.sleep(2000);
 		System.err.println("Web server started");
+		Thread.sleep(2000);
 	}
 
 	@AfterClass
@@ -44,7 +44,7 @@ public class JmxWebHandlerTest {
 	@Test(timeout = 10000)
 	public void testSimple() throws Exception {
 		WebClient webClient = new WebClient();
-		HtmlPage page = webClient.getPage("http://" + InetAddress.getLocalHost() + ":" + WEB_SERVER_PORT);
+		HtmlPage page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT);
 		assertTrue(page.asText().contains("JMX Domains"));
 		System.err.println("Got first page");
 

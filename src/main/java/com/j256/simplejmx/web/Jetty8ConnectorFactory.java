@@ -22,7 +22,7 @@ public class Jetty8ConnectorFactory implements JettyConnectorFactory {
 		// create the NIO connector
 		SelectChannelConnector connector = new SelectChannelConnector();
 		if (inetAddress != null) {
-			connector.setHost(inetAddress.getHostName());
+			connector.setHost(inetAddress.getHostAddress());
 		}
 		connector.setPort(port);
 

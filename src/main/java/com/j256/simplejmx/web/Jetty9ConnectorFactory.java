@@ -21,7 +21,7 @@ public class Jetty9ConnectorFactory implements JettyConnectorFactory {
 			Constructor<?> constructor = clazz.getConstructor(Server.class);
 			Connector connector = (Connector) constructor.newInstance(server);
 			if (inetAddress != null) {
-				connector.setHost(inetAddress.getHostName());
+				connector.setHost(inetAddress.getHostAddress());
 			}
 			connector.setPort(port);
 			return connector;

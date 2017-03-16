@@ -2,6 +2,8 @@ package com.j256.simplejmx.web;
 
 import static org.junit.Assert.assertTrue;
 
+import java.net.InetAddress;
+
 import org.junit.Test;
 
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -13,7 +15,7 @@ public class JmxWebServerTest {
 
 	@Test(timeout = 10000)
 	public void testBasic() throws Exception {
-		JmxWebServer webServer = new JmxWebServer(WEB_SERVER_PORT);
+		JmxWebServer webServer = new JmxWebServer(InetAddress.getByName("localhost"), WEB_SERVER_PORT);
 		webServer.start();
 		Thread.sleep(2000);
 		try {
@@ -26,6 +28,7 @@ public class JmxWebServerTest {
 	@Test(timeout = 10000)
 	public void testSpring() throws Exception {
 		JmxWebServer webServer = new JmxWebServer();
+		webServer.setServerAddress(InetAddress.getByName("localhost"));
 		webServer.setServerPort(WEB_SERVER_PORT);
 		webServer.start();
 		Thread.sleep(2000);

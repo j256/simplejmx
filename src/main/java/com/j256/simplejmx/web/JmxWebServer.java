@@ -19,7 +19,7 @@ import org.eclipse.jetty.server.Server;
  */
 public class JmxWebServer {
 
-	private InetAddress inetAddress;
+	private InetAddress serverAddress;
 	private int serverPort;
 	private Server server;
 	private final JettyConnectorFactory jettyConnectorFactory = getConnectorFactory();
@@ -29,7 +29,7 @@ public class JmxWebServer {
 	}
 
 	public JmxWebServer(InetAddress inetAddress, int serverPort) {
-		this.inetAddress = inetAddress;
+		this.serverAddress = inetAddress;
 		this.serverPort = serverPort;
 	}
 
@@ -42,7 +42,7 @@ public class JmxWebServer {
 	 */
 	public void start() throws Exception {
 		server = new Server();
-		Connector connector = jettyConnectorFactory.buildConnector(server, inetAddress, serverPort);
+		Connector connector = jettyConnectorFactory.buildConnector(server, serverAddress, serverPort);
 		server.addConnector(connector);
 		server.setHandler(new JmxWebHandler());
 		server.start();
@@ -54,6 +54,13 @@ public class JmxWebServer {
 	public void stop() throws Exception {
 		server.stop();
 		server = null;
+	}
+
+	/**
+	 * Optional address that the Jetty web server will be running on.
+	 */
+	public void setServerAddress(InetAddress serverAddress) {
+		this.serverAddress = serverAddress;
 	}
 
 	/**
