@@ -37,6 +37,7 @@ public class Jetty8ConnectorFactory implements JettyConnectorFactory {
 		threadPool.setMaxThreads(WEB_SERVER_MAX_THREADS);
 		threadPool.setName("simplejmx-web-server");
 		connector.setThreadPool(threadPool);
+		connector.setAcceptors(1);
 
 		return connector;
 	}
