@@ -14,7 +14,7 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
  */
 public class Jetty8ConnectorFactory implements JettyConnectorFactory {
 
-	private static final int WEB_SERVER_MIN_THREADS = 5;
+	private static final int WEB_SERVER_MIN_THREADS = 1;
 	private static final int WEB_SERVER_MAX_THREADS = 5;
 
 	@Override
@@ -37,7 +37,6 @@ public class Jetty8ConnectorFactory implements JettyConnectorFactory {
 		threadPool.setMaxThreads(WEB_SERVER_MAX_THREADS);
 		threadPool.setName("simplejmx-web-server");
 		connector.setThreadPool(threadPool);
-		connector.setAcceptors(1);
 
 		return connector;
 	}
