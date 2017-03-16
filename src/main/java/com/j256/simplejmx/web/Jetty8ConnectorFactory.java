@@ -14,7 +14,7 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
  */
 public class Jetty8ConnectorFactory implements JettyConnectorFactory {
 
-	private static final int WEB_SERVER_MIN_THREADS = 1;
+	private static final int WEB_SERVER_MIN_THREADS = 2;
 	private static final int WEB_SERVER_MAX_THREADS = 5;
 
 	@Override
