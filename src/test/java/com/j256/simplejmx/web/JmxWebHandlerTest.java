@@ -27,7 +27,7 @@ public class JmxWebHandlerTest {
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-		webServer = new JmxWebServer(WEB_SERVER_PORT);
+		webServer = new JmxWebServer(InetAddress.getLocalHost(), WEB_SERVER_PORT);
 		webServer.start();
 		Thread.sleep(2000);
 		System.err.println("Web server started");

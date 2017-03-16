@@ -39,13 +39,13 @@ public class ReflectionMbeanTest {
 	private static JmxServer server;
 
 	@BeforeClass
-	public static void before() throws Exception {
+	public static void beforeClass() throws Exception {
 		server = new JmxServer(DEFAULT_PORT);
 		server.start();
 	}
 
 	@AfterClass
-	public static void after() {
+	public static void afterClass() {
 		if (server != null) {
 			server.stop();
 			server = null;

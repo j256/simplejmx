@@ -1,3 +1,6 @@
+1.14: X/X/2017
+	* Added optional address to the jmx web server constructor.
+
 1.13: 10/17/2016
 	* Small tweaks to web output.
 	* Added some improvements to JmxBean to be easier to configure.
