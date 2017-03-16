@@ -1,5 +1,7 @@
 package com.j256.simplejmx.web;
 
+import java.net.InetAddress;
+
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
@@ -16,10 +18,13 @@ public class Jetty8ConnectorFactory implements JettyConnectorFactory {
 	private static final int WEB_SERVER_MAX_THREADS = 5;
 
 	@Override
-	public Connector buildConnector(Server server, int serverPort) {
+	public Connector buildConnector(Server server, InetAddress inetAddress, int port) {
 		// create the NIO connector
 		SelectChannelConnector connector = new SelectChannelConnector();
-		connector.setPort(serverPort);
+		if (inetAddress != null) {
+			connector.setHost(inetAddress.getHostName());
+		}
+		connector.setPort(port);
 
 		// turn on statistics
 		connector.setStatsOn(true);

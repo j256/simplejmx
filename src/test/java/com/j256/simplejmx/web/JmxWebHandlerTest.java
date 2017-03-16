@@ -22,7 +22,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 public class JmxWebHandlerTest {
 
-	private static final int WEB_SERVER_PORT = 8081;
+	private static final int WEB_SERVER_PORT = 8080;
 	private static JmxWebServer webServer;
 
 	@BeforeClass

@@ -1,6 +1,7 @@
 package com.j256.simplejmx.web;
 
 import java.lang.reflect.Constructor;
+import java.net.InetAddress;
 
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
@@ -14,12 +15,15 @@ import org.eclipse.jetty.server.Server;
 public class Jetty9ConnectorFactory implements JettyConnectorFactory {
 
 	@Override
-	public Connector buildConnector(Server server, int serverPort) {
+	public Connector buildConnector(Server server, InetAddress inetAddress, int port) {
 		try {
 			Class<?> clazz = Class.forName("org.eclipse.jetty.server.ServerConnector");
 			Constructor<?> constructor = clazz.getConstructor(Server.class);
 			Connector connector = (Connector) constructor.newInstance(server);
-			connector.setPort(serverPort);
+			if (inetAddress != null) {
+				connector.setHost(inetAddress.getHostName());
+			}
+			connector.setPort(port);
 			return connector;
 		} catch (Exception e) {
 			throw new RuntimeException("could not create ServerConnector with reflection", e);
