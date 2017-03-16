@@ -420,7 +420,7 @@ public class JmxServerTest {
 
 	@Test
 	public void testLocalAddress() throws Exception {
-		testAddress(InetAddress.getLocalHost(), differentPost.incrementAndGet());
+		testAddress(serverAddress, differentPost.incrementAndGet());
 	}
 
 	@Test
