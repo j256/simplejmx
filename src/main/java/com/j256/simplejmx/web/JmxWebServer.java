@@ -52,6 +52,7 @@ public class JmxWebServer {
 	 * Stop the internal Jetty web server and associated classes.
 	 */
 	public void stop() throws Exception {
+		server.setGracefulShutdown(100);
 		server.stop();
 		server = null;
 	}
