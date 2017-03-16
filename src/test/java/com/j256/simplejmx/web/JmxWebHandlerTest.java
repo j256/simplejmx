@@ -23,6 +23,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 public class JmxWebHandlerTest {
 
 	private static final int WEB_SERVER_PORT = 8080;
+
 	private static JmxWebServer webServer;
 
 	@BeforeClass
@@ -37,6 +38,7 @@ public class JmxWebHandlerTest {
 		// Thread.sleep(100000);
 		if (webServer != null) {
 			webServer.stop();
+			webServer = null;
 		}
 	}
 
