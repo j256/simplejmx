@@ -45,7 +45,7 @@ public class JmxServerTest {
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-		server = new JmxServer(InetAddress.getLocalHost(), DEFAULT_PORT);
+		server = new JmxServer(DEFAULT_PORT);
 		server.start();
 	}
 
@@ -56,7 +56,7 @@ public class JmxServerTest {
 
 	@Test
 	public void testJmxServerStartStopStart() throws Exception {
-		server = new JmxServer(InetAddress.getLocalHost(), differentPost.incrementAndGet());
+		server = new JmxServer(differentPost.incrementAndGet());
 		server.stop();
 		server.start();
 	}
