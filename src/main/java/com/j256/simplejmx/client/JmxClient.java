@@ -1,5 +1,6 @@
 package com.j256.simplejmx.client;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -29,7 +30,7 @@ import com.j256.simplejmx.common.ObjectNameUtil;
  * 
  * @author graywatson
  */
-public class JmxClient {
+public class JmxClient implements Closeable {
 
 	private JMXConnector jmxConnector;
 	private JMXServiceURL serviceUrl;
@@ -171,7 +172,8 @@ public class JmxClient {
 	/**
 	 * Close the client connection to the mbean server.If you want a method that throws then use {@link #closeThrow()}.
 	 */
-	public synchronized void close() {
+	@Override
+	public void close() {
 		try {
 			closeThrow();
 		} catch (JMException e) {
@@ -183,7 +185,7 @@ public class JmxClient {
 	 * Close the client connection to the mbean server. If you want a method that does not throw then use
 	 * {@link #close()}.
 	 */
-	public synchronized void closeThrow() throws JMException {
+	public void closeThrow() throws JMException {
 		try {
 			if (jmxConnector != null) {
 				jmxConnector.close();
@@ -507,8 +509,8 @@ public class JmxClient {
 		if (first == null) {
 			throw new IllegalArgumentException("Cannot find operation named '" + operName + "'");
 		} else if (nameC > 1) {
-			throw new IllegalArgumentException("Cannot find operation named '" + operName
-					+ "' with matching argument types");
+			throw new IllegalArgumentException(
+					"Cannot find operation named '" + operName + "' with matching argument types");
 		} else {
 			// return the first one we found that matches the name
 			return first;

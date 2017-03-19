@@ -3,8 +3,11 @@ package com.j256.simplejmx.common;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.net.InetAddress;
+
 import javax.management.JMException;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import com.j256.simplejmx.client.JmxClient;
@@ -22,27 +25,28 @@ public class JmxSelfNamingTest {
 	@Test
 	public void testGetAll() throws Exception {
 		int port = 8000;
-		JmxServer server = new JmxServer(port);
+		InetAddress address = InetAddress.getByName("127.0.0.1");
+		JmxServer server = new JmxServer(address, port);
+		JmxClient client = null;
 		try {
 			server.start();
 			OurJmxObject jmxObject = new OurJmxObject();
 			server.register(jmxObject);
 
-			JmxClient client = new JmxClient(port);
+			client = new JmxClient(address, port);
 			try {
-				client.getAttribute(
-						ObjectNameUtil.makeObjectName(JMX_RESOURCE_DOMAIN_NAME, JMX_RESOURCE_BEAN_NAME, new String[] {
-								"foo", "bar" }), "foo");
+				client.getAttribute(ObjectNameUtil.makeObjectName(JMX_RESOURCE_DOMAIN_NAME, JMX_RESOURCE_BEAN_NAME,
+						new String[] { "foo", "bar" }), "foo");
 				fail("should have thrown");
 			} catch (JMException e) {
 				// expected
 			}
 
-			long value =
-					(Long) client.getAttribute(ObjectNameUtil.makeObjectName(JMX_SELF_NAMING_DOMAIN_NAME,
-							JMX_SELF_NAMING_BEAN_NAME, new String[] { "zing" }), "foo");
+			long value = (Long) client.getAttribute(ObjectNameUtil.makeObjectName(JMX_SELF_NAMING_DOMAIN_NAME,
+					JMX_SELF_NAMING_BEAN_NAME, new String[] { "zing" }), "foo");
 			assertEquals(jmxObject.foo, value);
 		} finally {
+			IOUtils.closeQuietly(client);
 			server.stop();
 		}
 	}

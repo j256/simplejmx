@@ -3,8 +3,11 @@ package com.j256.simplejmx.server;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import org.junit.After;
-import org.junit.Before;
+import java.net.InetAddress;
+
+import org.apache.commons.io.IOUtils;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.j256.simplejmx.client.JmxClient;
@@ -18,16 +21,18 @@ public class PublishAllBeanWrapperTest {
 	private static final int FOO_VALUE = 1459243;
 	private static final int BAR_VALUE = 1423459243;
 
-	private JmxServer server;
+	private static JmxServer server;
+	private static InetAddress serverAddress;
 
-	@Before
-	public void before() throws Exception {
-		server = new JmxServer(DEFAULT_PORT);
+	@BeforeClass
+	public static void beforeClass() throws Exception {
+		serverAddress = InetAddress.getByName("127.0.0.1");
+		server = new JmxServer(serverAddress, DEFAULT_PORT);
 		server.start();
 	}
 
-	@After
-	public void after() {
+	@AfterClass
+	public static void afterClass() {
 		if (server != null) {
 			server.stop();
 			server = null;
@@ -41,7 +46,7 @@ public class PublishAllBeanWrapperTest {
 		PublishAllBeanWrapper publishAll = new PublishAllBeanWrapper(obj, resourceInfo);
 		JmxClient client = null;
 		try {
-			client = new JmxClient(DEFAULT_PORT);
+			client = new JmxClient(serverAddress, DEFAULT_PORT);
 			server.register(publishAll);
 
 			assertEquals(FOO_VALUE, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo"));
@@ -83,9 +88,7 @@ public class PublishAllBeanWrapperTest {
 
 		} finally {
 			server.unregister(resourceInfo);
-			if (client != null) {
-				client.close();
-			}
+			IOUtils.closeQuietly(client);
 		}
 	}
 
@@ -96,7 +99,7 @@ public class PublishAllBeanWrapperTest {
 		PublishAllBeanWrapper publishAll = new PublishAllBeanWrapper(obj, resourceInfo);
 		JmxClient client = null;
 		try {
-			client = new JmxClient(DEFAULT_PORT);
+			client = new JmxClient(serverAddress, DEFAULT_PORT);
 			server.register(publishAll);
 
 			obj.bar = 37634345;
@@ -107,9 +110,7 @@ public class PublishAllBeanWrapperTest {
 			assertEquals(3, client.getAttributesInfo(DOMAIN_NAME, OBJECT_NAME).length);
 		} finally {
 			server.unregister(resourceInfo);
-			if (client != null) {
-				client.close();
-			}
+			IOUtils.closeQuietly(client);
 		}
 	}
 
@@ -118,15 +119,19 @@ public class PublishAllBeanWrapperTest {
 	protected static class TestObject {
 		private int foo = FOO_VALUE;
 		public int bar = BAR_VALUE;
+
 		public int getFoo() {
 			return foo;
 		}
+
 		public void setFoo(int foo) {
 			this.foo = foo;
 		}
+
 		public void resetFoo() {
 			this.foo = 0;
 		}
+
 		public void resetFoo(int newValue) {
 			this.foo = newValue;
 		}
@@ -134,9 +139,11 @@ public class PublishAllBeanWrapperTest {
 
 	protected static class SubClassTestObject extends TestObject {
 		private int baz;
+
 		public int getBaz() {
 			return baz;
 		}
+
 		public void setBaz(int baz) {
 			this.baz = baz;
 		}

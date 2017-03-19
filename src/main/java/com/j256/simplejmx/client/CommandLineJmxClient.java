@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -60,6 +61,13 @@ public class CommandLineJmxClient {
 	}
 
 	/**
+	 * Connect the client to an address and port combination.
+	 */
+	public CommandLineJmxClient(InetAddress address, int port) throws JMException {
+		this(address.getHostAddress(), port);
+	}
+
+	/**
 	 * <p>
 	 * Create a command line interface connected to a JMX server using the full JMX URL format. The URL should look
 	 * something like:
@@ -79,6 +87,7 @@ public class CommandLineJmxClient {
 	public void runCommands(final String[] commands) throws IOException {
 		doLines(0, new LineReader() {
 			private int commandC = 0;
+
 			@Override
 			public String getNextLine(String prompt) {
 				if (commandC >= commands.length) {
@@ -286,7 +295,7 @@ public class CommandLineJmxClient {
 				patterns[i - 1] = Pattern.compile("(?i).*" + args[i] + ".*");
 			}
 		}
-		OBJNAME : for (ObjectName objectName : objectNames) {
+		OBJNAME: for (ObjectName objectName : objectNames) {
 			String name = objectName.getCanonicalName();
 			if (patterns != null) {
 				for (Pattern pattern : patterns) {
@@ -455,7 +464,8 @@ public class CommandLineJmxClient {
 			System.out.println("  Attribute " + parts[1] + " set to " + valueString);
 		} else {
 			// may never happen but let's be careful out there
-			System.out.println("Error.  Set attribute " + parts[1] + " to " + valueString + " but new value is " + attr);
+			System.out
+					.println("Error.  Set attribute " + parts[1] + " to " + valueString + " but new value is " + attr);
 		}
 	}
 

@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<!-- simplejmx pom configuration file for maven -->
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.j256.simplejmx</groupId>
 	<artifactId>simplejmx</artifactId>
-	<version>1.13-SNAPSHOT</version>
+	<version>1.15-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Simple JMX</name>
-	<url>http://256.com/sources/simplejmx/</url>
+	<url>http://256stuff.com/sources/simplejmx/</url>
 	<description>Simple JMX Classes</description>
 	<licenses>
 		<license>
@@ -24,7 +23,7 @@
 	<properties>
 		<!-- optional dependency versions -->
 		<spring-version>3.1.0.RELEASE</spring-version>
-		<jetty-version>8.1.9.v20130131</jetty-version>
+		<jetty-version>8.1.22.v20160922</jetty-version>
 		<!-- test dependency versions -->
 		<easymock-version>2.3</easymock-version>
 		<junit-version>4.8.1</junit-version>
@@ -39,9 +38,9 @@
 		<developer>
 			<id>gray</id>
 			<name>Gray Watson</name>
-			<url>http://256.com/gray/</url>
-			<organization>256.com</organization>
-			<organizationUrl>http://256.com/</organizationUrl>
+			<url>http://256stuff.com/gray/</url>
+			<organization>256stuff.com</organization>
+			<organizationUrl>http://256stuff.com/</organizationUrl>
 			<roles>
 				<role>architect</role>
 				<role>developer</role>
@@ -120,7 +119,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.9</version>
+				<version>2.9.1</version>
 				<executions>
 					<execution>
 						<goals>

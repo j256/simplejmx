@@ -12,7 +12,7 @@ import com.j256.simplejmx.web.JmxWebServer;
  * interface.
  * 
  * <p>
- * <b>NOTE:</b> For more details, see the SimpleJMX website: http://256.com/sources/simplejmx/
+ * <b>NOTE:</b> For more details, see the SimpleJMX website: http://256stuff.com/sources/simplejmx/
  * </p>
  * 
  * @author graywatson

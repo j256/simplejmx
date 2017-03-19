@@ -7,11 +7,14 @@ import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.JMException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.j256.simplejmx.client.JmxClient;
@@ -37,21 +40,26 @@ public class JmxServerTest {
 	private static final String FOLDER_VALUE_NAME = "FolderName";
 	private static final String FOLDER_NAME = FOLDER_FIELD_NAME + "=" + FOLDER_VALUE_NAME;
 
-	@Test
-	public void testJmxServer() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
-		try {
-			server.start();
-		} finally {
-			server.stop();
-		}
+	private static JmxServer server;
+	private static InetAddress serverAddress;
+	private static AtomicInteger differentPost = new AtomicInteger(DEFAULT_PORT);
+
+	@BeforeClass
+	public static void beforeClass() throws Exception {
+		serverAddress = InetAddress.getByName("127.0.0.1");
+		server = new JmxServer(serverAddress, DEFAULT_PORT);
+		server.start();
+	}
+
+	@AfterClass
+	public static void afterClass() {
+		server.stop();
 	}
 
 	@Test
 	public void testJmxServerStartStopStart() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
+		JmxServer server = new JmxServer(serverAddress, differentPost.incrementAndGet());
 		try {
-			server.start();
 			server.stop();
 			server.start();
 		} finally {
@@ -61,18 +69,21 @@ public class JmxServerTest {
 
 	@Test(expected = JMException.class)
 	public void testJmxServerDoubleInstance() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
+		int port = differentPost.incrementAndGet();
+		JmxServer first = new JmxServer(serverAddress, port);
+		JmxServer second = new JmxServer(serverAddress, port);
 		try {
-			server.start();
-			new JmxServer(DEFAULT_PORT).start();
+			first.start();
+			second.start();
 		} finally {
-			server.stop();
+			first.stop();
+			second.stop();
 		}
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testJmxServerWildPort() throws Exception {
-		JmxServer server = new JmxServer(-10);
+		JmxServer server = new JmxServer(serverAddress, -10);
 		try {
 			server.start();
 		} finally {
@@ -82,7 +93,7 @@ public class JmxServerTest {
 
 	@Test(expected = JMException.class)
 	public void testDoubleClose() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
+		JmxServer server = new JmxServer(serverAddress, differentPost.incrementAndGet());
 		try {
 			server.start();
 		} finally {
@@ -103,7 +114,8 @@ public class JmxServerTest {
 	public void testJmxServerInt() throws Exception {
 		JmxServer server = new JmxServer();
 		try {
-			server.setPort(DEFAULT_PORT);
+			server.setPort(DEFAULT_PORT + 11);
+			server.setInetAddress(serverAddress);
 			server.start();
 		} finally {
 			server.stop();
@@ -123,12 +135,10 @@ public class JmxServerTest {
 
 	@Test
 	public void testRegister() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		TestObject obj = new TestObject();
 		JmxClient client = null;
 		try {
-			server.start();
-			client = new JmxClient(DEFAULT_PORT);
+			client = new JmxClient(serverAddress, DEFAULT_PORT);
 
 			try {
 				client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo");
@@ -169,230 +179,187 @@ public class JmxServerTest {
 		} finally {
 			closeClient(client);
 			server.unregister(obj);
-			server.stop();
 		}
 	}
 
 	@Test(expected = JMException.class)
 	public void testDoubleRegister() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		TestObject obj = new TestObject();
 		try {
-			server.start();
 			server.register(obj);
 			server.register(obj);
 		} finally {
 			server.unregister(obj);
-			server.stop();
 		}
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testRegisterNoJmxResource() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		try {
-			server.start();
 			// this class has no JmxResource annotation
 			server.register(this);
 		} finally {
 			server.unregister(this);
-			server.stop();
 		}
 	}
 
 	@Test(expected = JMException.class)
 	public void testShortAttributeMethodName() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		ShortAttributeMethodName obj = new ShortAttributeMethodName();
 		try {
-			server.start();
 			server.register(obj);
 		} finally {
 			server.unregister(obj);
-			server.stop();
 		}
 	}
 
 	@Test(expected = JMException.class)
 	public void testJustGetAttributeMethodName() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		JustGet obj = new JustGet();
 		try {
-			server.start();
 			server.register(obj);
 		} finally {
 			server.unregister(obj);
-			server.stop();
 		}
 	}
 
 	@Test
 	public void testRegisterFolders() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		TestObjectFolders obj = new TestObjectFolders();
 		JmxClient client = null;
 		try {
-			server.start();
 			server.register(obj);
-			client = new JmxClient(DEFAULT_PORT);
+			client = new JmxClient(serverAddress, DEFAULT_PORT);
 			assertEquals(FOO_VALUE, client.getAttribute(
 					ObjectNameUtil.makeObjectName(DOMAIN_NAME, OBJECT_NAME, new String[] { FOLDER_NAME }), "foo"));
-			assertEquals(
-					FOO_VALUE,
-					client.getAttribute(
-							ObjectNameUtil.makeObjectName(DOMAIN_NAME, OBJECT_NAME, new String[] { FOLDER_FIELD_NAME
-									+ "=" + FOLDER_VALUE_NAME }), "foo"));
+			assertEquals(FOO_VALUE, client.getAttribute(ObjectNameUtil.makeObjectName(DOMAIN_NAME, OBJECT_NAME,
+					new String[] { FOLDER_FIELD_NAME + "=" + FOLDER_VALUE_NAME }), "foo"));
 		} finally {
 			closeClient(client);
 			server.unregister(obj);
-			server.stop();
 		}
 	}
 
 	@Test
 	public void testSelfNaming() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		SelfNaming obj = new SelfNaming();
 		JmxClient client = null;
 		try {
-			server.start();
 			server.register(obj);
-			client = new JmxClient(DEFAULT_PORT);
+			client = new JmxClient(serverAddress, DEFAULT_PORT);
 			assertEquals(FOO_VALUE, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo"));
 		} finally {
 			closeClient(client);
 			server.unregister(obj);
-			server.stop();
 		}
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testInvalidDomain() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		InvalidDomain obj = new InvalidDomain();
 		try {
-			server.start();
 			server.register(obj);
 		} finally {
 			server.unregister(obj);
-			server.stop();
 		}
 	}
 
 	@Test
 	public void testNoDescriptions() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		NoDescriptions obj = new NoDescriptions();
 		JmxClient client = null;
 		try {
-			server.start();
 			server.register(obj);
-			client = new JmxClient(DEFAULT_PORT);
+			client = new JmxClient(serverAddress, DEFAULT_PORT);
 			assertEquals(FOO_VALUE, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo"));
 		} finally {
 			closeClient(client);
 			server.unregister(obj);
-			server.stop();
 		}
 	}
 
 	@Test
 	public void testHasDescription() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		HasDescriptions obj = new HasDescriptions();
 		JmxClient client = null;
 		try {
-			server.start();
 			server.register(obj);
-			client = new JmxClient(DEFAULT_PORT);
+			client = new JmxClient(serverAddress, DEFAULT_PORT);
 			assertEquals(FOO_VALUE, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo"));
 		} finally {
 			closeClient(client);
 			server.unregister(obj);
-			server.stop();
 		}
 	}
 
 	@Test
 	public void testOperationParameters() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		OperationParameters obj = new OperationParameters();
 		JmxClient client = null;
 		try {
-			server.start();
 			server.register(obj);
-			client = new JmxClient(DEFAULT_PORT);
+			client = new JmxClient(serverAddress, DEFAULT_PORT);
 			String someArg = "pfoewjfpeowjfewf ewopjfwefew";
 			assertEquals(someArg, client.invokeOperation(DOMAIN_NAME, OBJECT_NAME, "doSomething", someArg));
 		} finally {
 			closeClient(client);
 			server.unregister(obj);
-			server.stop();
 		}
 	}
 
 	@Test(expected = ReflectionException.class)
 	public void testThrowingGet() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		MisterThrow obj = new MisterThrow();
 		JmxClient client = null;
 		try {
-			server.start();
 			server.register(obj);
-			client = new JmxClient(DEFAULT_PORT);
+			client = new JmxClient(serverAddress, DEFAULT_PORT);
 			client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo");
 		} finally {
 			closeClient(client);
 			server.unregister(obj);
-			server.stop();
 		}
 	}
 
 	@Test(expected = ReflectionException.class)
 	public void testThrowingSet() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		MisterThrow obj = new MisterThrow();
 		JmxClient client = null;
 		try {
-			server.start();
 			server.register(obj);
-			client = new JmxClient(DEFAULT_PORT);
+			client = new JmxClient(serverAddress, DEFAULT_PORT);
 			client.setAttribute(DOMAIN_NAME, OBJECT_NAME, "foo", 0);
 		} finally {
 			closeClient(client);
 			server.unregister(obj);
-			server.stop();
 		}
 	}
 
 	@Test(expected = ReflectionException.class)
 	public void testThrowingOperation() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		MisterThrow obj = new MisterThrow();
 		JmxClient client = null;
 		try {
-			server.start();
 			server.register(obj);
-			client = new JmxClient(DEFAULT_PORT);
+			client = new JmxClient(serverAddress, DEFAULT_PORT);
 			client.invokeOperation(DOMAIN_NAME, OBJECT_NAME, "someCall");
 		} finally {
 			closeClient(client);
 			server.unregister(obj);
-			server.stop();
 		}
 	}
 
 	@Test
 	public void testRegisterObjUserInfoFieldAttribute() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		RandomObject obj = new RandomObject();
 		ObjectName objectName = ObjectNameUtil.makeObjectName(DOMAIN_NAME, OBJECT_NAME);
 		JmxClient client = null;
 		try {
-			server.start();
-			server.register(obj, objectName, new JmxAttributeFieldInfo[] { new JmxAttributeFieldInfo("foo", true,
-					false /* not writable */, "description") }, null, null);
-			client = new JmxClient(DEFAULT_PORT);
+			server.register(obj, objectName,
+					new JmxAttributeFieldInfo[] {
+							new JmxAttributeFieldInfo("foo", true, false /* not writable */, "description") },
+					null, null);
+			client = new JmxClient(serverAddress, DEFAULT_PORT);
 			int val = 4232431;
 			obj.setFoo(val);
 			assertEquals(val, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo"));
@@ -405,43 +372,38 @@ public class JmxServerTest {
 		} finally {
 			closeClient(client);
 			server.unregister(objectName);
-			server.stop();
 		}
 	}
 
 	@Test
 	public void testRegisterObjUserInfoFieldMethod() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		RandomObject obj = new RandomObject();
 		ObjectName objectName = ObjectNameUtil.makeObjectName(DOMAIN_NAME, OBJECT_NAME);
 		JmxClient client = null;
 		try {
-			server.start();
-			server.register(obj, objectName, null, new JmxAttributeMethodInfo[] {
-					new JmxAttributeMethodInfo("getFoo", "description"),
-					new JmxAttributeMethodInfo("setFoo", "description") }, null);
-			client = new JmxClient(DEFAULT_PORT);
+			server.register(obj, objectName, null,
+					new JmxAttributeMethodInfo[] { new JmxAttributeMethodInfo("getFoo", "description"),
+							new JmxAttributeMethodInfo("setFoo", "description") },
+					null);
+			client = new JmxClient(serverAddress, DEFAULT_PORT);
 			int val = 4232431;
 			client.setAttribute(DOMAIN_NAME, OBJECT_NAME, "foo", val);
 			assertEquals(val, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo"));
 		} finally {
 			closeClient(client);
 			server.unregister(objectName);
-			server.stop();
 		}
 	}
 
 	@Test
 	public void testRegisterObjUserInfoOperationOnly() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		RandomObject obj = new RandomObject();
 		ObjectName objectName = ObjectNameUtil.makeObjectName(DOMAIN_NAME, OBJECT_NAME);
 		JmxClient client = null;
 		try {
-			server.start();
-			server.register(obj, objectName, null, null, new JmxOperationInfo[] { new JmxOperationInfo("resetFoo",
-					null, null, OperationAction.UNKNOWN, "description") });
-			client = new JmxClient(DEFAULT_PORT);
+			server.register(obj, objectName, null, null, new JmxOperationInfo[] {
+					new JmxOperationInfo("resetFoo", null, null, OperationAction.UNKNOWN, "description") });
+			client = new JmxClient(serverAddress, DEFAULT_PORT);
 			obj.setFoo(1);
 			client.invokeOperation(DOMAIN_NAME, OBJECT_NAME, "resetFoo");
 			assertEquals(0, obj.getFoo());
@@ -454,28 +416,25 @@ public class JmxServerTest {
 		} finally {
 			closeClient(client);
 			server.unregister(objectName);
-			server.stop();
 		}
 	}
 
 	@Test
 	public void testLoopBackAddress() throws Exception {
-		testAddress(InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }), DEFAULT_PORT + 10);
+		testAddress(null, differentPost.incrementAndGet());
 	}
 
 	@Test
 	public void testLocalAddress() throws Exception {
-		testAddress(InetAddress.getLocalHost(), DEFAULT_PORT + 20);
+		testAddress(serverAddress, differentPost.incrementAndGet());
 	}
 
 	@Test
 	public void testSubClass() throws Exception {
-		JmxServer server = new JmxServer(DEFAULT_PORT);
 		SubClassTestObject obj = new SubClassTestObject();
 		JmxClient client = null;
 		try {
-			server.start();
-			client = new JmxClient(DEFAULT_PORT);
+			client = new JmxClient(serverAddress, DEFAULT_PORT);
 
 			try {
 				client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo");
@@ -516,22 +475,30 @@ public class JmxServerTest {
 		} finally {
 			closeClient(client);
 			server.unregister(obj);
-			server.stop();
 		}
 	}
 
 	/* =========================================================================================== */
 
 	private void testAddress(InetAddress address, int port) throws Exception {
-		JmxServer server = new JmxServer(address, port);
+		JmxServer server;
+		if (address == null) {
+			server = new JmxServer(port);
+		} else {
+			server = new JmxServer(address, port);
+		}
 		RandomObject obj = new RandomObject();
 		ObjectName objectName = ObjectNameUtil.makeObjectName(DOMAIN_NAME, OBJECT_NAME);
 		JmxClient client = null;
 		try {
 			server.start();
-			server.register(obj, objectName, null, null, new JmxOperationInfo[] { new JmxOperationInfo("resetFoo",
-					null, null, OperationAction.UNKNOWN, "description") });
-			client = new JmxClient(address.getHostAddress(), port);
+			server.register(obj, objectName, null, null, new JmxOperationInfo[] {
+					new JmxOperationInfo("resetFoo", null, null, OperationAction.UNKNOWN, "description") });
+			if (address == null) {
+				client = new JmxClient(port);
+			} else {
+				client = new JmxClient(address.getHostAddress(), port);
+			}
 			obj.setFoo(1);
 			client.invokeOperation(DOMAIN_NAME, OBJECT_NAME, "resetFoo");
 			assertEquals(0, obj.getFoo());
@@ -613,14 +580,17 @@ public class JmxServerTest {
 		public int getFoo() {
 			return FOO_VALUE;
 		}
+
 		@Override
 		public String getJmxDomainName() {
 			return DOMAIN_NAME;
 		}
+
 		@Override
 		public String getJmxBeanName() {
 			return OBJECT_NAME;
 		}
+
 		@Override
 		public JmxFolderName[] getJmxFolderNames() {
 			return null;
@@ -641,6 +611,7 @@ public class JmxServerTest {
 		public int getFoo() {
 			return FOO_VALUE;
 		}
+
 		@JmxOperation
 		public void doSomething() {
 		}
@@ -669,10 +640,12 @@ public class JmxServerTest {
 		public int getFoo() {
 			throw new IllegalStateException("because I can");
 		}
+
 		@JmxAttributeMethod
 		public void setFoo(int value) {
 			throw new IllegalStateException("because I can");
 		}
+
 		@JmxOperation
 		public void someCall() {
 			throw new IllegalStateException("because I can");

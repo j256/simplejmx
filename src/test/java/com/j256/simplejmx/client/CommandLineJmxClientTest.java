@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintStream;
+import java.net.InetAddress;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -26,14 +27,16 @@ public class CommandLineJmxClientTest {
 	private static JmxServer server;
 	private static CommandLineJmxClient client;
 	private static String objectNameString;
+	private static CommandLineJmxClientTestObject testObj;
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-		server = new JmxServer(JMX_PORT);
+		InetAddress address = InetAddress.getByName("localhost");
+		server = new JmxServer(InetAddress.getByName("localhost"), JMX_PORT);
 		server.start();
-		CommandLineJmxClientTestObject obj = new CommandLineJmxClientTestObject();
-		server.register(obj);
-		client = new CommandLineJmxClient("localhost", JMX_PORT);
+		testObj = new CommandLineJmxClientTestObject();
+		server.register(testObj);
+		client = new CommandLineJmxClient(address, JMX_PORT);
 		objectNameString = JMX_DOMAIN + ":name=" + CommandLineJmxClientTestObject.class.getSimpleName();
 	}
 
@@ -162,9 +165,10 @@ public class CommandLineJmxClientTest {
 
 	@Test
 	public void testGetAttribute() throws Exception {
+		int value = 456;
+		testObj.x = value;
 		String output = getClientOutput(client, "get " + objectNameString + " x");
-		assertTrue(output, output.matches("(?s).*get 'x' in \\d+ms = 0.*"));
-
+		assertTrue(output, output.matches("(?s).*get 'x' in \\d+ms = " + value + ".*"));
 	}
 
 	@Test
@@ -356,9 +360,8 @@ public class CommandLineJmxClientTest {
 	public void testDoLinesOperation() throws Exception {
 		int x1 = 12;
 		int x2 = 654;
-		String output =
-				getClientOutput(client, "dolines " + objectNameString + " times", Integer.toString(x1),
-						Integer.toString(x2));
+		String output = getClientOutput(client, "dolines " + objectNameString + " times", Integer.toString(x1),
+				Integer.toString(x2));
 		int times = x1 * x2;
 		assertTrue(output, output.matches("(?s).*dolines 'times' in \\d+ms = " + times + ".*"));
 	}
@@ -472,59 +475,73 @@ public class CommandLineJmxClientTest {
 
 	@JmxResource(domainName = JMX_DOMAIN)
 	protected static class CommandLineJmxClientTestObject {
-		int x;
+		volatile int x;
+
 		@JmxAttributeMethod
 		public void setX(int x) {
 			this.x = x;
 		}
+
 		@JmxAttributeMethod
 		public int getX() {
 			return x;
 		}
+
 		@JmxOperation
 		public int times(int x1, int x2) {
 			return x1 * x2;
 		}
+
 		@JmxOperation
 		public byte[] byteArray(byte x1, byte x2) {
 			return new byte[] { x1, x2 };
 		}
+
 		@JmxOperation
 		public short[] shortArray(short x1, short x2) {
 			return new short[] { x1, x2 };
 		}
+
 		@JmxOperation
 		public int[] intArray(int x1, int x2) {
 			return new int[] { x1, x2 };
 		}
+
 		@JmxOperation
 		public long[] longArray(long x1, long x2) {
 			return new long[] { x1, x2 };
 		}
+
 		@JmxOperation
 		public boolean[] booleanArray(boolean x1, boolean x2) {
 			return new boolean[] { x1, x2 };
 		}
+
 		@JmxOperation
 		public char[] charArray(char x1, char x2) {
 			return new char[] { x1, x2 };
 		}
+
 		@JmxOperation
 		public float[] floatArray(float x1, float x2) {
 			return new float[] { x1, x2 };
 		}
+
 		@JmxOperation
 		public double[] doubleArray(double x1, double x2) {
 			return new double[] { x1, x2 };
 		}
+
 		@JmxOperation
 		public Integer[] objectArray(int x1, int x2) {
 			return new Integer[] { x1, x2 };
 		}
+
 		@JmxOperation
 		public void doThrow() {
 			throw new RuntimeException("throw away!");
 		}
+
 		@JmxOperation
 		public Object returnNull() {
 			return null;

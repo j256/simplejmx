@@ -1,5 +1,7 @@
 package com.j256.simplejmx.web;
 
+import java.net.InetAddress;
+
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 
@@ -17,12 +19,18 @@ import org.eclipse.jetty.server.Server;
  */
 public class JmxWebServer {
 
+	private InetAddress serverAddress;
 	private int serverPort;
 	private Server server;
 	private final JettyConnectorFactory jettyConnectorFactory = getConnectorFactory();
 
 	public JmxWebServer() {
 		// for spring
+	}
+
+	public JmxWebServer(InetAddress inetAddress, int serverPort) {
+		this.serverAddress = inetAddress;
+		this.serverPort = serverPort;
 	}
 
 	public JmxWebServer(int serverPort) {
@@ -34,7 +42,7 @@ public class JmxWebServer {
 	 */
 	public void start() throws Exception {
 		server = new Server();
-		Connector connector = jettyConnectorFactory.buildConnector(server, serverPort);
+		Connector connector = jettyConnectorFactory.buildConnector(server, serverAddress, serverPort);
 		server.addConnector(connector);
 		server.setHandler(new JmxWebHandler());
 		server.start();
@@ -44,8 +52,16 @@ public class JmxWebServer {
 	 * Stop the internal Jetty web server and associated classes.
 	 */
 	public void stop() throws Exception {
+		server.setGracefulShutdown(100);
 		server.stop();
 		server = null;
+	}
+
+	/**
+	 * Optional address that the Jetty web server will be running on.
+	 */
+	public void setServerAddress(InetAddress serverAddress) {
+		this.serverAddress = serverAddress;
 	}
 
 	/**

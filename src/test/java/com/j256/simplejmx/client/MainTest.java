@@ -3,6 +3,7 @@ package com.j256.simplejmx.client;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.PrintStream;
+import java.net.InetAddress;
 
 import javax.management.JMException;
 
@@ -86,18 +87,20 @@ public class MainTest {
 	@Test
 	public void testConnectToServer() throws Exception {
 		int port = 8000;
-		JmxServer server = new JmxServer(port);
+		InetAddress address = InetAddress.getByName("127.0.0.1");
+		JmxServer server = new JmxServer(address, port);
 		try {
 			server.start();
 
 			StringBuilder sb = new StringBuilder();
 			sb.append("quit\n");
 			System.setIn(new ByteArrayInputStream(sb.toString().getBytes()));
-			new Main().doMain(new String[] { "localhost:" + port }, true);
+			new Main().doMain(new String[] { address.getHostAddress() + ":" + port }, true);
 
 			// now connect as jmx url
 			System.setIn(new ByteArrayInputStream(sb.toString().getBytes()));
-			new Main().doMain(new String[] { JmxClient.generalJmxUrlForHostNamePort("localhost", port) }, true);
+			new Main().doMain(new String[] { JmxClient.generalJmxUrlForHostNamePort(address.getHostAddress(), port) },
+					true);
 		} finally {
 			server.stop();
 		}

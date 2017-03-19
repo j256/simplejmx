@@ -5,6 +5,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.net.InetAddress;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -21,26 +23,32 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 public class JmxWebHandlerTest {
 
 	private static final int WEB_SERVER_PORT = 8080;
+	private static final String WEB_SERVER_NAME = "127.0.0.1";
+
 	private static JmxWebServer webServer;
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-		webServer = new JmxWebServer(WEB_SERVER_PORT);
+		webServer = new JmxWebServer(InetAddress.getByName(WEB_SERVER_NAME), WEB_SERVER_PORT);
 		webServer.start();
+		Thread.sleep(2000);
 	}
 
 	@AfterClass
 	public static void afterClass() throws Exception {
+		// Thread.sleep(100000);
 		if (webServer != null) {
 			webServer.stop();
+			webServer = null;
 		}
 	}
 
-	@Test
+	@Test(timeout = 10000)
 	public void testSimple() throws Exception {
 		WebClient webClient = new WebClient();
-		HtmlPage page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT);
+		HtmlPage page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT);
 		assertTrue(page.asText().contains("JMX Domains"));
+
 		String domain = "java.lang";
 		HtmlAnchor anchor = page.getAnchorByText(domain);
 		assertNotNull(anchor);
@@ -94,32 +102,37 @@ public class JmxWebHandlerTest {
 		assertEquals(operation + " method successfully invoked.\n", textPage.getContent());
 	}
 
-	@Test
+	@Test(timeout = 10000)
 	public void testOtherStuff() throws Exception {
 		WebClient webClient = new WebClient();
-		HtmlPage page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/s");
+		HtmlPage page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT);
+		assertTrue(page.asText().contains("Show all beans"));
+
+		HtmlAnchor anchor = page.getAnchorByText("Show all beans.");
+		assertNotNull(anchor);
+		page = anchor.click();
 		assertTrue(page.asText().contains("All Beans"));
 
 		String beanName = "java.lang:type=Memory";
-		HtmlAnchor anchor = page.getAnchorByText(beanName);
+		anchor = page.getAnchorByText(beanName);
 		page = anchor.click();
 		assertTrue(page.asText().contains("Information about object " + beanName));
 
 		try {
-			webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/not-found/");
+			webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/not-found/");
 			fail("should have thrown");
 		} catch (FailingHttpStatusCodeException fhsce) {
 			// ignored
 		}
 
-		page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/b/:::::");
+		page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/b/:::::");
 		assertTrue(page.asText(), page.asText().contains("Invalid object name"));
 
-		page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/b/hello:name=there");
+		page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/b/hello:name=there");
 		assertTrue(page.asText(), page.asText().contains("Investigating object threw exception"));
 
 		beanName = "java.lang:type=Runtime";
-		page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/b/" + beanName);
+		page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/b/" + beanName);
 		assertTrue(page.asText(), page.asText().contains("Information about object " + beanName));
 
 		anchor = page.getAnchorByName("text");
@@ -127,7 +140,7 @@ public class JmxWebHandlerTest {
 		assertTrue(textPage.getContent().contains("ClassPath="));
 
 		beanName = "java.lang:type=Threading";
-		page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/b/" + beanName);
+		page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/b/" + beanName);
 		assertTrue(page.asText().contains("Information about object " + beanName));
 
 		anchor = page.getAnchorByName("text");
@@ -137,38 +150,40 @@ public class JmxWebHandlerTest {
 		/* assign errors */
 
 		beanName = "java.lang:type=Memory";
-		page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/a/" + beanName);
+		page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/a/" + beanName);
 		assertTrue(page.asText().contains("Invalid number of parameters"));
 
-		page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/a/" + beanName + "/Verbose");
+		page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/a/" + beanName + "/Verbose");
 		assertTrue(page.asText().contains("No value parameter specified"));
 
-		page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/a/bad-name/Verbose?val=foo");
+		page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/a/bad-name/Verbose?val=foo");
 		assertTrue(page.asText().contains("Invalid object name"));
 
-		page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/a/not:name=found/Verbose?val=foo");
+		page = webClient
+				.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/a/not:name=found/Verbose?val=foo");
 		assertTrue(page.asText().contains("Could not get mbean info"));
 
-		page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/a/" + beanName + "/notFound?val=foo");
+		page = webClient
+				.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/a/" + beanName + "/notFound?val=foo");
 		assertTrue(page.asText().contains("Cannot find attribute"));
 
-		page =
-				webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/a/" + beanName
-						+ "/ObjectPendingFinalizationCount?val=foo");
+		page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/a/" + beanName
+				+ "/ObjectPendingFinalizationCount?val=foo");
 		assertTrue(page.asText().contains("Could not set attribute"));
 
 		/* invoke errors */
 
-		page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/o/");
+		page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/o/");
 		assertTrue(page.asText().contains("Invalid number of parameters"));
 
-		page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/o/bad-name/gc/");
+		page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/o/bad-name/gc/");
 		assertTrue(page.asText(), page.asText().contains("Invalid object name"));
 
-		page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/o/not:name=found/gc/");
+		page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/o/not:name=found/gc/");
 		assertTrue(page.asText(), page.asText().contains("Could not get mbean info"));
 
-		page = webClient.getPage("http://localhost:" + WEB_SERVER_PORT + "/o/" + beanName + "/not-found/");
+		page = webClient
+				.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/o/" + beanName + "/not-found/");
 		assertTrue(page.asText(), page.asText().contains("Cannot find operation"));
 	}
 }

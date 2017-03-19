@@ -6,9 +6,9 @@
 @c %**end of header
 
 @c ----------------------------------------------------------------
-@set simplejmx_version 1.12
-@set simplejmx_year 2014
-@set simplejmx_date September @value{simplejmx_year}
+@set simplejmx_version 1.14
+@set simplejmx_year 2017
+@set simplejmx_date March @value{simplejmx_year}
 @set package SimpleJMX
 @c ----------------------------------------------------------------
 
@@ -954,7 +954,7 @@ DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING F
 WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE
 USE OR PERFORMANCE OF THIS SOFTWARE.
 
-The author may be contacted via @uref{http://256.com/sources/simplejmx/}
+The author may be contacted via the @uref{http://256.com/sources/simplejmx/, SimpleJMX home page}.
 
 @c ----------------------------------------------------------------
 @node Index of Concepts,, License, Top
