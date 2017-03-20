@@ -1,3 +1,6 @@
+Simple Java JMX
+===============
+
 This package provides some Java classes to help with the publishing of objects using JMX.
 
 For more information, visit the home page:
