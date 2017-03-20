@@ -77,8 +77,8 @@ public class JmxServerTest {
 			first.start();
 			second.start();
 		} finally {
-			first.close();
-			second.close();
+			IoUtils.closeQuietly(first);
+			IoUtils.closeQuietly(second);
 		}
 	}
 
@@ -106,7 +106,7 @@ public class JmxServerTest {
 			try {
 				server.stopThrow();
 			} finally {
-				server.stop();
+				IoUtils.closeQuietly(server);
 			}
 		}
 	}
