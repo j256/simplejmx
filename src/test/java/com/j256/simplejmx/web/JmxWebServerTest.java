@@ -25,7 +25,7 @@ public class JmxWebServerTest {
 		try {
 			testServer(port);
 		} finally {
-			webServer.stop();
+			webServer.close();
 		}
 	}
 
@@ -40,7 +40,7 @@ public class JmxWebServerTest {
 		try {
 			testServer(port);
 		} finally {
-			webServer.stop();
+			webServer.close();
 		}
 	}
 
