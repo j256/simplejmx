@@ -4,11 +4,13 @@ import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.j256.simplejmx.client.JmxClient;
 import com.j256.simplejmx.common.IoUtils;
 
+@Ignore("not ready for prime time yet")
 public class JmxUsernamePasswordAuthenticatorTest {
 
 	private static final int DEFAULT_PORT = 5256;
