@@ -1,5 +1,6 @@
 1.15: 3/20/2017
 	* Added environment map arguments to constructor.  Thanks to nicoulaj.
+	* Made JmxServer and JmxWebServer be Closeable.
 
 1.14: 3/16/2017
 	* Ton of improvements to tests to get them to work with circle-ci and (I suspect) other systems.

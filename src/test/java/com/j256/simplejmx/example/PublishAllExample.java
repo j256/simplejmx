@@ -48,7 +48,7 @@ public class PublishAllExample {
 			// unregister is not necessary if we are stopping the server
 			jmxServer.unregister(counter);
 			// stop our server
-			jmxServer.stop();
+			jmxServer.close();
 		}
 	}
 

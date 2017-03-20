@@ -2,6 +2,7 @@ package com.j256.simplejmx.server;
 
 import org.junit.Ignore;
 
+import com.j256.simplejmx.common.IoUtils;
 import com.j256.simplejmx.common.JmxOperation;
 import com.j256.simplejmx.common.JmxResource;
 
@@ -22,7 +23,7 @@ public class PlatformMbeanServerTest {
 			}
 			System.out.println("shutdown");
 		} finally {
-			server.stop();
+			IoUtils.closeQuietly(server);
 		}
 	}
 

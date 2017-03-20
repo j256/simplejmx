@@ -18,6 +18,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.j256.simplejmx.client.JmxClient;
+import com.j256.simplejmx.common.IoUtils;
 import com.j256.simplejmx.common.JmxAttributeField;
 import com.j256.simplejmx.common.JmxAttributeFieldInfo;
 import com.j256.simplejmx.common.JmxAttributeMethod;
@@ -53,7 +54,7 @@ public class JmxServerTest {
 
 	@AfterClass
 	public static void afterClass() {
-		server.stop();
+		IoUtils.closeQuietly(server);
 	}
 
 	@Test
@@ -63,7 +64,7 @@ public class JmxServerTest {
 			server.stop();
 			server.start();
 		} finally {
-			server.stop();
+			IoUtils.closeQuietly(server);
 		}
 	}
 
@@ -76,8 +77,8 @@ public class JmxServerTest {
 			first.start();
 			second.start();
 		} finally {
-			first.stop();
-			second.stop();
+			first.close();
+			second.close();
 		}
 	}
 
@@ -87,7 +88,7 @@ public class JmxServerTest {
 		try {
 			server.start();
 		} finally {
-			server.stop();
+			IoUtils.closeQuietly(server);
 		}
 	}
 
@@ -118,7 +119,7 @@ public class JmxServerTest {
 			server.setInetAddress(serverAddress);
 			server.start();
 		} finally {
-			server.stop();
+			IoUtils.closeQuietly(server);
 		}
 	}
 
@@ -129,7 +130,7 @@ public class JmxServerTest {
 			server.start();
 			fail("Should not have gotten here");
 		} finally {
-			server.stop();
+			IoUtils.closeQuietly(server);
 		}
 	}
 
@@ -177,7 +178,7 @@ public class JmxServerTest {
 				// ignored
 			}
 		} finally {
-			closeClient(client);
+			IoUtils.closeQuietly(client);
 			server.unregister(obj);
 		}
 	}
@@ -235,7 +236,7 @@ public class JmxServerTest {
 			assertEquals(FOO_VALUE, client.getAttribute(ObjectNameUtil.makeObjectName(DOMAIN_NAME, OBJECT_NAME,
 					new String[] { FOLDER_FIELD_NAME + "=" + FOLDER_VALUE_NAME }), "foo"));
 		} finally {
-			closeClient(client);
+			IoUtils.closeQuietly(client);
 			server.unregister(obj);
 		}
 	}
@@ -249,7 +250,7 @@ public class JmxServerTest {
 			client = new JmxClient(serverAddress, DEFAULT_PORT);
 			assertEquals(FOO_VALUE, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo"));
 		} finally {
-			closeClient(client);
+			IoUtils.closeQuietly(client);
 			server.unregister(obj);
 		}
 	}
@@ -273,7 +274,7 @@ public class JmxServerTest {
 			client = new JmxClient(serverAddress, DEFAULT_PORT);
 			assertEquals(FOO_VALUE, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo"));
 		} finally {
-			closeClient(client);
+			IoUtils.closeQuietly(client);
 			server.unregister(obj);
 		}
 	}
@@ -287,7 +288,7 @@ public class JmxServerTest {
 			client = new JmxClient(serverAddress, DEFAULT_PORT);
 			assertEquals(FOO_VALUE, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo"));
 		} finally {
-			closeClient(client);
+			IoUtils.closeQuietly(client);
 			server.unregister(obj);
 		}
 	}
@@ -302,7 +303,7 @@ public class JmxServerTest {
 			String someArg = "pfoewjfpeowjfewf ewopjfwefew";
 			assertEquals(someArg, client.invokeOperation(DOMAIN_NAME, OBJECT_NAME, "doSomething", someArg));
 		} finally {
-			closeClient(client);
+			IoUtils.closeQuietly(client);
 			server.unregister(obj);
 		}
 	}
@@ -316,7 +317,7 @@ public class JmxServerTest {
 			client = new JmxClient(serverAddress, DEFAULT_PORT);
 			client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo");
 		} finally {
-			closeClient(client);
+			IoUtils.closeQuietly(client);
 			server.unregister(obj);
 		}
 	}
@@ -330,7 +331,7 @@ public class JmxServerTest {
 			client = new JmxClient(serverAddress, DEFAULT_PORT);
 			client.setAttribute(DOMAIN_NAME, OBJECT_NAME, "foo", 0);
 		} finally {
-			closeClient(client);
+			IoUtils.closeQuietly(client);
 			server.unregister(obj);
 		}
 	}
@@ -344,7 +345,7 @@ public class JmxServerTest {
 			client = new JmxClient(serverAddress, DEFAULT_PORT);
 			client.invokeOperation(DOMAIN_NAME, OBJECT_NAME, "someCall");
 		} finally {
-			closeClient(client);
+			IoUtils.closeQuietly(client);
 			server.unregister(obj);
 		}
 	}
@@ -370,7 +371,7 @@ public class JmxServerTest {
 				// ignored
 			}
 		} finally {
-			closeClient(client);
+			IoUtils.closeQuietly(client);
 			server.unregister(objectName);
 		}
 	}
@@ -390,7 +391,7 @@ public class JmxServerTest {
 			client.setAttribute(DOMAIN_NAME, OBJECT_NAME, "foo", val);
 			assertEquals(val, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo"));
 		} finally {
-			closeClient(client);
+			IoUtils.closeQuietly(client);
 			server.unregister(objectName);
 		}
 	}
@@ -414,7 +415,7 @@ public class JmxServerTest {
 				// ignored
 			}
 		} finally {
-			closeClient(client);
+			IoUtils.closeQuietly(client);
 			server.unregister(objectName);
 		}
 	}
@@ -473,7 +474,7 @@ public class JmxServerTest {
 				// ignored
 			}
 		} finally {
-			closeClient(client);
+			IoUtils.closeQuietly(client);
 			server.unregister(obj);
 		}
 	}
@@ -509,15 +510,9 @@ public class JmxServerTest {
 				// ignored
 			}
 		} finally {
-			closeClient(client);
+			IoUtils.closeQuietly(client);
 			server.unregister(objectName);
-			server.stop();
-		}
-	}
-
-	private void closeClient(JmxClient client) {
-		if (client != null) {
-			client.close();
+			IoUtils.closeQuietly(server);
 		}
 	}
 

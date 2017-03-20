@@ -11,6 +11,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.j256.simplejmx.common.IoUtils;
 import com.j256.simplejmx.server.JmxServer;
 
 public class MainTest {
@@ -102,7 +103,7 @@ public class MainTest {
 			new Main().doMain(new String[] { JmxClient.generalJmxUrlForHostNamePort(address.getHostAddress(), port) },
 					true);
 		} finally {
-			server.stop();
+			IoUtils.closeQuietly(server);
 		}
 	}
 }

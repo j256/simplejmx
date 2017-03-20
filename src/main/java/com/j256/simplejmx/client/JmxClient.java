@@ -22,6 +22,7 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
+import com.j256.simplejmx.common.IoUtils;
 import com.j256.simplejmx.common.ObjectNameUtil;
 
 /**
@@ -107,6 +108,13 @@ public class JmxClient implements Closeable {
 	}
 
 	/**
+	 * Connect the client to a host and port combination and a username and password.
+	 */
+	public JmxClient(String hostName, int port, String userName, String password) throws JMException {
+		this(generalJmxUrlForHostNamePort(hostName, port), addCredentialsToMap(userName, password, null));
+	}
+
+	/**
 	 * Connect the client to a host and port combination.
 	 */
 	public JmxClient(String hostName, int port, Map<String, Object> environment) throws JMException {
@@ -147,11 +155,7 @@ public class JmxClient implements Closeable {
 			mbeanConn = jmxConnector.getMBeanServerConnection();
 		} catch (IOException e) {
 			if (jmxConnector != null) {
-				try {
-					jmxConnector.close();
-				} catch (IOException e1) {
-					// ignore, we did our best
-				}
+				IoUtils.closeQuietly(jmxConnector);
 				jmxConnector = null;
 			}
 			throw createJmException("Problems connecting to the server" + e, e);
@@ -459,7 +463,7 @@ public class JmxClient implements Closeable {
 		}
 		if (userName != null || password != null) {
 			String[] credentials = new String[] { userName, password };
-			environmentMap.put("jmx.remote.credentials", credentials);
+			environmentMap.put(JMXConnector.CREDENTIALS, credentials);
 		}
 		return environmentMap;
 	}

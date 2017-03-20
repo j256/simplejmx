@@ -1,5 +1,6 @@
 package com.j256.simplejmx.server;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
@@ -34,7 +35,7 @@ import com.j256.simplejmx.common.ObjectNameUtil;
  * 
  * @author graywatson
  */
-public class JmxServer {
+public class JmxServer implements Closeable {
 
 	private final String RMI_SERVER_HOST_NAME_PROPERTY = "java.rmi.server.hostname";
 
@@ -166,6 +167,15 @@ public class JmxServer {
 			stopThrow();
 		} catch (JMException e) {
 			// ignored
+		}
+	}
+
+	@Override
+	public void close() throws IOException {
+		try {
+			stopThrow();
+		} catch (JMException jme) {
+			throw new IOException(jme);
 		}
 	}
 

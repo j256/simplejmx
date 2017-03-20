@@ -8,6 +8,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.j256.simplejmx.client.JmxClient;
+import com.j256.simplejmx.common.IoUtils;
 import com.j256.simplejmx.common.JmxAttributeMethod;
 import com.j256.simplejmx.common.JmxOperation;
 import com.j256.simplejmx.common.JmxResource;
@@ -53,11 +54,11 @@ public class DoubleServerTest {
 		} finally {
 			if (server1 != null) {
 				server1.unregister(testObject);
-				server1.stop();
+				IoUtils.closeQuietly(server1);
 			}
 			if (server2 != null) {
 				server2.unregister(testObject);
-				server2.stop();
+				IoUtils.closeQuietly(server2);
 			}
 		}
 	}

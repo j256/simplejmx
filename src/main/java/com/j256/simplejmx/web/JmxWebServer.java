@@ -1,5 +1,7 @@
 package com.j256.simplejmx.web;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.net.InetAddress;
 
 import org.eclipse.jetty.server.Connector;
@@ -17,7 +19,7 @@ import org.eclipse.jetty.server.Server;
  * 
  * @author graywatson
  */
-public class JmxWebServer {
+public class JmxWebServer implements Closeable {
 
 	private InetAddress serverAddress;
 	private int serverPort;
@@ -55,6 +57,17 @@ public class JmxWebServer {
 		server.setGracefulShutdown(100);
 		server.stop();
 		server = null;
+	}
+
+	@Override
+	public void close() throws IOException {
+		try {
+			stop();
+		} catch (IOException ioe) {
+			throw ioe;
+		} catch (Exception e) {
+			throw new IOException(e);
+		}
 	}
 
 	/**

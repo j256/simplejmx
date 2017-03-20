@@ -75,7 +75,7 @@ public class RandomObjectExample {
 			// unregister is not necessary if we are stopping the server
 			jmxServer.unregister(lookupCache);
 			// stop our server
-			jmxServer.stop();
+			jmxServer.close();
 		}
 	}
 

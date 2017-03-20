@@ -56,8 +56,8 @@ public class BasicExample {
 		} finally {
 			// unregister is not necessary if we are stopping the server
 			jmxServer.unregister(counter);
-			// stop our server
-			jmxServer.stop();
+			// close our server
+			jmxServer.close();
 		}
 	}
 

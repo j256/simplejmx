@@ -14,12 +14,12 @@ import javax.management.JMException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.ReflectionException;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.j256.simplejmx.client.JmxClient;
+import com.j256.simplejmx.common.IoUtils;
 import com.j256.simplejmx.common.JmxAttributeField;
 import com.j256.simplejmx.common.JmxAttributeMethod;
 import com.j256.simplejmx.common.JmxOperation;
@@ -92,7 +92,7 @@ public class ReflectionMbeanTest {
 			}
 
 		} finally {
-			IOUtils.closeQuietly(client);
+			IoUtils.closeQuietly(client);
 			server.unregister(obj);
 		}
 	}
@@ -111,7 +111,7 @@ public class ReflectionMbeanTest {
 			assertEquals(int.class.toString(), attributes[0].getType());
 
 		} finally {
-			IOUtils.closeQuietly(client);
+			IoUtils.closeQuietly(client);
 			server.unregister(obj);
 		}
 	}
@@ -190,7 +190,7 @@ public class ReflectionMbeanTest {
 			int y = 2934;
 			assertEquals(y, client.invokeOperation(DOMAIN_NAME, OBJECT_NAME, "assignX", x, y));
 		} finally {
-			IOUtils.closeQuietly(client);
+			IoUtils.closeQuietly(client);
 			server.unregister(obj);
 		}
 	}
@@ -223,7 +223,7 @@ public class ReflectionMbeanTest {
 				// expected
 			}
 		} finally {
-			IOUtils.closeQuietly(client);
+			IoUtils.closeQuietly(client);
 			server.unregister(attributeField);
 		}
 	}

@@ -49,8 +49,8 @@ public class WebServerExample {
 
 		} finally {
 			// stop our server
-			jmxWebServer.stop();
-			jmxServer.stop();
+			jmxWebServer.close();
+			jmxServer.close();
 		}
 	}
 

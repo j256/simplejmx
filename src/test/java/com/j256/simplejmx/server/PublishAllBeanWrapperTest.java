@@ -5,12 +5,12 @@ import static org.junit.Assert.fail;
 
 import java.net.InetAddress;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.j256.simplejmx.client.JmxClient;
+import com.j256.simplejmx.common.IoUtils;
 import com.j256.simplejmx.common.JmxResourceInfo;
 
 public class PublishAllBeanWrapperTest {
@@ -88,7 +88,7 @@ public class PublishAllBeanWrapperTest {
 
 		} finally {
 			server.unregister(resourceInfo);
-			IOUtils.closeQuietly(client);
+			IoUtils.closeQuietly(client);
 		}
 	}
 
@@ -110,7 +110,7 @@ public class PublishAllBeanWrapperTest {
 			assertEquals(3, client.getAttributesInfo(DOMAIN_NAME, OBJECT_NAME).length);
 		} finally {
 			server.unregister(resourceInfo);
-			IOUtils.closeQuietly(client);
+			IoUtils.closeQuietly(client);
 		}
 	}
 
