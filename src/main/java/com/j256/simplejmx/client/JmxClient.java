@@ -54,13 +54,26 @@ public class JmxClient implements Closeable {
 	 * <p>
 	 * Connect the client to a JMX server using the full JMX URL format. The URL should look something like:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * service:jmx:rmi:///jndi/rmi://hostName:portNumber/jmxrmi
 	 * </pre>
 	 */
 	public JmxClient(String jmxUrl) throws JMException {
 		this(jmxUrl, null, null);
+	}
+
+	/**
+	 * <p>
+	 * Connect the client to a JMX server using the full JMX URL format. The URL should look something like:
+	 * </p>
+	 *
+	 * <pre>
+	 * service:jmx:rmi:///jndi/rmi://hostName:portNumber/jmxrmi
+	 * </pre>
+	 */
+	public JmxClient(String jmxUrl, Map<String, Object> environment) throws JMException {
+		this(jmxUrl, null, null, environment);
 	}
 
 	/**
@@ -74,13 +87,28 @@ public class JmxClient implements Closeable {
 	 * </pre>
 	 */
 	public JmxClient(String jmxUrl, String userName, String password) throws JMException {
+		this(jmxUrl, userName, password, null);
+	}
+
+	/**
+	 * <p>
+	 * Connect the client to a JMX server using the full JMX URL format with username/password credentials. The URL
+	 * should look something like:
+	 * </p>
+	 *
+	 * <pre>
+	 * service:jmx:rmi:///jndi/rmi://hostName:portNumber/jmxrmi
+	 * </pre>
+	 */
+	public JmxClient(String jmxUrl, String userName, String password, Map<String, Object> environment) throws JMException {
 		if (jmxUrl == null) {
 			throw new IllegalArgumentException("Jmx URL cannot be null");
 		}
 
-		HashMap<String, Object> map = null;
+		Map<String, Object> map = environment;
 		if (userName != null || password != null) {
-			map = new HashMap<String, Object>();
+			if (map == null)
+				map = new HashMap<String, Object>();
 			String[] credentials = new String[] { userName, password };
 			map.put("jmx.remote.credentials", credentials);
 		}
@@ -118,6 +146,13 @@ public class JmxClient implements Closeable {
 	 */
 	public JmxClient(String hostName, int port) throws JMException {
 		this(generalJmxUrlForHostNamePort(hostName, port));
+	}
+
+	/**
+	 * Connect the client to a host and port combination.
+	 */
+	public JmxClient(String hostName, int port, Map<String, Object> environment) throws JMException {
+		this(generalJmxUrlForHostNamePort(hostName, port), environment);
 	}
 
 	/**
