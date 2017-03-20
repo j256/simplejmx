@@ -60,20 +60,7 @@ public class JmxClient implements Closeable {
 	 * </pre>
 	 */
 	public JmxClient(String jmxUrl) throws JMException {
-		this(jmxUrl, null, null);
-	}
-
-	/**
-	 * <p>
-	 * Connect the client to a JMX server using the full JMX URL format. The URL should look something like:
-	 * </p>
-	 *
-	 * <pre>
-	 * service:jmx:rmi:///jndi/rmi://hostName:portNumber/jmxrmi
-	 * </pre>
-	 */
-	public JmxClient(String jmxUrl, Map<String, Object> environment) throws JMException {
-		this(jmxUrl, null, null, environment);
+		this(jmxUrl, null);
 	}
 
 	/**
@@ -87,7 +74,7 @@ public class JmxClient implements Closeable {
 	 * </pre>
 	 */
 	public JmxClient(String jmxUrl, String userName, String password) throws JMException {
-		this(jmxUrl, userName, password, null);
+		this(jmxUrl, addCredentialsToMap(userName, password, null));
 	}
 
 	/**
@@ -100,52 +87,23 @@ public class JmxClient implements Closeable {
 	 * service:jmx:rmi:///jndi/rmi://hostName:portNumber/jmxrmi
 	 * </pre>
 	 */
-	public JmxClient(String jmxUrl, String userName, String password, Map<String, Object> environment) throws JMException {
-		if (jmxUrl == null) {
-			throw new IllegalArgumentException("Jmx URL cannot be null");
-		}
-
-		Map<String, Object> map = environment;
-		if (userName != null || password != null) {
-			if (map == null)
-				map = new HashMap<String, Object>();
-			String[] credentials = new String[] { userName, password };
-			map.put("jmx.remote.credentials", credentials);
-		}
-		try {
-			this.serviceUrl = new JMXServiceURL(jmxUrl);
-		} catch (MalformedURLException e) {
-			throw createJmException("JmxServiceUrl was malformed: " + jmxUrl, e);
-		}
-
-		try {
-			jmxConnector = JMXConnectorFactory.connect(serviceUrl, map);
-			mbeanConn = jmxConnector.getMBeanServerConnection();
-		} catch (IOException e) {
-			if (jmxConnector != null) {
-				try {
-					jmxConnector.close();
-				} catch (IOException e1) {
-					// ignore, we did our best
-				}
-				jmxConnector = null;
-			}
-			throw createJmException("Problems connecting to the server" + e, e);
-		}
+	public JmxClient(String jmxUrl, String userName, String password, Map<String, Object> environmentMap)
+			throws JMException {
+		this(jmxUrl, addCredentialsToMap(userName, password, environmentMap));
 	}
 
 	/**
 	 * Connect the client to the local host at a certain port number.
 	 */
 	public JmxClient(int localPort) throws JMException {
-		this(generalJmxUrlForHostNamePort("", localPort));
+		this(generalJmxUrlForHostNamePort("", localPort), null);
 	}
 
 	/**
 	 * Connect the client to a host and port combination.
 	 */
 	public JmxClient(String hostName, int port) throws JMException {
-		this(generalJmxUrlForHostNamePort(hostName, port));
+		this(generalJmxUrlForHostNamePort(hostName, port), null);
 	}
 
 	/**
@@ -159,7 +117,45 @@ public class JmxClient implements Closeable {
 	 * Connect the client to an address and port combination.
 	 */
 	public JmxClient(InetAddress address, int port) throws JMException {
-		this(address.getHostAddress(), port);
+		this(generalJmxUrlForHostNamePort(address.getHostAddress(), port), null);
+	}
+
+	/**
+	 * <p>
+	 * Connect the client to a JMX server using the full JMX URL format an environment-map passed into
+	 * {@link JMXConnectorFactory#connect(JMXServiceURL, Map)}. The URL should look something like:
+	 * </p>
+	 *
+	 * <pre>
+	 * service:jmx:rmi:///jndi/rmi://hostName:portNumber/jmxrmi
+	 * </pre>
+	 */
+	public JmxClient(String jmxUrl, Map<String, Object> environmentMap) throws JMException {
+
+		if (jmxUrl == null) {
+			throw new IllegalArgumentException("Jmx URL cannot be null");
+		}
+
+		try {
+			this.serviceUrl = new JMXServiceURL(jmxUrl);
+		} catch (MalformedURLException e) {
+			throw createJmException("JmxServiceUrl was malformed: " + jmxUrl, e);
+		}
+
+		try {
+			jmxConnector = JMXConnectorFactory.connect(serviceUrl, environmentMap);
+			mbeanConn = jmxConnector.getMBeanServerConnection();
+		} catch (IOException e) {
+			if (jmxConnector != null) {
+				try {
+					jmxConnector.close();
+				} catch (IOException e1) {
+					// ignore, we did our best
+				}
+				jmxConnector = null;
+			}
+			throw createJmException("Problems connecting to the server" + e, e);
+		}
 	}
 
 	/**
@@ -454,6 +450,18 @@ public class JmxClient implements Closeable {
 	public Object invokeOperation(ObjectName objectName, String operName, Object... params) throws Exception {
 		String[] paramTypes = lookupParamTypes(objectName, operName, params);
 		return invokeOperation(objectName, operName, paramTypes, params);
+	}
+
+	private static Map<String, Object> addCredentialsToMap(String userName, String password,
+			Map<String, Object> environmentMap) {
+		if (environmentMap == null) {
+			environmentMap = new HashMap<String, Object>();
+		}
+		if (userName != null || password != null) {
+			String[] credentials = new String[] { userName, password };
+			environmentMap.put("jmx.remote.credentials", credentials);
+		}
+		return environmentMap;
 	}
 
 	private Object invokeOperation(ObjectName objectName, String operName, String[] paramTypes, Object[] params)
