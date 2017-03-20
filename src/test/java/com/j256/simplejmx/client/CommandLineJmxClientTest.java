@@ -154,7 +154,7 @@ public class CommandLineJmxClientTest {
 	@Test
 	public void testGetAllAttributes() throws Exception {
 		String output = getClientOutput(client, "get " + objectNameString);
-		assertTrue(output, output.matches("(?s).*get 'x' in \\d+ms = 0.*"));
+		assertTrue(output, output.matches("(?s).*get 'x' in \\d+ms = \\d+.*"));
 	}
 
 	@Test
