@@ -25,8 +25,10 @@ on it's own port.
 
 	// create a new JMX server listening on a specific port
 	JmxServer jmxServer = new JmxServer(JMX_PORT);
-	// NOTE: you could also use the platform mbean server: new JmxServer(ManagementFactory.getPlatformMBeanServer());
-	// start our server
+	// NOTE: you could also use the platform mbean server:
+	// JmxServer jmxServer = new JmxServer(ManagementFactory.getPlatformMBeanServer());
+	
+	// start the server
 	jmxServer.start();
  	
 	// create the object we will be exposing with JMX
@@ -38,7 +40,9 @@ on it's own port.
 	jmxServer.stop();
 	...
 
-Here's the class we are publishing via the server.
+Here's the class we are publishing via the server.  The class is annotated with `@JmxResource` to define the bean
+name.  The fields and get/set methods are annotated to show attributes (`@JmxAttributeField`, `@JmxAttributeMethod`).
+Other methods can be annotated with `@JmxOperation` to expose them as operations.
 
 	@JmxResource(domainName = "j256")
 	public class RuntimeCounter {
