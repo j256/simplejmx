@@ -25,7 +25,7 @@ on it's own port.
 
 	// create a new JMX server listening on a specific port
 	JmxServer jmxServer = new JmxServer(JMX_PORT);
-	// NOTE: you could also do: new JmxServer(ManagementFactory.getPlatformMBeanServer()); to use the platform mbean server
+	// NOTE: you could also use the platform mbean server: new JmxServer(ManagementFactory.getPlatformMBeanServer());
 	// start our server
 	jmxServer.start();
  	
