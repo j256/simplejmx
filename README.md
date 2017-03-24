@@ -20,9 +20,12 @@ Here's a [little sample program](http://256stuff.com/sources/simplejmx/docs/exam
 
 ## Sample Code
 
+First we create a server either as a wrapper around the default mbean server running in the JVM or one that listens
+on it's own port.
+
 	// create a new JMX server listening on a specific port
 	JmxServer jmxServer = new JmxServer(JMX_PORT);
-	// NOTE: you could also do: new JmxServer(ManagementFactory.getPlatformMBeanServer());
+	// NOTE: you could also do: new JmxServer(ManagementFactory.getPlatformMBeanServer()); to use the platform mbean server
 	// start our server
 	jmxServer.start();
  	
@@ -34,7 +37,9 @@ Here's a [little sample program](http://256stuff.com/sources/simplejmx/docs/exam
 	// shutdown our server
 	jmxServer.stop();
 	...
-	
+
+Here's the class we are publishing via the server.
+
 	@JmxResource(domainName = "j256")
 	public class RuntimeCounter {
 		private long startMillis = System.currentTimeMillis();
