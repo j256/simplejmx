@@ -11,8 +11,6 @@ You can see the source on the [git repository](https://github.com/j256/simplejmx
 
 Maven packages are published via the [maven central repo](http://repo1.maven.org/maven2/com/j256/simplejmx/simplejmx/).
 
-Here's a [little working example program](http://256stuff.com/sources/simplejmx/docs/example-simple).
-
 Enjoy,
 Gray Watson
 
