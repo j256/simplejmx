@@ -18,6 +18,18 @@ Gray Watson
 
 Here's a [little sample program](http://256stuff.com/sources/simplejmx/docs/example-simple) to help you get started.
 
+## Publishing JMX Beans over HTTP for Web Browser
+
+SimpleJMX also contains a simple web-server handler that uses Jetty so that you can access JMX information from a web
+browser or other web client using the ```JmxWebServer``` class.  To use this class you need to provide a Jetty
+version in your dependency list or classpath.  You just need to add the following code to your application startup.
+
+	// start a web server for exposing jmx beans listing on port 8080
+	JmxWebServer jmxWebServer = new JmxWebServer(8080);
+	jmxWebServer.start();
+
+For more details, see the [web server sample program](http://256stuff.com/sources/simplejmx/docs/example-web).
+
 ## Sample Code
 
 First we create a server either as a wrapper around the default mbean server running in the JVM or one that listens
