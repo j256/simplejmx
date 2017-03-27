@@ -3,15 +3,12 @@ Simple Java JMX
 
 This package provides some Java classes to help with the publishing of objects using JMX.
 
-For more information, visit the [SimpleJMX home page](http://256stuff.com/sources/simplejmx/).
+* For more information, visit the [SimpleJMX home page](http://256stuff.com/sources/simplejmx/).
+* Online documentation can be found on the home page.  Here are the [SimpleJMX Javadocs](http://256stuff.com/sources/simplejmx/javadoc/simplejmx/).
+* You can see the source on the [git repository](https://github.com/j256/simplejmx).
+* Maven packages are published via the [maven central repo](http://repo1.maven.org/maven2/com/j256/simplejmx/simplejmx/).
 
-Online documentation can be found on the home page.  Here are the [SimpleJMX Javadocs](http://256stuff.com/sources/simplejmx/javadoc/simplejmx/).
-
-You can see the source on the [git repository](https://github.com/j256/simplejmx).
-
-Maven packages are published via the [maven central repo](http://repo1.maven.org/maven2/com/j256/simplejmx/simplejmx/).
-
-Enjoy,
+Enjoy, <br />
 Gray Watson
 
 ## Little Sample Program
@@ -30,7 +27,7 @@ version in your dependency list or classpath.  You just need to add the followin
 
 For more details, see the [web server sample program](http://256stuff.com/sources/simplejmx/docs/example-web).
 
-## Sample Code
+## Sample Jmx Code
 
 First we create a server either as a wrapper around the default mbean server running in the JVM or one that listens
 on it's own port.
