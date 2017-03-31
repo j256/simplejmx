@@ -422,6 +422,8 @@ public class JmxServerTest {
 
 	@Test
 	public void testLoopBackAddress() throws Exception {
+		// this fails every so often so let's see if it a port clearing thing
+		Thread.sleep(1000);
 		testAddress(null, differentPost.incrementAndGet());
 	}
 
