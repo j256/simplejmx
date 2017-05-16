@@ -74,3 +74,7 @@ Other methods can be annotated with `@JmxOperation` to expose them as operations
 			return "Timer has been reset to current millis";
 		}
  	}
+
+# ChangeLog Release Notes
+
+See the [ChangeLog.txt file](src/main/javadoc/doc-files/changelog.txt).
