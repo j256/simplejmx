@@ -6,7 +6,7 @@ This package provides some Java classes to help with the publishing of objects u
 * For more information, visit the [SimpleJMX home page](http://256stuff.com/sources/simplejmx/).
 * Online documentation can be found on the home page.  Here are the [SimpleJMX Javadocs](http://256stuff.com/sources/simplejmx/javadoc/simplejmx/).
 * You can see the source on the [git repository](https://github.com/j256/simplejmx).  [![CircleCI](https://circleci.com/gh/j256/simplejmx.svg?style=svg)](https://circleci.com/gh/j256/simplejmx)
-* Maven packages are published via the [maven central repo](http://repo1.maven.org/maven2/com/j256/simplejmx/simplejmx/).
+* Maven packages are published via [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.j256.simplejmx/simplejmx/badge.svg?style=flat-square)](https://maven-badges.herokuapp.com/maven-central/com.j256.simplejmx/simplejmx/)
 
 Enjoy, Gray Watson
 
