@@ -44,6 +44,20 @@ public class JmxWebServerTest {
 		}
 	}
 
+	@Test(timeout = 10000)
+	public void testCoverage() throws Exception {
+		int port = portCounter.getAndIncrement();
+		JmxWebServer webServer = new JmxWebServer(port);
+		webServer.start();
+		Thread.sleep(1000);
+		try {
+			testServer(port);
+		} finally {
+			webServer.close();
+			webServer.close();
+		}
+	}
+
 	private void testServer(int port) throws Exception {
 		WebClient webClient = new WebClient();
 		HtmlPage page = webClient.getPage("http://localhost:" + port);

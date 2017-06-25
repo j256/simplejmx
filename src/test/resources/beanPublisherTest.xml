@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- test spring config file that shows off the support for the Spring Framework (an optional dependency) -->
+
+	<!-- publishes classes that have @JmxResource or implement JmxSelfNaming to jmxServer automagically -->
+	<bean id="beanPublisher" class="com.j256.simplejmx.spring.BeanPublisher">
+		<property name="jmxServer" ref="jmxServer" />
+	</bean>
+
+	<!-- JMX server which publishes our beans via JMX -->
+	<bean id="jmxServer" class="com.j256.simplejmx.server.JmxServer" init-method="start" destroy-method="stop">
+		<!-- the port should probably come from a configured property -->
+		<property name="registryPort" value="8000" />
+	</bean>
+
+	<!-- -->
+
+	<!-- a random bean exposing stuff through JMX -->
+	<bean id="runtimeCounter" class="com.j256.simplejmx.example.BasicExample$RuntimeCounter" />
+
+	<!-- a bean that registers/unregisters other beans dynamically by calling to the JMX server -->
+	<bean id="dynamicJmx" class="com.j256.simplejmx.spring.DynamicJmx">
+		<!-- we need this to register/unregister dynamic objects -->
+		<property name="jmxServer" ref="jmxServer" />
+	</bean>
+
+	<!-- self naming bean -->
+	<bean id="selfNaming" class="com.j256.simplejmx.spring.BeanPublisherTest$OurJmxObject" />
+
+	<!-- testing method invoking factory bean -->
+	<bean id="selfNamingJmxDomainName" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="targetObject" ref="selfNaming" />
+		<property name="targetMethod" value="voidMethod" />
+	</bean>
+
+	<!-- demonstration of expose information from another bean (in this case our jmxserver) without annotations -->
+	<bean id="jmxServerJmx" class="com.j256.simplejmx.spring.JmxBean">
+		<property name="jmxResourceInfo">
+			<bean class="com.j256.simplejmx.common.JmxResourceInfo">
+				<property name="jmxDomainName" value="j256.simplejmx" />
+				<property name="jmxBeanName" value="JmxServer" />
+			</bean>
+		</property>
+		<property name="attributeFieldInfos">
+			<array>
+				<bean class="com.j256.simplejmx.common.JmxAttributeFieldInfo">
+					<property name="name" value="serverPort" />
+				</bean>
+			</array>
+		</property>
+		<property name="attributeMethodInfos">
+			<array>
+				<bean class="com.j256.simplejmx.common.JmxAttributeMethodInfo">
+					<property name="methodName" value="getRegisteredCount" />
+				</bean>
+			</array>
+		</property>
+		<property name="operationInfos">
+			<array>
+				<bean class="com.j256.simplejmx.common.JmxOperationInfo">
+					<property name="methodName" value="stop" />
+				</bean>
+			</array>
+		</property>
+		<property name="target" ref="jmxServer" />
+	</bean>
+
+	<!-- create some object, in this case a String -->
+	<bean id="someObject" class="java.lang.String">
+		<constructor-arg value="String value" type="java.lang.String" />
+	</bean>
+
+	<!-- publish all of the public fields and methods about it -->
+	<bean id="someObjectPublished" class="com.j256.simplejmx.server.PublishAllBeanWrapper">
+		<property name="delegate" ref="someObject" />
+		<property name="jmxResourceInfo">
+			<bean class="com.j256.simplejmx.common.JmxResourceInfo">
+				<property name="jmxDomainName" value="j256.simplejmx" />
+				<property name="jmxBeanName" value="SomeObject" />
+			</bean>
+		</property>
+	</bean>
+
+</beans>
