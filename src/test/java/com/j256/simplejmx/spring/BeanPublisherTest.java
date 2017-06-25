@@ -2,8 +2,6 @@ package com.j256.simplejmx.spring;
 
 import static org.junit.Assert.assertNotNull;
 
-import java.io.IOException;
-
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -14,13 +12,12 @@ import com.j256.simplejmx.common.JmxResource;
 import com.j256.simplejmx.common.JmxSelfNaming;
 import com.j256.simplejmx.server.JmxServer;
 
-@Ignore
 public class BeanPublisherTest {
 
 	private static final String[] SPRING_CONFIG_FILES = new String[] { "classpath:/beanPublisherTest.xml" };
 
 	@Test
-	public void testStuff() throws IOException {
+	public void testStuff() throws Exception {
 		ClassPathXmlApplicationContext context = null;
 
 		JmxServer jmxServer = null;
@@ -38,6 +35,9 @@ public class BeanPublisherTest {
 			}
 			if (context != null) {
 				context.close();
+				while (context.isRunning()) {
+					Thread.sleep(10);
+				}
 			}
 		}
 		System.gc();
