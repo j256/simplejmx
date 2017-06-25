@@ -34,11 +34,13 @@ public class BeanPublisherTest {
 			}
 			if (context != null) {
 				context.close();
+				// this closes in the background so we have to wait for it here
 				while (context.isRunning()) {
 					Thread.sleep(10);
 				}
 			}
 		}
+		// make sure things are clened up
 		System.gc();
 	}
 

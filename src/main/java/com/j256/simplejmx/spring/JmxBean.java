@@ -1,7 +1,6 @@
 package com.j256.simplejmx.spring;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Required;
@@ -114,7 +113,7 @@ public class JmxBean {
 	 */
 	public void setAttributeFieldInfos(JmxAttributeFieldInfo[] attributeFieldInfos) {
 		if (this.attributeFieldInfos == null) {
-			this.attributeFieldInfos = Arrays.asList(attributeFieldInfos);
+			this.attributeFieldInfos = arrayToList(attributeFieldInfos);
 		} else {
 			for (JmxAttributeFieldInfo attributeFieldInfo : attributeFieldInfos) {
 				this.attributeFieldInfos.add(attributeFieldInfo);
@@ -150,7 +149,7 @@ public class JmxBean {
 	 */
 	public void setAttributeMethodInfos(JmxAttributeMethodInfo[] attributeMethodInfos) {
 		if (this.attributeMethodInfos == null) {
-			this.attributeMethodInfos = Arrays.asList(attributeMethodInfos);
+			this.attributeMethodInfos = arrayToList(attributeMethodInfos);
 		} else {
 			for (JmxAttributeMethodInfo attributeMethodInfo : attributeMethodInfos) {
 				this.attributeMethodInfos.add(attributeMethodInfo);
@@ -185,7 +184,7 @@ public class JmxBean {
 	 */
 	public void setOperationInfos(JmxOperationInfo[] operationInfos) {
 		if (this.operationInfos == null) {
-			this.operationInfos = Arrays.asList(operationInfos);
+			this.operationInfos = arrayToList(operationInfos);
 		} else {
 			for (JmxOperationInfo opertionInfo : operationInfos) {
 				this.operationInfos.add(opertionInfo);
@@ -217,5 +216,13 @@ public class JmxBean {
 	@Required
 	public void setTarget(Object target) {
 		this.target = target;
+	}
+
+	private <T> List<T> arrayToList(T[] array) {
+		List<T> list = new ArrayList<T>(array.length);
+		for (T t : array) {
+			list.add(t);
+		}
+		return list;
 	}
 }
