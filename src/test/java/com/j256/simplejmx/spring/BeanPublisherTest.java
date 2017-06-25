@@ -4,6 +4,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -13,6 +14,7 @@ import com.j256.simplejmx.common.JmxResource;
 import com.j256.simplejmx.common.JmxSelfNaming;
 import com.j256.simplejmx.server.JmxServer;
 
+@Ignore
 public class BeanPublisherTest {
 
 	private static final String[] SPRING_CONFIG_FILES = new String[] { "classpath:/beanPublisherTest.xml" };
