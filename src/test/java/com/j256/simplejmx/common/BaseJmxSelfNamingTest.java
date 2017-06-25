@@ -27,16 +27,14 @@ public class BaseJmxSelfNamingTest {
 		JmxClient client = null;
 		try {
 			server.start();
-			OurJmxObject jmxObject = new OurJmxObject();
+			OurJmxSelfNaming jmxObject = new OurJmxSelfNaming();
 			server.register(jmxObject);
 
 			client = new JmxClient(address, port);
 			try {
-				long value = (Long) client
-						.getAttribute(ObjectNameUtil.makeObjectName(DOMAIN_NAME, JMX_RESOURCE_BEAN_NAME), "foo");
-				// should not get here
-				System.err.println("Got value " + value);
-				fail("should have thrown");
+				// wrong bean name here
+				client.getAttribute(ObjectNameUtil.makeObjectName(DOMAIN_NAME, JMX_RESOURCE_BEAN_NAME), "foo");
+				fail("should have not found bean name " + JMX_RESOURCE_BEAN_NAME);
 			} catch (JMException e) {
 				// expected
 			}
@@ -72,7 +70,7 @@ public class BaseJmxSelfNamingTest {
 	}
 
 	@JmxResource(domainName = DOMAIN_NAME, beanName = JMX_RESOURCE_BEAN_NAME)
-	private static class OurJmxObject extends BaseJmxSelfNaming implements JmxSelfNaming {
+	private static class OurJmxSelfNaming extends BaseJmxSelfNaming implements JmxSelfNaming {
 
 		@JmxAttributeField
 		public long foo = 10;

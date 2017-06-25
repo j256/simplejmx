@@ -2,7 +2,6 @@ package com.j256.simplejmx.spring;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -44,7 +43,7 @@ public class BeanPublisherTest {
 	}
 
 	@JmxResource(folderNames = { "foo", "bar" })
-	public static class OurJmxObject implements JmxSelfNaming {
+	public static class BeanPublisherJmxObject implements JmxSelfNaming {
 
 		@JmxAttributeField
 		public long foo = 10;

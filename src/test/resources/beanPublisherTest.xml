@@ -27,7 +27,7 @@
 	</bean>
 
 	<!-- self naming bean -->
-	<bean id="selfNaming" class="com.j256.simplejmx.spring.BeanPublisherTest$OurJmxObject" />
+	<bean id="selfNaming" class="com.j256.simplejmx.spring.BeanPublisherTest$BeanPublisherJmxObject" />
 
 	<!-- testing method invoking factory bean -->
 	<bean id="selfNamingJmxDomainName" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
