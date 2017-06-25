@@ -21,20 +21,24 @@ public class BeanPublisherTest {
 	public void testStuff() throws IOException {
 		ClassPathXmlApplicationContext context = null;
 
+		JmxServer jmxServer = null;
 		try {
 			// load our context
 			context = new ClassPathXmlApplicationContext(SPRING_CONFIG_FILES);
 			context.registerShutdownHook();
 
 			// get our MainJmx bean from the context
-			JmxServer jmxServer = (JmxServer) context.getBean("jmxServer", JmxServer.class);
+			jmxServer = (JmxServer) context.getBean("jmxServer", JmxServer.class);
 			assertNotNull(jmxServer);
-			jmxServer.close();
 		} finally {
+			if (jmxServer != null) {
+				jmxServer.close();
+			}
 			if (context != null) {
 				context.close();
 			}
 		}
+		System.gc();
 	}
 
 	@JmxResource(folderNames = { "foo", "bar" })
