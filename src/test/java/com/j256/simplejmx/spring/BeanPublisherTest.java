@@ -1,5 +1,9 @@
 package com.j256.simplejmx.spring;
 
+import static org.junit.Assert.assertNotNull;
+
+import java.io.IOException;
+
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -14,7 +18,7 @@ public class BeanPublisherTest {
 	private static final String[] SPRING_CONFIG_FILES = new String[] { "classpath:/beanPublisherTest.xml" };
 
 	@Test
-	public void testStuff() {
+	public void testStuff() throws IOException {
 		ClassPathXmlApplicationContext context = null;
 
 		try {
@@ -23,7 +27,9 @@ public class BeanPublisherTest {
 			context.registerShutdownHook();
 
 			// get our MainJmx bean from the context
-			context.getBean("jmxServer", JmxServer.class);
+			JmxServer jmxServer = (JmxServer) context.getBean("jmxServer", JmxServer.class);
+			assertNotNull(jmxServer);
+			jmxServer.close();
 		} finally {
 			if (context != null) {
 				context.close();
