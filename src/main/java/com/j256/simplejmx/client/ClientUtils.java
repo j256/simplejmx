@@ -90,7 +90,7 @@ public class ClientUtils {
 		if (className.equals("[J")) {
 			array = true;
 			if (value == null) {
-				className = "";
+				className = "unknown";
 			} else if (value instanceof boolean[]) {
 				className = "boolean";
 			} else if (value instanceof byte[]) {
@@ -108,7 +108,7 @@ public class ClientUtils {
 			} else if (value instanceof double[]) {
 				className = "double";
 			} else {
-				className = className.substring(2, className.length() - 1);
+				className = "unknown";
 			}
 		} else if (className.startsWith("[L")) {
 			className = className.substring(2, className.length() - 1);
