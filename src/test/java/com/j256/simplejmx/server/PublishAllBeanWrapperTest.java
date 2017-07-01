@@ -106,9 +106,9 @@ public class PublishAllBeanWrapperTest {
 			obj.bar = 37634345;
 			obj.baz = 678934522;
 
-			assertEquals(obj.bar, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "bar"));
-			assertEquals(obj.baz, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "baz"));
-			assertEquals(4, client.getAttributesInfo(DOMAIN_NAME, OBJECT_NAME).length);
+			assertEquals(obj.bar, client.getAttribute(DOMAIN_NAME, obj.getClass().getSimpleName(), "bar"));
+			assertEquals(obj.baz, client.getAttribute(DOMAIN_NAME, obj.getClass().getSimpleName(), "baz"));
+			assertEquals(4, client.getAttributesInfo(DOMAIN_NAME, obj.getClass().getSimpleName()).length);
 		} finally {
 			server.unregister(resourceInfo);
 			IoUtils.closeQuietly(client);
