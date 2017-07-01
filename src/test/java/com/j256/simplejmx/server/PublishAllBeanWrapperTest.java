@@ -20,6 +20,7 @@ public class PublishAllBeanWrapperTest {
 	private static final String OBJECT_NAME = PublishAllBeanWrapperTest.class.getSimpleName();
 	private static final int FOO_VALUE = 1459243;
 	private static final int BAR_VALUE = 1423459243;
+	private static final int BAZ_VALUE = 63456352;
 
 	private static JmxServer server;
 	private static InetAddress serverAddress;
@@ -95,7 +96,7 @@ public class PublishAllBeanWrapperTest {
 	@Test
 	public void testSubClass() throws Exception {
 		SubClassTestObject obj = new SubClassTestObject();
-		JmxResourceInfo resourceInfo = new JmxResourceInfo(DOMAIN_NAME, OBJECT_NAME, "description");
+		JmxResourceInfo resourceInfo = new JmxResourceInfo(DOMAIN_NAME, null, "description");
 		PublishAllBeanWrapper publishAll = new PublishAllBeanWrapper(obj, resourceInfo);
 		JmxClient client = null;
 		try {
@@ -107,11 +108,20 @@ public class PublishAllBeanWrapperTest {
 
 			assertEquals(obj.bar, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "bar"));
 			assertEquals(obj.baz, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "baz"));
-			assertEquals(3, client.getAttributesInfo(DOMAIN_NAME, OBJECT_NAME).length);
+			assertEquals(4, client.getAttributesInfo(DOMAIN_NAME, OBJECT_NAME).length);
 		} finally {
 			server.unregister(resourceInfo);
 			IoUtils.closeQuietly(client);
 		}
+	}
+
+	@SuppressWarnings("deprecation")
+	@Test
+	public void testCoverage() {
+		PublishAllBeanWrapper wrapper = new PublishAllBeanWrapper();
+		wrapper.setDelegate(this);
+		wrapper.setTarget(this);
+		wrapper.setJmxResourceInfo(new JmxResourceInfo(DOMAIN_NAME, OBJECT_NAME, "description"));
 	}
 
 	/* ======================================================================= */
@@ -119,6 +129,7 @@ public class PublishAllBeanWrapperTest {
 	protected static class TestObject {
 		private int foo = FOO_VALUE;
 		public int bar = BAR_VALUE;
+		public final int baz = BAZ_VALUE;
 
 		public int getFoo() {
 			return foo;
@@ -134,6 +145,22 @@ public class PublishAllBeanWrapperTest {
 
 		public void resetFoo(int newValue) {
 			this.foo = newValue;
+		}
+
+		public boolean isSomething() {
+			return true;
+		}
+
+		public boolean is() {
+			return false;
+		}
+
+		public boolean get() {
+			return false;
+		}
+
+		public void set(int foo) {
+			// nothing here
 		}
 	}
 

@@ -34,6 +34,9 @@ public class PublishAllBeanWrapper {
 		ignoredMethods.add("hashCode");
 		ignoredMethods.add("notify");
 		ignoredMethods.add("notifyAll");
+		ignoredMethods.add("is");
+		ignoredMethods.add("get");
+		ignoredMethods.add("set");
 	}
 
 	public PublishAllBeanWrapper() {
@@ -94,8 +97,8 @@ public class PublishAllBeanWrapper {
 				if (!knownFields.add(field.getName())) {
 					continue;
 				}
-				fieldInfos.add(new JmxAttributeFieldInfo(field.getName(), true,
-						!Modifier.isFinal(field.getModifiers()), null));
+				fieldInfos.add(new JmxAttributeFieldInfo(field.getName(), true, !Modifier.isFinal(field.getModifiers()),
+						null));
 			}
 		}
 		return fieldInfos.toArray(new JmxAttributeFieldInfo[fieldInfos.size()]);
@@ -110,7 +113,7 @@ public class PublishAllBeanWrapper {
 					continue;
 				}
 				String name = method.getName();
-				if (!ignoredMethods.contains(name) && isGetGetAttributeMethod(name)) {
+				if (!ignoredMethods.contains(name) && isGetAttributeMethod(name)) {
 					methodInfos.add(new JmxAttributeMethodInfo(name, (String) null));
 				}
 			}
@@ -127,7 +130,7 @@ public class PublishAllBeanWrapper {
 					continue;
 				}
 				String name = method.getName();
-				if (!ignoredMethods.contains(name) && !isGetGetAttributeMethod(name)) {
+				if (!ignoredMethods.contains(name) && !isGetAttributeMethod(name)) {
 					operationInfos.add(new JmxOperationInfo(name, null, null, OperationAction.UNKNOWN, null));
 				}
 			}
@@ -135,15 +138,14 @@ public class PublishAllBeanWrapper {
 		return operationInfos.toArray(new JmxOperationInfo[operationInfos.size()]);
 	}
 
-	private boolean isGetGetAttributeMethod(String name) {
-		if (name.startsWith("is") && name.length() > 2) {
+	private boolean isGetAttributeMethod(String name) {
+		if (name.startsWith("is")) {
 			return true;
-		} else if (name.startsWith("get") && name.length() > 3) {
+		} else if (name.startsWith("get")) {
 			return true;
-		} else if (name.startsWith("set") && name.length() > 3) {
+		} else if (name.startsWith("set")) {
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 }
