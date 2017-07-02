@@ -49,7 +49,7 @@ public class JmxWebHandler extends AbstractHandler {
 	private MBeanServer mbeanServer;
 	private ObjectNameComparator objectNameComparator = new ObjectNameComparator();
 
-	private static boolean charIsMapped[] = new boolean[256];
+	private static boolean charIsMapped[] = new boolean[128];
 
 	static {
 		// for <input values
