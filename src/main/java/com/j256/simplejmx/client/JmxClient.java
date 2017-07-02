@@ -406,7 +406,11 @@ public class JmxClient implements Closeable {
 	 */
 	public Object invokeOperation(String domain, String beanName, String operName, String... paramStrings)
 			throws Exception {
-		return invokeOperation(ObjectNameUtil.makeObjectName(domain, beanName), operName, paramStrings);
+		if (paramStrings.length == 0) {
+			return invokeOperation(ObjectNameUtil.makeObjectName(domain, beanName), operName, null, null);
+		} else {
+			return invokeOperation(ObjectNameUtil.makeObjectName(domain, beanName), operName, paramStrings);
+		}
 	}
 
 	/**
