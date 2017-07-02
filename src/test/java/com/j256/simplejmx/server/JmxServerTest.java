@@ -56,6 +56,7 @@ public class JmxServerTest {
 	@AfterClass
 	public static void afterClass() {
 		IoUtils.closeQuietly(server);
+		System.gc();
 	}
 
 	@Test

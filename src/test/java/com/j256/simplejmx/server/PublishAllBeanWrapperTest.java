@@ -37,6 +37,7 @@ public class PublishAllBeanWrapperTest {
 		if (server != null) {
 			server.stop();
 			server = null;
+			System.gc();
 		}
 	}
 

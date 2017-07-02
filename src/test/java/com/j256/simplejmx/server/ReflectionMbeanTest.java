@@ -24,10 +24,11 @@ import com.j256.simplejmx.common.JmxAttributeField;
 import com.j256.simplejmx.common.JmxAttributeMethod;
 import com.j256.simplejmx.common.JmxOperation;
 import com.j256.simplejmx.common.JmxResource;
+import com.j256.simplejmx.common.ObjectNameUtil;
 
 public class ReflectionMbeanTest {
 
-	private static final int DEFAULT_PORT = 5257;
+	private static final int DEFAULT_PORT = 9010;
 	private static final String DOMAIN_NAME = "j256";
 	private static final String OBJECT_NAME = "ReflectionMbeanTest";
 	private static final int FOO_VALUE = 1459243;
@@ -52,6 +53,7 @@ public class ReflectionMbeanTest {
 		if (server != null) {
 			server.stop();
 			server = null;
+			System.gc();
 		}
 	}
 
@@ -65,6 +67,34 @@ public class ReflectionMbeanTest {
 
 			try {
 				client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "unknown");
+				fail("Should have thrown");
+			} catch (Exception e) {
+				// ignored
+			}
+
+			try {
+				client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "resetFoo");
+				fail("Should have thrown");
+			} catch (Exception e) {
+				// ignored
+			}
+
+			try {
+				client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "noread");
+				fail("Should have thrown");
+			} catch (Exception e) {
+				// ignored
+			}
+
+			try {
+				client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "onlySet");
+				fail("Should have thrown");
+			} catch (Exception e) {
+				// ignored
+			}
+
+			try {
+				client.setAttribute(DOMAIN_NAME, OBJECT_NAME, "onlyGet", 1);
 				fail("Should have thrown");
 			} catch (Exception e) {
 				// ignored
@@ -91,6 +121,13 @@ public class ReflectionMbeanTest {
 				// ignored
 			}
 
+			try {
+				client.invokeOperation(ObjectNameUtil.makeObjectName(DOMAIN_NAME, OBJECT_NAME), "unknown");
+				fail("Should have thrown");
+			} catch (Exception e) {
+				// ignored
+			}
+
 		} finally {
 			IoUtils.closeQuietly(client);
 			server.unregister(obj);
@@ -106,8 +143,20 @@ public class ReflectionMbeanTest {
 			server.register(obj);
 
 			MBeanAttributeInfo[] attributes = client.getAttributesInfo(DOMAIN_NAME, OBJECT_NAME);
-			assertEquals(1, attributes.length);
-			assertEquals("foo", attributes[0].getName());
+			assertEquals(4, attributes.length);
+			int foundCount = 0;
+			for (MBeanAttributeInfo attribute : attributes) {
+				if ("foo".equals(attribute.getName())) {
+					foundCount++;
+				} else if ("noread".equals(attribute.getName())) {
+					foundCount++;
+				} else if ("onlyGet".equals(attribute.getName())) {
+					foundCount++;
+				} else if ("onlySet".equals(attribute.getName())) {
+					foundCount++;
+				}
+			}
+			assertEquals(4, foundCount);
 			assertEquals(int.class.toString(), attributes[0].getType());
 
 		} finally {
@@ -388,6 +437,8 @@ public class ReflectionMbeanTest {
 	protected static class TestObject {
 
 		private int foo = FOO_VALUE;
+		@JmxAttributeField(isReadible = false)
+		private int noread = 0;
 
 		@JmxAttributeMethod(description = "A value")
 		public int getFoo() {
@@ -397,6 +448,16 @@ public class ReflectionMbeanTest {
 		@JmxAttributeMethod(description = "A value")
 		public void setFoo(int foo) {
 			this.foo = foo;
+		}
+
+		@JmxAttributeMethod(description = "no set method")
+		public int getOnlyGet() {
+			return 0;
+		}
+
+		@JmxAttributeMethod(description = "no get method")
+		public void setOnlySet(int value) {
+			// no get method
 		}
 
 		@JmxOperation(description = "A value")

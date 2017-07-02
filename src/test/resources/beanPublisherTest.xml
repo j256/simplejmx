@@ -4,15 +4,15 @@
 
 	<!-- test spring config file that shows off the support for the Spring Framework (an optional dependency) -->
 
-	<!-- publishes classes that have @JmxResource or implement JmxSelfNaming to jmxServer automagically -->
-	<bean id="beanPublisher" class="com.j256.simplejmx.spring.BeanPublisher">
-		<property name="jmxServer" ref="jmxServer" />
-	</bean>
-
 	<!-- JMX server which publishes our beans via JMX -->
 	<bean id="jmxServer" class="com.j256.simplejmx.server.JmxServer" init-method="start" destroy-method="stop">
 		<!-- the port should probably come from a configured property -->
-		<property name="registryPort" value="8000" />
+		<property name="registryPort" value="8110" />
+	</bean>
+
+	<!-- publishes classes that have @JmxResource or implement JmxSelfNaming to jmxServer automagically -->
+	<bean id="beanPublisher" class="com.j256.simplejmx.spring.BeanPublisher">
+		<property name="jmxServer" ref="jmxServer" />
 	</bean>
 
 	<!-- -->

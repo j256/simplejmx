@@ -60,6 +60,7 @@ public class DoubleServerTest {
 				server2.unregister(testObject);
 				IoUtils.closeQuietly(server2);
 			}
+			System.gc();
 		}
 	}
 

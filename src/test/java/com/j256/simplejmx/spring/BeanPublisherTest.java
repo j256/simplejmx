@@ -40,7 +40,7 @@ public class BeanPublisherTest {
 				}
 			}
 		}
-		// make sure things are clened up
+		// make sure things are cleaned up
 		System.gc();
 	}
 
