@@ -15,7 +15,7 @@ import com.j256.simplejmx.server.JmxServer;
 public class BaseJmxSelfNamingTest {
 
 	private static final String DOMAIN_NAME = "foo.bar";
-	private static final String JMX_RESOURCE_BEAN_NAME = "beanName";
+	private static final String JMX_RESOURCE_BEAN_NAME = "beanName23";
 
 	private static final String JMX_SELF_NAMING_BEAN_NAME = "nameOfBean";
 
