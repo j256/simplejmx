@@ -401,7 +401,11 @@ public class JmxServer implements Closeable {
 	 * @see JmxServer#setServerPort(int)
 	 */
 	public int getServerPort() {
-		return serverPort;
+		if (serverPort == 0) {
+			return registryPort;
+		} else {
+			return serverPort;
+		}
 	}
 
 	/**
@@ -574,8 +578,10 @@ public class JmxServer implements Closeable {
 
 	/**
 	 * Socket factory which allows us to set a particular local address.
+	 * 
+	 * NOTE: this must implement equals at least otherwise some bean comparisons fail.
 	 */
-	private static class LocalSocketFactory implements RMIServerSocketFactory {
+	static class LocalSocketFactory implements RMIServerSocketFactory {
 
 		private final InetAddress inetAddress;
 
