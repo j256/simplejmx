@@ -520,9 +520,13 @@ public class JmxClientTest {
 		assertEquals(times, result);
 	}
 
-	@Test(expected = JMException.class)
-	public void testCoverage() throws Exception {
-		new JmxClient(JMX_PORT).close();
+	@Test
+	public void testCoverage() {
+		try {
+			new JmxClient(JMX_PORT).close();
+		} catch (JMException jme) {
+			// ignored
+		}
 	}
 
 	@Test
