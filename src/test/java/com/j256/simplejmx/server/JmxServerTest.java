@@ -159,6 +159,24 @@ public class JmxServerTest {
 		server.close();
 	}
 
+	@Test
+	public void testServiceUrl() throws Exception {
+		int port = serverPortCounter.incrementAndGet();
+		JmxServer server = new JmxServer(port);
+		server.setServiceUrl("service:jmx:rmi://127.0.0.1:" + port + "/jndi/rmi://127.0.0.1:" + port + "/jmxrmi");
+		server.start();
+		server.close();
+	}
+
+	@Test(expected = JMException.class)
+	public void testBadServiceUrl() throws Exception {
+		int port = serverPortCounter.incrementAndGet();
+		JmxServer server = new JmxServer(port);
+		server.setServiceUrl("service:blahblah");
+		server.start();
+		server.close();
+	}
+
 	@Test(expected = JMException.class)
 	public void testJmxServerDoubleInstance() throws Exception {
 		int port = serverPortCounter.incrementAndGet();
