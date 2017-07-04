@@ -1,8 +1,11 @@
 package com.j256.simplejmx.server;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.rmi.registry.Registry;
@@ -31,6 +34,7 @@ import com.j256.simplejmx.common.JmxOperationInfo.OperationAction;
 import com.j256.simplejmx.common.JmxResource;
 import com.j256.simplejmx.common.JmxSelfNaming;
 import com.j256.simplejmx.common.ObjectNameUtil;
+import com.j256.simplejmx.server.JmxServer.LocalSocketFactory;
 
 public class JmxServerTest {
 
@@ -44,7 +48,7 @@ public class JmxServerTest {
 
 	private static JmxServer server;
 	private static InetAddress serverAddress;
-	private static AtomicInteger differentPost = new AtomicInteger(DEFAULT_PORT);
+	private static AtomicInteger serverPortCounter = new AtomicInteger(DEFAULT_PORT);
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
@@ -61,7 +65,7 @@ public class JmxServerTest {
 
 	@Test
 	public void testJmxServerStartStopStart() throws Exception {
-		JmxServer server = new JmxServer(serverAddress, differentPost.incrementAndGet());
+		JmxServer server = new JmxServer(serverAddress, serverPortCounter.incrementAndGet());
 		try {
 			server.stop();
 			server.start();
@@ -70,9 +74,94 @@ public class JmxServerTest {
 		}
 	}
 
+	@Test
+	public void testJmxServerAddressTwoPorts() {
+		int port = serverPortCounter.incrementAndGet();
+		JmxServer server = new JmxServer(serverAddress, port, port);
+		IoUtils.closeQuietly(server);
+	}
+
+	@Test
+	public void testJmxServerOnePort() {
+		int port = serverPortCounter.incrementAndGet();
+		JmxServer server = new JmxServer(port);
+		assertEquals(port, server.getRegistryPort());
+		assertEquals(port, server.getServerPort());
+		IoUtils.closeQuietly(server);
+	}
+
+	@Test
+	public void testJmxServerTwoPorts() {
+		int regPort = serverPortCounter.incrementAndGet();
+		int serverPort = serverPortCounter.incrementAndGet();
+		JmxServer server = new JmxServer(regPort, serverPort);
+		assertEquals(regPort, server.getRegistryPort());
+		assertEquals(serverPort, server.getServerPort());
+		IoUtils.closeQuietly(server);
+	}
+
+	@Test
+	public void testJmxServerNoPorts() {
+		int registryPort = serverPortCounter.incrementAndGet();
+		int serverPort = serverPortCounter.incrementAndGet();
+		JmxServer server = new JmxServer();
+		server.setServerPort(serverPort);
+		server.setRegistryPort(registryPort);
+		assertEquals(registryPort, server.getRegistryPort());
+		assertEquals(serverPort, server.getServerPort());
+		IoUtils.closeQuietly(server);
+	}
+
+	@Test
+	public void testCoverage() throws Exception {
+		JmxServer server = new JmxServer(ManagementFactory.getPlatformMBeanServer());
+		server.start();
+		IoUtils.closeQuietly(server);
+		server = new JmxServer(true);
+		IoUtils.closeQuietly(server);
+		server = new JmxServer(false);
+		server.setUsePlatformMBeanServer(true);
+		server.setUsePlatformMBeanServer(false);
+		IoUtils.closeQuietly(server);
+		server.setServerSocketFactory(null);
+		server.close();
+		// LocalSocketFactory
+		LocalSocketFactory lsf1 = new LocalSocketFactory(null);
+		lsf1.hashCode();
+		assertTrue(lsf1.equals(lsf1));
+		LocalSocketFactory lsf2 = new LocalSocketFactory(InetAddress.getLocalHost());
+		lsf2.hashCode();
+		assertTrue(lsf2.equals(lsf2));
+		assertFalse(lsf2.equals(null));
+		assertFalse(lsf2.equals(this));
+		assertFalse(lsf1.equals(lsf2));
+		assertFalse(lsf2.equals(lsf1));
+	}
+
+	@Test(expected = JMException.class)
+	public void testNoStart() throws Exception {
+		JmxServer server = new JmxServer();
+		server.register(this);
+		server.close();
+	}
+
+	@Test(expected = JMException.class)
+	public void testNoStart2() throws Exception {
+		JmxServer server = new JmxServer();
+		server.register(this, (ObjectName) null, null, null, null);
+		server.close();
+	}
+
+	@Test(expected = JMException.class)
+	public void testNoStart3() throws Exception {
+		JmxServer server = new JmxServer();
+		server.unregisterThrow((ObjectName) null);
+		server.close();
+	}
+
 	@Test(expected = JMException.class)
 	public void testJmxServerDoubleInstance() throws Exception {
-		int port = differentPost.incrementAndGet();
+		int port = serverPortCounter.incrementAndGet();
 		JmxServer first = new JmxServer(serverAddress, port);
 		JmxServer second = new JmxServer(serverAddress, port);
 		try {
@@ -96,7 +185,7 @@ public class JmxServerTest {
 
 	@Test(expected = JMException.class)
 	public void testDoubleClose() throws Exception {
-		JmxServer server = new JmxServer(serverAddress, differentPost.incrementAndGet());
+		JmxServer server = new JmxServer(serverAddress, serverPortCounter.incrementAndGet());
 		try {
 			server.start();
 		} finally {
@@ -117,7 +206,7 @@ public class JmxServerTest {
 	public void testJmxServerInt() throws Exception {
 		JmxServer server = new JmxServer();
 		try {
-			server.setPort(DEFAULT_PORT + 11);
+			server.setPort(serverPortCounter.incrementAndGet());
 			server.setInetAddress(serverAddress);
 			server.start();
 		} finally {
@@ -150,7 +239,9 @@ public class JmxServerTest {
 				// ignored
 			}
 
+			assertEquals(0, server.getRegisteredCount());
 			server.register(obj);
+			assertEquals(1, server.getRegisteredCount());
 			assertEquals(FOO_VALUE, client.getAttribute(DOMAIN_NAME, OBJECT_NAME, "foo"));
 
 			int newValue = FOO_VALUE + 2;
@@ -425,14 +516,12 @@ public class JmxServerTest {
 	@Ignore("this fails every so often")
 	@Test
 	public void testLoopBackAddress() throws Exception {
-		// this fails every so often so let's see if it a port clearing thing
-		Thread.sleep(1000);
-		testAddress(null, differentPost.incrementAndGet());
+		testAddress(null, serverPortCounter.incrementAndGet());
 	}
 
 	@Test
 	public void testLocalAddress() throws Exception {
-		testAddress(serverAddress, differentPost.incrementAndGet());
+		testAddress(serverAddress, serverPortCounter.incrementAndGet());
 	}
 
 	@Test
@@ -673,7 +762,7 @@ public class JmxServerTest {
 		}
 	}
 
-	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME, description = "")
 	protected static class SubClassTestObject extends TestObject {
 
 		@JmxAttributeField

@@ -89,7 +89,7 @@ public class PublishAllBeanWrapperTest {
 			}
 
 		} finally {
-			server.unregister(resourceInfo);
+			server.unregister(publishAll);
 			IoUtils.closeQuietly(client);
 		}
 	}
