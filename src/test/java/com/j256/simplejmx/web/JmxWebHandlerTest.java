@@ -199,8 +199,8 @@ public class JmxWebHandlerTest {
 		assertTrue(page.asText().contains("Could not set attribute"));
 
 		textPage = webClient.getPage(
-				"http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/a/" + beanName + "/Verbose?val=true&t=true");
-		assertTrue(textPage.getContent().contains("Verbose set to true"));
+				"http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/a/" + beanName + "/Verbose?val=false&t=true");
+		assertTrue(textPage.getContent().contains("Verbose set to false"));
 
 		/* invoke errors */
 
