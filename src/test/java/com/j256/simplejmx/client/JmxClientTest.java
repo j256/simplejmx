@@ -11,8 +11,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import javax.management.Attribute;
+import javax.management.AttributeNotFoundException;
 import javax.management.JMException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanOperationInfo;
@@ -60,6 +63,7 @@ public class JmxClientTest {
 
 		client = new JmxClient(address, JMX_PORT);
 		closedClient = new JmxClient(address, JMX_PORT);
+		closedClient.closeThrow();
 		closedClient.closeThrow();
 	}
 
@@ -176,6 +180,16 @@ public class JmxClientTest {
 	}
 
 	@Test(expected = IllegalArgumentException.class)
+	public void testSetAttributeUnknown() throws Exception {
+		client.setAttribute(objectName, "not-known", "1");
+	}
+
+	@Test(expected = AttributeNotFoundException.class)
+	public void testSetAttributeUnknownObj() throws Exception {
+		client.setAttribute(objectName, "not-known", 1);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
 	public void testGetAttributeInfoClosed() throws Exception {
 		closedClient.getAttributeInfo(objectName, "x");
 	}
@@ -195,6 +209,12 @@ public class JmxClientTest {
 		for (String expectedName : expectedNames) {
 			fail("should have matched " + expectedName);
 		}
+	}
+
+	@Test
+	public void testGetOperationsInfoStringString() throws Exception {
+		MBeanOperationInfo[] infos = client.getOperationsInfo(JMX_DOMAIN, beanName);
+		assertEquals(13, infos.length);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -237,6 +257,26 @@ public class JmxClientTest {
 		client.setAttribute(objectName, "x", val);
 		Object result = client.getAttribute(objectName, "x");
 		assertEquals(val, result);
+	}
+
+	@Test
+	public void testGetAttributes() throws Exception {
+		int val = 13123;
+		client.setAttribute(objectName, "x", val);
+		List<Attribute> results = client.getAttributes(objectName, new String[] { "x" });
+		assertNotNull(results);
+		assertEquals(1, results.size());
+		assertEquals(new Attribute("x", val), results.get(0));
+	}
+
+	@Test
+	public void testGetAttributesStringString() throws Exception {
+		int val = 213132;
+		client.setAttribute(objectName, "x", val);
+		List<Attribute> results = client.getAttributes(JMX_DOMAIN, beanName, new String[] { "x" });
+		assertNotNull(results);
+		assertEquals(1, results.size());
+		assertEquals(new Attribute("x", val), results.get(0));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -295,6 +335,22 @@ public class JmxClientTest {
 		assertEquals(val, result);
 	}
 
+	@Test
+	public void testSetAttributes() throws Exception {
+		int val = 217731231;
+		client.setAttributes(objectName, Collections.singletonList(new Attribute("x", val)));
+		Object result = client.getAttribute(objectName, "x");
+		assertEquals(val, result);
+	}
+
+	@Test
+	public void testSetAttributesStringString() throws Exception {
+		int val = 218131231;
+		client.setAttributes(JMX_DOMAIN, beanName, Collections.singletonList(new Attribute("x", val)));
+		Object result = client.getAttribute(objectName, "x");
+		assertEquals(val, result);
+	}
+
 	@Test(expected = IllegalArgumentException.class)
 	public void testSetAttributeClosed() throws Exception {
 		closedClient.setAttribute(objectName, "x", 1);
@@ -345,6 +401,11 @@ public class JmxClientTest {
 	@Test
 	public void testInvokeOperationNoArgs() throws Exception {
 		assertNull(client.invokeOperation(objectName, "returnNull", new Object[0]));
+	}
+
+	@Test
+	public void testInvokeOperationStringStringNoArgs() throws Exception {
+		assertNull(client.invokeOperation(JMX_DOMAIN, beanName, "returnNull", new String[0]));
 	}
 
 	@Test
@@ -457,6 +518,37 @@ public class JmxClientTest {
 		Object result = client.invokeOperation(anotherObjectName, "timesTwo", val1, val2);
 		long times = val1 * val2;
 		assertEquals(times, result);
+	}
+
+	@Test(expected = JMException.class)
+	public void testCoverage() throws Exception {
+		new JmxClient(JMX_PORT).close();
+	}
+
+	@Test
+	public void testUserNamePass() throws Exception {
+		new JmxClient("localhost", JMX_PORT, "user", "pass").close();
+	}
+
+	@Test
+	public void testUserNamePassNull() throws Exception {
+		new JmxClient("localhost", JMX_PORT, null, null).close();
+	}
+
+	@Test
+	public void testServiceUrl() throws Exception {
+		new JmxClient("service:jmx:rmi:///jndi/rmi://localhost:" + JMX_PORT + "/jmxrmi").close();
+	}
+
+	@Test
+	public void testUserNamePassServiceUrl() throws Exception {
+		new JmxClient("service:jmx:rmi:///jndi/rmi://localhost:" + JMX_PORT + "/jmxrmi", null, null).close();
+	}
+
+	@Test
+	public void testUserNamePassNull2() throws Exception {
+		new JmxClient("service:jmx:rmi:///jndi/rmi://localhost:" + JMX_PORT + "/jmxrmi", null, null,
+				Collections.<String, Object> emptyMap()).close();
 	}
 
 	/* ======================================================================= */
