@@ -39,18 +39,16 @@ To release:
 	- select Releases (not-bold) -> com -> j256 -> simplejmx
 	- see if the release is there
 
-	mvn -P st release:perform -DconnectionUrl=scm:svn:scm:svn:https://svn.code.sf.net/p/simplejmx/code/tags/simpleJmx-X.X
+	mvn -P st release:perform
 
 8) Update the website:
 
-	- cd /var/www/256.com/sources/simplejmx/releases
+	- cd /var/www/256stuff.com/sources/simplejmx/releases
 	- sh get_release.sh  [enter release number]
 	- cd ..
 	- sh explode_javadocs.sh
 	- add new release to the release/index.shtml file
 
-9) Add a News section to SF with the svn log highlights and subject: released version X.X
+9) Possibly publish to announcements forum if the release needs more information.
 
-10) Possibly publish to announcements forum if the release needs more information.
-
-11) Watch to make sure the central repository was updated.  http://repo1.maven.org/maven2/com/j256/simplejmx/
+10) Watch to make sure the central repository was updated.  http://repo1.maven.org/maven2/com/j256/simplejmx/
