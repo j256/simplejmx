@@ -9,7 +9,7 @@
 	<packaging>jar</packaging>
 	<name>Simple JMX</name>
 	<url>http://256stuff.com/sources/simplejmx/</url>
-	<description>Simple JMX Classes</description>
+	<description>Simple JMX package for Java that helps publishing of objects using JMX.</description>
 	<licenses>
 		<license>
 			<name>ISC License</name>
