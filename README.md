@@ -6,6 +6,7 @@ This package provides some Java classes to help with the publishing of objects u
 * For more information, visit the [SimpleJMX home page](http://256stuff.com/sources/simplejmx/).
 * Online documentation can be found on the home page.  Here are the [SimpleJMX Javadocs](http://256stuff.com/sources/simplejmx/javadoc/simplejmx/).
 * You can see the source on the [git repository](https://github.com/j256/simplejmx).  [![CircleCI](https://circleci.com/gh/j256/simplejmx.svg?style=svg)](https://circleci.com/gh/j256/simplejmx) [![CodeCov](https://img.shields.io/codecov/c/github/j256/simplejmx.svg)](https://codecov.io/github/j256/simplejmx/)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fj256%2Fsimplejmx.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fj256%2Fsimplejmx?ref=badge_shield)
 * Maven packages are published via [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.j256.simplejmx/simplejmx/badge.svg?style=flat-square)](https://maven-badges.herokuapp.com/maven-central/com.j256.simplejmx/simplejmx/)
 
 Enjoy, Gray Watson
@@ -78,3 +79,7 @@ Other methods can be annotated with `@JmxOperation` to expose them as operations
 # ChangeLog Release Notes
 
 See the [ChangeLog.txt file](src/main/javadoc/doc-files/changelog.txt).
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fj256%2Fsimplejmx.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fj256%2Fsimplejmx?ref=badge_large)
