@@ -15,8 +15,8 @@ import com.j256.simplejmx.server.JmxServer;
 public class BaseJmxSelfNamingTest {
 
 	private static final String DOMAIN_NAME = "foo.bar";
-	private static final String JMX_RESOURCE_BEAN_NAME = "beanName23";
-
+	private static final String JMX_RESOURCE_BEAN_NAME = "beanName";
+	private static final String JMX_RESOURCE_NOT_FOUND_BEAN_NAME = "beanName23";
 	private static final String JMX_SELF_NAMING_BEAN_NAME = "nameOfBean";
 
 	@Test
@@ -33,8 +33,9 @@ public class BaseJmxSelfNamingTest {
 			client = new JmxClient(address, port);
 			try {
 				// wrong bean name here
-				client.getAttribute(ObjectNameUtil.makeObjectName(DOMAIN_NAME, JMX_RESOURCE_BEAN_NAME), "foo");
-				fail("should have not found bean name " + JMX_RESOURCE_BEAN_NAME);
+				client.getAttribute(ObjectNameUtil.makeObjectName(DOMAIN_NAME, JMX_RESOURCE_NOT_FOUND_BEAN_NAME),
+						"foo");
+				fail("should have not found bean name " + JMX_RESOURCE_NOT_FOUND_BEAN_NAME);
 			} catch (JMException e) {
 				// expected
 			}
@@ -69,7 +70,7 @@ public class BaseJmxSelfNamingTest {
 		}
 	}
 
-	@JmxResource(domainName = DOMAIN_NAME, beanName = JMX_RESOURCE_BEAN_NAME)
+	@JmxResource(domainName = DOMAIN_NAME, beanName = JMX_RESOURCE_NOT_FOUND_BEAN_NAME)
 	private static class OurJmxSelfNaming extends BaseJmxSelfNaming implements JmxSelfNaming {
 
 		@JmxAttributeField
