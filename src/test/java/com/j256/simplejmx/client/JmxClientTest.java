@@ -45,14 +45,15 @@ public class JmxClientTest {
 	private static ObjectName anotherObjectName;
 	private static JmxClient client;
 	private static JmxClient closedClient;
+	private static JmxClientTestObject testObject;
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
 		InetAddress address = InetAddress.getByName("localhost");
 		server = new JmxServer(address, JMX_PORT);
 		server.start();
-		JmxClientTestObject obj = new JmxClientTestObject();
-		server.register(obj);
+		testObject = new JmxClientTestObject();
+		server.register(testObject);
 		beanName = JmxClientTestObject.class.getSimpleName();
 		objectName = ObjectNameUtil.makeObjectName(JMX_DOMAIN, beanName);
 
@@ -150,6 +151,11 @@ public class JmxClientTest {
 		assertEquals(String.class.getName(), infos[0].getType());
 		assertEquals("x", infos[1].getName());
 		assertEquals(int.class.getName(), infos[1].getType());
+		int val = 349813481;
+		testObject.x = val;
+		Object value = client.getAttribute(JMX_DOMAIN, beanName, "x");
+		assertTrue(value instanceof Integer);
+		assertEquals(val, (int) value);
 	}
 
 	@Test
@@ -568,7 +574,7 @@ public class JmxClientTest {
 
 	@JmxResource(domainName = JMX_DOMAIN)
 	protected static class JmxClientTestObject {
-		int x;
+		volatile int x;
 
 		@JmxAttributeMethod
 		public void setX(int x) {
