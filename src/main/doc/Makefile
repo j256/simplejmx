@@ -18,7 +18,7 @@ $(PKG).html : $(TEXI)
 
 $(PKG) : $(TEXI)
 	rm -rf $(PKG)
-	texi2html --number --split=chapter $<
+	texi2html --number $<
 
 $(PKG).pdf : $(TEXI)
 	scp $< $(REMOTE):$(REMOTE_DIR)
