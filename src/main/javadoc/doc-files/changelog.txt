@@ -1,3 +1,6 @@
+1.17: 2/17/2019
+	* Bumped the Jetty version again to require 9.3.24.
+
 1.16: 2/17/2019
 	* Moved to requiring Java 1.7 (overdue).
 	* Bumped the Jetty version to require 9 which removed security warnings on github.
