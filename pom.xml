@@ -23,7 +23,7 @@
 	<properties>
 		<!-- optional dependency versions -->
 		<spring-version>3.1.0.RELEASE</spring-version>
-		<jetty-version>9.2.25.v20180606</jetty-version>
+		<jetty-version>9.3.24.v20180605</jetty-version>
 		<!-- test dependency versions -->
 		<easymock-version>3.4</easymock-version>
 		<junit-version>4.8.1</junit-version>
