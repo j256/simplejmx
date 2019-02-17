@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -256,13 +257,22 @@ public class JmxWebHandlerTest {
 	@Test
 	public void coverage() throws IOException {
 		JmxWebHandler handler = new JmxWebHandler();
-		Request request = new Request();
+		Request request = new Request(null, null);
 		HttpServletRequest servletRequest = EasyMock.createMock(HttpServletRequest.class);
 		HttpServletResponse servletResponse = EasyMock.createMock(HttpServletResponse.class);
 
 		ServletOutputStream outputStream = new ServletOutputStream() {
 			@Override
 			public void write(int b) {
+			}
+
+			@Override
+			public boolean isReady() {
+				return true;
+			}
+
+			@Override
+			public void setWriteListener(WriteListener writeListener) {
 			}
 		};
 		expect(servletResponse.getOutputStream()).andReturn(outputStream);

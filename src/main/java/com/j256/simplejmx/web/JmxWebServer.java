@@ -4,8 +4,8 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetAddress;
 
-import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 
 /**
  * Simple web-server which exposes JMX beans via HTTP. To use this class you need to provide a Jetty version in your
@@ -24,7 +24,6 @@ public class JmxWebServer implements Closeable {
 	private InetAddress serverAddress;
 	private int serverPort;
 	private Server server;
-	private final JettyConnectorFactory jettyConnectorFactory = getConnectorFactory();
 
 	public JmxWebServer() {
 		// for spring
@@ -44,7 +43,11 @@ public class JmxWebServer implements Closeable {
 	 */
 	public void start() throws Exception {
 		server = new Server();
-		Connector connector = jettyConnectorFactory.buildConnector(server, serverAddress, serverPort);
+		ServerConnector connector = new ServerConnector(server);
+		if (serverAddress != null) {
+			connector.setHost(serverAddress.getHostAddress());
+		}
+		connector.setPort(serverPort);
 		server.addConnector(connector);
 		server.setHandler(new JmxWebHandler());
 		server.start();
@@ -55,7 +58,7 @@ public class JmxWebServer implements Closeable {
 	 */
 	public void stop() throws Exception {
 		if (server != null) {
-			server.setGracefulShutdown(100);
+			server.setStopTimeout(100);
 			server.stop();
 			server = null;
 		}
@@ -84,17 +87,5 @@ public class JmxWebServer implements Closeable {
 	 */
 	public void setServerPort(int serverPort) {
 		this.serverPort = serverPort;
-	}
-
-	/**
-	 * Try to figure out and return a connector factory compatible with either Jetty version 8 or 9.
-	 */
-	private JettyConnectorFactory getConnectorFactory() {
-		try {
-			Class.forName("org.eclipse.jetty.server.nio.SelectChannelConnector");
-			return new Jetty8ConnectorFactory();
-		} catch (Exception e) {
-			return new Jetty9ConnectorFactory();
-		}
 	}
 }

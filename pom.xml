@@ -24,7 +24,7 @@
 	<properties>
 		<!-- optional dependency versions -->
 		<spring-version>3.1.0.RELEASE</spring-version>
-		<jetty-version>8.1.22.v20160922</jetty-version>
+		<jetty-version>9.2.25.v20180606</jetty-version>
 		<!-- test dependency versions -->
 		<easymock-version>3.4</easymock-version>
 		<junit-version>4.8.1</junit-version>
@@ -96,8 +96,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.5.1</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.7</source>
+					<target>1.7</target>
 				</configuration>
 			</plugin>
 			<plugin>
