@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -597,60 +598,9 @@ public class CommandLineJmxClient {
 		}
 
 		System.out.println(" is a " + clazz.getSimpleName() + " array:");
-		if (clazz == byte[].class) {
-			byte[] array = (byte[]) value;
-			for (int arrayC = 0; arrayC < array.length; arrayC++) {
-				// recurse to get any sub-arrays
-				displayValue(array[arrayC], indent + "  ", "[" + arrayC + "]");
-			}
-		} else if (clazz == short[].class) {
-			short[] array = (short[]) value;
-			for (int arrayC = 0; arrayC < array.length; arrayC++) {
-				// recurse to get any sub-arrays
-				displayValue(array[arrayC], indent + "  ", "[" + arrayC + "]");
-			}
-		} else if (clazz == int[].class) {
-			int[] array = (int[]) value;
-			for (int arrayC = 0; arrayC < array.length; arrayC++) {
-				// recurse to get any sub-arrays
-				displayValue(array[arrayC], indent + "  ", "[" + arrayC + "]");
-			}
-		} else if (clazz == long[].class) {
-			long[] array = (long[]) value;
-			for (int arrayC = 0; arrayC < array.length; arrayC++) {
-				// recurse to get any sub-arrays
-				displayValue(array[arrayC], indent + "  ", "[" + arrayC + "]");
-			}
-		} else if (clazz == boolean[].class) {
-			boolean[] array = (boolean[]) value;
-			for (int arrayC = 0; arrayC < array.length; arrayC++) {
-				// recurse to get any sub-arrays
-				displayValue(array[arrayC], indent + "  ", "[" + arrayC + "]");
-			}
-		} else if (clazz == char[].class) {
-			char[] array = (char[]) value;
-			for (int arrayC = 0; arrayC < array.length; arrayC++) {
-				// recurse to get any sub-arrays
-				displayValue(array[arrayC], indent + "  ", "[" + arrayC + "]");
-			}
-		} else if (clazz == float[].class) {
-			float[] array = (float[]) value;
-			for (int arrayC = 0; arrayC < array.length; arrayC++) {
-				// recurse to get any sub-arrays
-				displayValue(array[arrayC], indent + "  ", "[" + arrayC + "]");
-			}
-		} else if (clazz == double[].class) {
-			double[] array = (double[]) value;
-			for (int arrayC = 0; arrayC < array.length; arrayC++) {
-				// recurse to get any sub-arrays
-				displayValue(array[arrayC], indent + "  ", "[" + arrayC + "]");
-			}
-		} else {
-			Object[] array = (Object[]) value;
-			for (int arrayC = 0; arrayC < array.length; arrayC++) {
-				// recurse to get any sub-arrays
-				displayValue(array[arrayC], indent + "  ", "[" + arrayC + "]");
-			}
+		int length = Array.getLength(value);
+		for (int i = 0; i < length; i++) {
+			displayValue(Array.get(value, i), indent + "  ", "[" + i + "]");
 		}
 		System.out.println(indent + "END of " + clazz.getSimpleName() + " array:");
 	}

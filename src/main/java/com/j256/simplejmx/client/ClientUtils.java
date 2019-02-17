@@ -1,7 +1,7 @@
 package com.j256.simplejmx.client;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
-import java.util.Arrays;
 
 /**
  * Utility methods used whenever we are processing JMX client information.
@@ -58,25 +58,9 @@ public class ClientUtils {
 			return value.toString();
 		}
 
-		if (value instanceof boolean[]) {
-			return Arrays.toString((boolean[]) value);
-		} else if (value instanceof byte[]) {
-			return Arrays.toString((byte[]) value);
-		} else if (value instanceof char[]) {
-			return Arrays.toString((char[]) value);
-		} else if (value instanceof short[]) {
-			return Arrays.toString((short[]) value);
-		} else if (value instanceof int[]) {
-			return Arrays.toString((int[]) value);
-		} else if (value instanceof long[]) {
-			return Arrays.toString((long[]) value);
-		} else if (value instanceof float[]) {
-			return Arrays.toString((float[]) value);
-		} else if (value instanceof double[]) {
-			return Arrays.toString((double[]) value);
-		} else {
-			return Arrays.toString((Object[]) value);
-		}
+		StringBuilder sb = new StringBuilder();
+		valueToString(sb, value);
+		return sb.toString();
 	}
 
 	/**
@@ -141,5 +125,25 @@ public class ClientUtils {
 		} catch (Exception e) {
 			throw new IllegalArgumentException("Could not find constructor with single String argument for " + clazz);
 		}
+	}
+
+	private static void valueToString(StringBuilder sb, Object value) {
+		if (value == null) {
+			sb.append("null");
+			return;
+		} else if (!value.getClass().isArray()) {
+			sb.append(value);
+			return;
+		}
+
+		sb.append('[');
+		int length = Array.getLength(value);
+		for (int i = 0; i < length; i++) {
+			if (i > 0) {
+				sb.append(", ");
+			}
+			valueToString(sb, Array.get(value, i));
+		}
+		sb.append(']');
 	}
 }
