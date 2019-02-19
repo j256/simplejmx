@@ -16,6 +16,8 @@ import com.j256.simplejmx.common.JmxResource;
 @JmxResource(domainName = "j256.simplejmx", beanName = "Main", description = "Main Jmx class")
 public class MainJmx {
 
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss z");
+
 	private long start = System.currentTimeMillis();
 	private CountDownLatch shutdownLatch = new CountDownLatch(1);
 
@@ -61,6 +63,6 @@ public class MainJmx {
 	}
 
 	private String millisTimeToStart(long millis) {
-		return new SimpleDateFormat("yyyy/MM/dd HH:mm:ss z").format(new Date(millis));
+		return ((SimpleDateFormat) DATE_FORMAT.clone()).format(new Date(millis));
 	}
 }
