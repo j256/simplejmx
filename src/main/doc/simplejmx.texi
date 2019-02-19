@@ -52,13 +52,13 @@ JMX beans to a browser or other web client.
 To get started quickly using SimpleJMX, @pxref{Quick Start}.  You can also take a look at the examples section of the
 document which has various working code packages. @xref{Examples}.
 @ifhtml
-There is also a @uref{http://256.com/sources/simplejmx/docs/simplejmx.pdf, PDF version of this documentation}.
+There is also a @uref{http://256stuff.com/sources/simplejmx/docs/simplejmx.pdf, PDF version of this documentation}.
 @end ifhtml
 @iftex
-There is also a @uref{http://256.com/sources/simplejmx/docs/simplejmx.html, HTML version of this documentation}.
+There is also a @uref{http://256stuff.com/sources/simplejmx/docs/simplejmx.html, HTML version of this documentation}.
 @end iftex
 
-Gray Watson @uref{http://256.com/gray/}
+Gray Watson @uref{http://256stuff.com/gray/}
 
 @menu
 * Quick Start::                Start using SimpleJMX quickly.
@@ -79,7 +79,7 @@ To use SimpleJMX you need to do the following steps.  For more information, @pxr
 
 @enumerate
 
-@item Download SimpleJMX from the @uref{http://256.com/sources/simplejmx/releases/, SimpleJMX release page}.  @xref{Downloading}.
+@item Download SimpleJMX from the @uref{http://256stuff.com/sources/simplejmx/releases/, SimpleJMX release page}.  @xref{Downloading}.
 
 @item Add @code{@@JmxResource} annotation to the top of each class you want to publish via JMX.  @xref{Naming Objects}.
 
@@ -159,7 +159,7 @@ For more extensive instructions, @pxref{Using}.
 @cindex how to download the jars
 @cindex downloading the jars
 @cindex where to get new jars
-To get started with SimpleJMX, you will need to download the jar file.  The @uref{http://256.com/sources/simplejmx/releases/, SimpleJMX
+To get started with SimpleJMX, you will need to download the jar file.  The @uref{http://256stuff.com/sources/simplejmx/releases/, SimpleJMX
 release page} is the default repository but the jars are also available from the @uref{http://repo1.maven.org/maven2/com/j256/simplejmx/,
 central maven repository}.
 
@@ -905,20 +905,20 @@ are welcome as long as you don't get piqued if we don't chose your's.
 @item Simple, basic
 
 This is a simple application which publishes a single object.  See the
-@uref{http://256.com/sources/simplejmx/docs/example-simple, source code on github}.
+@uref{http://256stuff.com/sources/simplejmx/docs/example-simple, source code on github}.
 
 @anchor{random object example}
 @item Random object example
 
 This is an example showing how to programmatically expose using JMX a random object without SimpleJMX annotations:
-See the @uref{http://256.com/sources/simplejmx/docs/example-random, source code on github}.
+See the @uref{http://256stuff.com/sources/simplejmx/docs/example-random, source code on github}.
 
 @anchor{spring framework example}
 @item Spring Framework example
 
 This is an example showing how you can use SimpleJMX with the Spring Framework.
-See the @uref{http://256.com/sources/simplejmx/docs/example-spring, source code on github}.  The
-@uref{http://256.com/sources/simplejmx/docs/example-spring-config, example spring
+See the @uref{http://256stuff.com/sources/simplejmx/docs/example-spring, source code on github}.  The
+@uref{http://256stuff.com/sources/simplejmx/docs/example-spring-config, example spring
 config file} is also available.
 
 @cindex web server example
@@ -926,14 +926,14 @@ config file} is also available.
 @item Jmx Web Server example
 
 This is an example showing how you can use SimpleJMX to expose JMX beans over HTTP to web browsers.
-See the @uref{http://256.com/sources/simplejmx/docs/example-web, source code on github}.
+See the @uref{http://256stuff.com/sources/simplejmx/docs/example-web, source code on github}.
 
 @cindex publish all example
 @anchor{publish all example}
 @item Publish all example
 
 This is an example that shows how you can use the @code{PublishAllBeanWrapper} to publish information about a random
-object.  See the @uref{http://256.com/sources/simplejmx/docs/example-publish-all, source code on github}.
+object.  See the @uref{http://256stuff.com/sources/simplejmx/docs/example-publish-all, source code on github}.
 
 @end table
 
@@ -945,6 +945,8 @@ object.  See the @uref{http://256.com/sources/simplejmx/docs/example-publish-all
 @cindex open source license
 This document is part of the SimpleJMX project.
 
+Copyright @value{simplejmx_year}, Gray Watson
+
 Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby
 granted, provided that this permission notice appear in all copies.
 
@@ -954,7 +956,7 @@ DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING F
 WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE
 USE OR PERFORMANCE OF THIS SOFTWARE.
 
-The author may be contacted via the @uref{http://256.com/sources/simplejmx/, SimpleJMX home page}.
+The author may be contacted via the @uref{http://256stuff.com/sources/simplejmx/, SimpleJMX home page}.
 
 @c ----------------------------------------------------------------
 @node Index of Concepts,, License, Top
