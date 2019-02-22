@@ -13,6 +13,7 @@
 		<license>
 			<name>ISC License</name>
 			<distribution>repo</distribution>
+			<url>https://opensource.org/licenses/ISC</url>
 		</license>
 	</licenses>
 	<parent>
