@@ -133,7 +133,7 @@ public class JmxServerTest {
 		lsf2.hashCode();
 		assertTrue(lsf2.equals(lsf2));
 		assertFalse(lsf2.equals(null));
-		assertFalse(lsf2.equals(this));
+		assertFalse(lsf2.equals(new Object()));
 		assertFalse(lsf1.equals(lsf2));
 		assertFalse(lsf2.equals(lsf1));
 	}
