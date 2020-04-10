@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="https://maven.apache.org/POM/4.0.0" xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
 	<!-- simplejmx pom configuration file for maven -->
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.j256.simplejmx</groupId>
@@ -7,7 +7,7 @@
 	<version>1.18-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Simple JMX</name>
-	<url>http://256stuff.com/sources/simplejmx/</url>
+	<url>https://256stuff.com/sources/simplejmx/</url>
 	<description>Simple JMX package for Java that helps publishing of objects using JMX.</description>
 	<licenses>
 		<license>
@@ -39,9 +39,9 @@
 		<developer>
 			<id>gray</id>
 			<name>Gray Watson</name>
-			<url>http://256stuff.com/gray/</url>
+			<url>https://256stuff.com/gray/</url>
 			<organization>256stuff.com</organization>
-			<organizationUrl>http://256stuff.com/</organizationUrl>
+			<organizationUrl>https://256stuff.com/</organizationUrl>
 			<roles>
 				<role>architect</role>
 				<role>developer</role>
@@ -56,12 +56,12 @@
 				<repository>
 					<id>sonatype-nexus-staging</id>
 					<name>Nexus Release Repository</name>
-					<url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+					<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 				</repository>
 				<snapshotRepository>
 					<id>sonatype-nexus-snapshots</id>
 					<name>Sonatype Nexus Snapshots</name>
-					<url>http://oss.sonatype.org/content/repositories/snapshots/</url>
+					<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
 				</snapshotRepository>
 			</distributionManagement>
 		</profile>
@@ -137,7 +137,7 @@
 					<bottom>
 						This documentation content is licensed by Gray Watson under the
 						&lt;a
-						href="http://creativecommons.org/licenses/by-sa/3.0/" &gt;Creative Commons Attribution-Share Alike 3.0 License.
+						href="https://creativecommons.org/licenses/by-sa/3.0/" &gt;Creative Commons Attribution-Share Alike 3.0 License.
 						&lt;/a&gt; </bottom>
 					<additionalparam>-tag inheritDoc:X</additionalparam>
 					<excludePackageNames>
