@@ -26,6 +26,7 @@ public class JmxIntegrationTest {
 			server.start();
 			server.register(new TestObject(server));
 			server.register(new TestSubObject());
+			System.out.println("JMX server running on port: " + DEFAULT_PORT);
 			Thread.sleep(1000000000);
 		} finally {
 			server.stop();

@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.bio.SocketConnector;
 
 /**
  * Simple web-server which exposes JMX beans via HTTP. To use this class you need to provide a Jetty version in your
@@ -43,7 +43,8 @@ public class JmxWebServer implements Closeable {
 	 */
 	public void start() throws Exception {
 		server = new Server();
-		ServerConnector connector = new ServerConnector(server);
+		SocketConnector connector = new SocketConnector();
+		connector.setServer(server);
 		if (serverAddress != null) {
 			connector.setHost(serverAddress.getHostAddress());
 		}
@@ -54,11 +55,10 @@ public class JmxWebServer implements Closeable {
 	}
 
 	/**
-	 * Stop the internal Jetty web server and associated classes.
+	 * Stop the internal web server and associated classes.
 	 */
 	public void stop() throws Exception {
 		if (server != null) {
-			server.setStopTimeout(100);
 			server.stop();
 			server = null;
 		}
@@ -68,8 +68,6 @@ public class JmxWebServer implements Closeable {
 	public void close() throws IOException {
 		try {
 			stop();
-		} catch (IOException ioe) {
-			throw ioe;
 		} catch (Exception e) {
 			throw new IOException(e);
 		}
