@@ -64,7 +64,7 @@ Other methods can be annotated with `@JmxOperation` to expose them as operations
 		@JmxAttributeMethod(description = "Run time in seconds or milliseconds")
 		public long getRunTime() {
 			long diffMillis = System.currentTimeMillis() - startMillis;
-			return diffMillis / (showSeconds ? 1 : 1000);
+			return diffMillis / (showSeconds ? 1000 : 1);
 		}
 		
 		// this is an operation that shows up in the operations tab in jconsole.
