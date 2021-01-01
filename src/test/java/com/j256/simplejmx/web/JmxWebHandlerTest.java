@@ -12,11 +12,12 @@ import java.io.IOException;
 import java.net.InetAddress;
 
 import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.easymock.EasyMock;
+import org.eclipse.jetty.io.EndPoint;
+import org.eclipse.jetty.server.AbstractHttpConnection;
 import org.eclipse.jetty.server.Request;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -257,7 +258,10 @@ public class JmxWebHandlerTest {
 	@Test
 	public void coverage() throws IOException {
 		JmxWebHandler handler = new JmxWebHandler();
-		Request request = new Request(null, null);
+		AbstractHttpConnection connection = EasyMock.createMock(AbstractHttpConnection.class);
+		EndPoint endpoint = EasyMock.createMock(EndPoint.class);
+		expect(connection.getEndPoint()).andReturn(endpoint);
+		expect(connection.getResolveNames()).andReturn(true);
 		HttpServletRequest servletRequest = EasyMock.createMock(HttpServletRequest.class);
 		HttpServletResponse servletResponse = EasyMock.createMock(HttpServletResponse.class);
 
@@ -265,24 +269,16 @@ public class JmxWebHandlerTest {
 			@Override
 			public void write(int b) {
 			}
-
-			@Override
-			public boolean isReady() {
-				return true;
-			}
-
-			@Override
-			public void setWriteListener(WriteListener writeListener) {
-			}
 		};
 		expect(servletResponse.getOutputStream()).andReturn(outputStream);
 		servletResponse.setContentType("text/html");
 		expect(servletRequest.getPathInfo()).andReturn(null);
 		expect(servletRequest.getParameter("t")).andReturn(null);
 
-		replay(servletRequest, servletResponse);
+		replay(servletRequest, servletResponse, connection);
+		Request request = new Request(connection);
 		handler.handle(null, request, servletRequest, servletResponse);
-		verify(servletRequest, servletResponse);
+		verify(servletRequest, servletResponse, connection);
 	}
 
 	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
