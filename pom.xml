@@ -27,7 +27,7 @@
 		<jetty-version>8.2.0.v20160908</jetty-version>
 		<!-- test dependency versions -->
 		<easymock-version>3.4</easymock-version>
-		<junit-version>4.13.1</junit-version>
+		<junit-version>4.13.2</junit-version>
 		<htmlunit-version>2.13</htmlunit-version>
 	</properties>
 	<scm>
@@ -198,7 +198,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.7.201606060606</version>
+				<version>0.8.6</version>
 				<executions>
 					<execution>
 						<goals>
@@ -225,7 +225,7 @@
 			<plugin>
 				<groupId>com.j256.testcheckpublisher</groupId>
 				<artifactId>test-check-publisher-maven-plugin</artifactId>
-				<version>0.9</version>
+				<version>1.2</version>
 			</plugin>
 		</plugins>
 		<pluginManagement>
