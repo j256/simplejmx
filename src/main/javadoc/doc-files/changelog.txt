@@ -1,3 +1,7 @@
+1.19: 5/12/2021
+	* Fixed the doc version.
+	* Make the optional jetty webserver spawn daemon threads.
+
 1.18: 5/12/2021
 	* Went back to Jetty 8 because I don't want to force folks to java8 yet.
 	* Added better thread dispatcher for Jetty for web-server.  Not sure why they didn't get that right.

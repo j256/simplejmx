@@ -83,7 +83,7 @@ Other methods can be annotated with `@JmxOperation` to expose them as operations
 <dependency>
 	<groupId>com.j256.simplejmx</groupId>
 	<artifactId>simplejmx</artifactId>
-	<version>1.18</version>
+	<version>1.19</version>
 </dependency>
 ```
 
