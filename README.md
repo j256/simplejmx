@@ -75,6 +75,18 @@ Other methods can be annotated with `@JmxOperation` to expose them as operations
 		}
  	}
 
+# Maven Configuration
+
+* Maven packages are published via [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.j256.simplejmx/simplejmx/badge.svg?style=flat-square)](https://maven-badges.herokuapp.com/maven-central/com.j256.simplejmx/simplejmx/)
+
+``` xml
+<dependency>
+	<groupId>com.j256.simplejmx</groupId>
+	<artifactId>simplejmx</artifactId>
+	<version>1.18</version>
+</dependency>
+```
+
 # ChangeLog Release Notes
 
 See the [ChangeLog.txt file](src/main/javadoc/doc-files/changelog.txt).
