@@ -1,3 +1,7 @@
+1.18: 5/12/2021
+	* Went back to Jetty 8 because I don't want to force folks to java8 yet.
+	* Added better thread dispatcher for Jetty for web-server.  Not sure why they didn't get that right.
+
 1.17: 2/17/2019
 	* Bumped the Jetty version again to require 9.3.24.
 
