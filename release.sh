@@ -80,7 +80,17 @@ if [ -r "src/main/doc/$LIBRARY.texi" ]; then
     fi
 fi
 
+if [ -r "src/main/javadoc/doc-files/$LIBRARY.html" ]; then
+    grep "Version $release" src/main/javadoc/doc-files/$LIBRARY.html > /dev/null
+    if [ $? -ne 0 ]; then
+	/bin/echo "javadoc doc-files $LIBRARY.html version seems wrong:"
+	grep "Version " src/main/javadoc/doc-files/$LIBRARY.html
+	bad=1
+    fi
+fi
+
 if [ $bad -ne 0 ]; then
+    echo "Please fix the previous error and re-run"
     exit 1
 fi
 
