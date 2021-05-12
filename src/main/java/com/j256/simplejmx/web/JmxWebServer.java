@@ -157,7 +157,7 @@ public class JmxWebServer implements Closeable {
 		public Thread newThread(Runnable r) {
 			Thread thread = new Thread(r);
 			thread.setName(JmxWebServer.class.getSimpleName() + '-' + threadNum.incrementAndGet());
-			thread.setDaemon(false);
+			thread.setDaemon(true);
 			return thread;
 		}
 	}
