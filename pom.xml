@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.j256.simplejmx</groupId>
 	<artifactId>simplejmx</artifactId>
-	<version>1.19-SNAPSHOT</version>
+	<version>1.19</version>
 	<packaging>jar</packaging>
 	<name>Simple JMX</name>
 	<url>https://256stuff.com/sources/simplejmx/</url>
