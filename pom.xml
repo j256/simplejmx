@@ -24,7 +24,7 @@
 	<properties>
 		<!-- optional dependency versions -->
 		<spring-version>3.1.0.RELEASE</spring-version>
-		<jetty-version>8.2.0.v20160908</jetty-version>
+		<jetty-version>9.4.41.v20210516</jetty-version>
 		<!-- test dependency versions -->
 		<easymock-version>3.4</easymock-version>
 		<junit-version>4.13.2</junit-version>
