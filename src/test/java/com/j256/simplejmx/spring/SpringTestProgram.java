@@ -35,6 +35,7 @@ public class SpringTestProgram {
 			// wait for someone to run the shutdown operation
 			System.out.println("waiting for the shutdown operation to be run via Jconsole");
 			mainJmx.waitForShutdown();
+			System.out.println("exiting");
 		} finally {
 			if (mainContext != null) {
 				mainContext.close();

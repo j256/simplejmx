@@ -9,7 +9,6 @@ import javax.management.ObjectName;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -36,6 +35,15 @@ public class BeanPublisher implements InitializingBean, ApplicationContextAware,
 	private JmxServer jmxServer;
 	private Set<ObjectName> registeredBeans = new HashSet<ObjectName>();
 
+	public BeanPublisher() {
+		// for spring
+	}
+
+	public BeanPublisher(ApplicationContext applicationContext, JmxServer jmxServer) {
+		this.applicationContext = applicationContext;
+		this.jmxServer = jmxServer;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		// do the annotations
@@ -50,10 +58,9 @@ public class BeanPublisher implements InitializingBean, ApplicationContextAware,
 			// check for more specific classes first
 			if (bean instanceof JmxBean) {
 				JmxBean jmxBean = (JmxBean) bean;
-				objectName =
-						jmxServer.register(jmxBean.getTarget(), jmxBean.getJmxResourceInfo(),
-								jmxBean.getAttributeFieldInfos(), jmxBean.getAttributeMethodInfos(),
-								jmxBean.getOperationInfos());
+				objectName = jmxServer.register(jmxBean.getTarget(), jmxBean.getJmxResourceInfo(),
+						jmxBean.getAttributeFieldInfos(), jmxBean.getAttributeMethodInfos(),
+						jmxBean.getOperationInfos());
 			} else if (bean instanceof PublishAllBeanWrapper) {
 				objectName = jmxServer.register((PublishAllBeanWrapper) bean);
 			} else if (bean instanceof JmxSelfNaming) {
@@ -75,12 +82,10 @@ public class BeanPublisher implements InitializingBean, ApplicationContextAware,
 	}
 
 	@Override
-	@Required
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
 	}
 
-	@Required
 	public void setJmxServer(JmxServer jmxServer) {
 		this.jmxServer = jmxServer;
 	}
