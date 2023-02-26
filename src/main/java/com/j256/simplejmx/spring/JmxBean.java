@@ -3,8 +3,6 @@ package com.j256.simplejmx.spring;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Required;
-
 import com.j256.simplejmx.common.JmxAttributeFieldInfo;
 import com.j256.simplejmx.common.JmxAttributeMethodInfo;
 import com.j256.simplejmx.common.JmxOperationInfo;
@@ -87,6 +85,15 @@ public class JmxBean {
 	private List<JmxOperationInfo> operationInfos;
 	private Object target;
 
+	public JmxBean() {
+		// for spring
+	}
+
+	public JmxBean(JmxResourceInfo jmxResourceInfo, Object target) {
+		this.jmxResourceInfo = jmxResourceInfo;
+		this.target = target;
+	}
+
 	public JmxResourceInfo getJmxResourceInfo() {
 		return jmxResourceInfo;
 	}
@@ -94,7 +101,6 @@ public class JmxBean {
 	/**
 	 * Required resource information which helps to make the ObjectName for the bean that we are exposing via JMX.
 	 */
-	@Required
 	public void setJmxResourceInfo(JmxResourceInfo jmxResourceInfo) {
 		this.jmxResourceInfo = jmxResourceInfo;
 	}
@@ -213,7 +219,6 @@ public class JmxBean {
 	/**
 	 * Required target object which specifies the Spring bean that we are exposing via JMX.
 	 */
-	@Required
 	public void setTarget(Object target) {
 		this.target = target;
 	}

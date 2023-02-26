@@ -1,3 +1,9 @@
+2.1: 2/26/2023
+	* Finally moving to Java version 8 because of dependency version requirements.  Maybe overdue.
+	* Bumped the optional version of Jetty to 9.4.50.v20221201 for security reasons.
+	* Bumped the optional version of Spring to 5.2.20 for security reasons.
+	* This is a 2.1 release and not 2.0 because there are no logic changes here.
+
 1.19: 5/12/2021
 	* Fixed the doc version.
 	* Make the optional jetty webserver spawn daemon threads.

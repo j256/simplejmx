@@ -6,8 +6,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.JMException;
 
-import org.springframework.beans.factory.annotation.Required;
-
 import com.j256.simplejmx.common.BaseJmxSelfNaming;
 import com.j256.simplejmx.common.JmxAttributeField;
 import com.j256.simplejmx.common.JmxAttributeMethod;
@@ -28,6 +26,14 @@ public class DynamicJmx {
 
 	private final AtomicInteger thingCount = new AtomicInteger(0);
 	private final Map<Integer, Thing> things = new HashMap<Integer, Thing>();
+
+	public DynamicJmx() {
+		// for spring
+	}
+
+	public DynamicJmx(JmxServer jmxServer) {
+		this.jmxServer = jmxServer;
+	}
 
 	@JmxAttributeMethod(description = "Number of things created")
 	public int getNumThings() {
@@ -64,7 +70,6 @@ public class DynamicJmx {
 		}
 	}
 
-	@Required
 	public void setJmxServer(JmxServer jmxServer) {
 		this.jmxServer = jmxServer;
 	}
