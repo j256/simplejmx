@@ -3,7 +3,6 @@ package com.j256.simplejmx.web;
 import java.net.InetAddress;
 
 import org.junit.Ignore;
-import org.junit.Test;
 
 import com.j256.simplejmx.common.JmxAttributeField;
 import com.j256.simplejmx.common.JmxAttributeMethod;
@@ -24,8 +23,11 @@ public class JmxWebIntergrationTest {
 	private static JmxServer jmxServer;
 	private static final TestBean testBean = new TestBean();
 
-	@Test
-	public void testStuff() throws Exception {
+	public static void main(String[] args) throws Exception {
+		new JmxWebIntergrationTest().doMain();
+	}
+
+	private void doMain() throws Exception {
 		jmxServer = new JmxServer(9113);
 		jmxServer.start();
 		jmxServer.register(testBean);
@@ -39,14 +41,16 @@ public class JmxWebIntergrationTest {
 	public static class TestBean {
 		@JmxAttributeField(isReadible = false)
 		int noread;
+		@JmxAttributeField(isWritable = true)
+		int both;
 
 		@JmxAttributeMethod
-		public int getThrows() {
+		public int getThrowsTest() {
 			throw new RuntimeException();
 		}
 
-		@JmxOperation
-		public String op(int foo) {
+		@JmxOperation(parameterNames = "foo")
+		public String convertNumberToString(int foo) {
 			if (foo == OP_PARAM_THROWS) {
 				throw new RuntimeException();
 			} else {

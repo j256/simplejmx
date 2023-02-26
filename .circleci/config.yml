@@ -1,9 +1,9 @@
 # config file for circleci
-version: 2 
+version: 2.1
 jobs:
   build:
     docker:
-      - image: circleci/openjdk:8-jdk-browsers
+      - image: cimg/openjdk:8.0.322
     steps:
       - checkout
       - restore_cache:
