@@ -9,10 +9,26 @@
 		<property name="jmxServer" ref="jmxServer" />
 	</bean>
 
+	<bean id="authenticator" class="com.j256.simplejmx.server.JmxUsernamePasswordAuthenticator">
+		<property name="authMap">
+			<map>
+				<entry>
+					<key>
+						<bean class="java.lang.String">
+							<constructor-arg value="foo" />
+						</bean>
+					</key>
+					<value type="java.lang.String">bar</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
 	<!-- JMX server which publishes our beans via JMX -->
 	<bean id="jmxServer" class="com.j256.simplejmx.server.JmxServer" init-method="start" destroy-method="stop">
 		<!-- the port should probably come from a configured property -->
 		<property name="registryPort" value="8000" />
+		<property name="authenticator" ref="authenticator" />
 	</bean>
 
 	<!-- -->

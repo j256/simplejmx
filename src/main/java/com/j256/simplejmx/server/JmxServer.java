@@ -17,6 +17,7 @@ import java.util.Map;
 import javax.management.JMException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import javax.management.remote.JMXAuthenticator;
 import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
@@ -49,6 +50,8 @@ public class JmxServer implements Closeable {
 	private RMIServerSocketFactory serverSocketFactory;
 	private boolean serverHostNamePropertySet = false;
 	private String serviceUrl;
+	private JMXAuthenticator authenticator;
+	private Map<String, Object> envMap;
 
 	/**
 	 * Create a JMX server that will be set with the port using setters. Used with spring. You must at least specify the
@@ -456,6 +459,20 @@ public class JmxServer implements Closeable {
 	}
 
 	/**
+	 * Set an authenticator to use with the server.
+	 */
+	public void setAuthenticator(JMXAuthenticator authenticator) {
+		this.authenticator = authenticator;
+	}
+
+	/**
+	 * Set the map of environment objects used to configure the JMX server
+	 */
+	public void setEnvMap(Map<String, Object> envMap) {
+		this.envMap = envMap;
+	}
+
+	/**
 	 * Number of registered objects.
 	 */
 	public int getRegisteredCount() {
@@ -545,10 +562,22 @@ public class JmxServer implements Closeable {
 			throw createJmException("Malformed service url created " + serviceUrl, e);
 		}
 
-		Map<String, Object> envMap = null;
+		Map<String, Object> serverEnvMap = null;
+		if (envMap != null) {
+			serverEnvMap = new HashMap<String, Object>();
+			serverEnvMap.putAll(this.envMap);
+		}
 		if (serverSocketFactory != null) {
-			envMap = new HashMap<String, Object>();
-			envMap.put(RMIConnectorServer.RMI_SERVER_SOCKET_FACTORY_ATTRIBUTE, serverSocketFactory);
+			if (serverEnvMap == null) {
+				serverEnvMap = new HashMap<String, Object>();
+			}
+			serverEnvMap.put(RMIConnectorServer.RMI_SERVER_SOCKET_FACTORY_ATTRIBUTE, serverSocketFactory);
+		}
+		if (authenticator != null) {
+			if (serverEnvMap == null) {
+				serverEnvMap = new HashMap<String, Object>();
+			}
+			serverEnvMap.put(JMXConnectorServer.AUTHENTICATOR, authenticator);
 		}
 		/*
 		 * NOTE: I tried to inject a client socket factory with RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE
@@ -558,7 +587,8 @@ public class JmxServer implements Closeable {
 
 		try {
 			mbeanServer = ManagementFactory.getPlatformMBeanServer();
-			connector = JMXConnectorServerFactory.newJMXConnectorServer(url, envMap, mbeanServer);
+			connector = JMXConnectorServerFactory.newJMXConnectorServer(url, serverEnvMap, mbeanServer);
+			System.err.println(connector.toString());
 		} catch (IOException e) {
 			throw createJmException("Could not make our Jmx connector server on URL: " + url, e);
 		}

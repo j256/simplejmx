@@ -2,7 +2,6 @@ package com.j256.simplejmx.server;
 
 import java.security.Principal;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,14 +30,14 @@ public class JmxUsernamePasswordAuthenticator implements JMXAuthenticator {
 
 		String username = usernamePassword[0];
 		String password = usernamePassword[1];
+
 		String expectedPassword = authMap.get(username);
 		if (expectedPassword == null || !expectedPassword.equals(password)) {
 			throw new SecurityException("Unknown username/password combination");
 		}
 
-		Set<Principal> principals = new HashSet<Principal>();
-		principals.add(new JMXPrincipal(username));
-		return new Subject(true, principals, Collections.emptySet(), Collections.emptySet());
+		Set<Principal> principals = Collections.singleton(new JMXPrincipal(username));
+		return new Subject(true /* readOnly */, principals, Collections.emptySet(), Collections.emptySet());
 	}
 
 	public void setAuthMap(Map<String, String> authMap) {

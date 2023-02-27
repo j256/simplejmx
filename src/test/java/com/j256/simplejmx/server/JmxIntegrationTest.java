@@ -1,14 +1,11 @@
 package com.j256.simplejmx.server;
 
-import org.junit.Ignore;
-
 import com.j256.simplejmx.common.JmxAttributeMethod;
 import com.j256.simplejmx.common.JmxFolderName;
 import com.j256.simplejmx.common.JmxOperation;
 import com.j256.simplejmx.common.JmxResource;
 import com.j256.simplejmx.common.JmxSelfNaming;
 
-@Ignore("Just for integration testing")
 public class JmxIntegrationTest {
 
 	private static final int DEFAULT_PORT = 5256;
@@ -22,6 +19,9 @@ public class JmxIntegrationTest {
 
 	public void doMain(String args[]) throws Exception {
 		JmxServer server = new JmxServer(DEFAULT_PORT);
+		JmxUsernamePasswordAuthenticator auth = new JmxUsernamePasswordAuthenticator();
+		auth.setAuthMap(null);
+		server.setAuthenticator(auth);
 		try {
 			server.start();
 			server.register(new TestObject(server));
@@ -58,8 +58,8 @@ public class JmxIntegrationTest {
 			this.foo = 0;
 		}
 
-		@JmxOperation(description = "Set Foo to be a particular value as an operation",
-				parameterNames = { "newValue" }, parameterDescriptions = { "new value to set to foo" })
+		@JmxOperation(description = "Set Foo to be a particular value as an operation", parameterNames = { "newValue" },
+				parameterDescriptions = { "new value to set to foo" })
 		public void resetFoo(int newValue) {
 			this.foo = newValue;
 		}
