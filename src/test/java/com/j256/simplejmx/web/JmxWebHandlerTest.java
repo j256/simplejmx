@@ -57,7 +57,6 @@ public class JmxWebHandlerTest {
 		jmxServer.register(testBean);
 		webServer = new JmxWebServer(InetAddress.getByName(WEB_SERVER_NAME), WEB_SERVER_PORT);
 		webServer.start();
-		Thread.sleep(2000);
 	}
 
 	@AfterClass
@@ -77,13 +76,13 @@ public class JmxWebHandlerTest {
 	public void testSimple() throws Exception {
 		WebClient webClient = new WebClient();
 		HtmlPage page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT);
-		assertTrue(page.asText().contains("JMX Domains"));
+		assertTrue(page.asNormalizedText().contains("JMX Domains"));
 
 		String domain = "java.lang";
 		HtmlAnchor anchor = page.getAnchorByText(domain);
 		assertNotNull(anchor);
 		page = anchor.click();
-		assertTrue(page.asText().contains("Beans in domain " + domain));
+		assertTrue(page.asNormalizedText().contains("Beans in domain " + domain));
 
 		anchor = page.getAnchorByName("text");
 		TextPage textPage = anchor.click();
@@ -92,7 +91,7 @@ public class JmxWebHandlerTest {
 
 		anchor = page.getAnchorByText(bean);
 		page = anchor.click();
-		assertTrue(page.asText().contains("Information about object " + domain + ":" + bean));
+		assertTrue(page.asNormalizedText().contains("Information about object " + domain + ":" + bean));
 
 		anchor = page.getAnchorByName("text");
 		textPage = anchor.click();
@@ -110,7 +109,7 @@ public class JmxWebHandlerTest {
 		form.appendChild(button);
 		// submit the form
 		page = button.click();
-		assertTrue(page.asText().contains("Information about object " + domain + ":" + bean));
+		assertTrue(page.asNormalizedText().contains("Information about object " + domain + ":" + bean));
 
 		form = page.getFormByName("Verbose");
 		assertNotNull(form);
@@ -123,30 +122,31 @@ public class JmxWebHandlerTest {
 		input = form.getInputByValue(operation);
 		page = input.click();
 
-		assertTrue(page.asText().contains("Invoking Operation " + operation));
-		assertTrue(page.asText().contains(operation + " method successfully invoked."));
+		assertTrue(page.asNormalizedText().contains("Invoking Operation " + operation));
+		assertTrue(page.asNormalizedText().contains(operation + " method successfully invoked."));
 
 		anchor = page.getAnchorByName("text");
 		assertNotNull(anchor);
 		textPage = anchor.click();
 		assertEquals(operation + " method successfully invoked.\n", textPage.getContent());
+		webClient.close();
 	}
 
 	@Test(timeout = 10000)
 	public void testOtherStuff() throws Exception {
 		WebClient webClient = new WebClient();
 		HtmlPage page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT);
-		assertTrue(page.asText().contains("Show all beans"));
+		assertTrue(page.asNormalizedText().contains("Show all beans"));
 
 		HtmlAnchor anchor = page.getAnchorByText("Show all beans.");
 		assertNotNull(anchor);
 		page = anchor.click();
-		assertTrue(page.asText().contains("All Beans"));
+		assertTrue(page.asNormalizedText().contains("All Beans"));
 
 		String beanName = "java.lang:type=Memory";
 		anchor = page.getAnchorByText(beanName);
 		page = anchor.click();
-		assertTrue(page.asText().contains("Information about object " + beanName));
+		assertTrue(page.asNormalizedText().contains("Information about object " + beanName));
 
 		try {
 			webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/not-found/");
@@ -156,14 +156,14 @@ public class JmxWebHandlerTest {
 		}
 
 		page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/b/:::::");
-		assertTrue(page.asText(), page.asText().contains("Invalid object name"));
+		assertTrue(page.asNormalizedText(), page.asNormalizedText().contains("Invalid object name"));
 
 		page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/b/hello:name=there");
-		assertTrue(page.asText(), page.asText().contains("Investigating object threw exception"));
+		assertTrue(page.asNormalizedText(), page.asNormalizedText().contains("Investigating object threw exception"));
 
 		beanName = "java.lang:type=Runtime";
 		page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/b/" + beanName);
-		assertTrue(page.asText(), page.asText().contains("Information about object " + beanName));
+		assertTrue(page.asNormalizedText(), page.asNormalizedText().contains("Information about object " + beanName));
 
 		anchor = page.getAnchorByName("text");
 		TextPage textPage = anchor.click();
@@ -171,7 +171,7 @@ public class JmxWebHandlerTest {
 
 		beanName = "java.lang:type=Threading";
 		page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/b/" + beanName);
-		assertTrue(page.asText().contains("Information about object " + beanName));
+		assertTrue(page.asNormalizedText().contains("Information about object " + beanName));
 
 		anchor = page.getAnchorByName("text");
 		textPage = anchor.click();
@@ -181,25 +181,25 @@ public class JmxWebHandlerTest {
 
 		beanName = "java.lang:type=Memory";
 		page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/a/" + beanName);
-		assertTrue(page.asText().contains("Invalid number of parameters"));
+		assertTrue(page.asNormalizedText().contains("Invalid number of parameters"));
 
 		page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/a/" + beanName + "/Verbose");
-		assertTrue(page.asText().contains("No value parameter specified"));
+		assertTrue(page.asNormalizedText().contains("No value parameter specified"));
 
 		page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/a/bad-name/Verbose?val=foo");
-		assertTrue(page.asText().contains("Invalid object name"));
+		assertTrue(page.asNormalizedText().contains("Invalid object name"));
 
 		page = webClient
 				.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/a/not:name=found/Verbose?val=foo");
-		assertTrue(page.asText().contains("Could not get mbean info"));
+		assertTrue(page.asNormalizedText().contains("Could not get mbean info"));
 
 		page = webClient
 				.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/a/" + beanName + "/notFound?val=foo");
-		assertTrue(page.asText().contains("Cannot find attribute"));
+		assertTrue(page.asNormalizedText().contains("Cannot find attribute"));
 
 		page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/a/" + beanName
 				+ "/ObjectPendingFinalizationCount?val=foo");
-		assertTrue(page.asText().contains("Could not set attribute"));
+		assertTrue(page.asNormalizedText().contains("Could not set attribute"));
 
 		textPage = webClient.getPage(
 				"http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/a/" + beanName + "/Verbose?val=false&t=true");
@@ -208,17 +208,17 @@ public class JmxWebHandlerTest {
 		/* invoke errors */
 
 		page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/o/");
-		assertTrue(page.asText().contains("Invalid number of parameters"));
+		assertTrue(page.asNormalizedText().contains("Invalid number of parameters"));
 
 		page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/o/bad-name/gc/");
-		assertTrue(page.asText(), page.asText().contains("Invalid object name"));
+		assertTrue(page.asNormalizedText(), page.asNormalizedText().contains("Invalid object name"));
 
 		page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/o/not:name=found/gc/");
-		assertTrue(page.asText(), page.asText().contains("Could not get mbean info"));
+		assertTrue(page.asNormalizedText(), page.asNormalizedText().contains("Could not get mbean info"));
 
 		page = webClient
 				.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/o/" + beanName + "/not-found/");
-		assertTrue(page.asText(), page.asText().contains("Cannot find operation"));
+		assertTrue(page.asNormalizedText(), page.asNormalizedText().contains("Cannot find operation"));
 
 		textPage = webClient
 				.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/a/bad-name/Verbose?val=foo&t=true");
@@ -228,7 +228,7 @@ public class JmxWebHandlerTest {
 
 		beanName = DOMAIN_NAME + ":name=" + OBJECT_NAME;
 		page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/b/" + beanName);
-		// assertFalse(page.asText(), page.asText().contains("Description"));
+		// assertFalse(page.asNormalizedText(), page.asNormalizedText().contains("Description"));
 
 		textPage =
 				webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/b/" + beanName + "?t=true");
@@ -237,14 +237,14 @@ public class JmxWebHandlerTest {
 		int val = 11232;
 		page = webClient
 				.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/o/" + beanName + "/op?p0=" + val);
-		assertTrue(page.asText(), page.asText().contains("op result is: " + val));
+		assertTrue(page.asNormalizedText(), page.asNormalizedText().contains("op result is: " + val));
 
 		page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/o/" + beanName + "/op?p0=wow");
-		assertTrue(page.asText(), page.asText().contains("NumberFormatException"));
+		assertTrue(page.asNormalizedText(), page.asNormalizedText().contains("NumberFormatException"));
 
 		page = webClient.getPage(
 				"http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/o/" + beanName + "/op?p0=" + OP_PARAM_THROWS);
-		assertTrue(page.asText(), page.asText().contains(OBJECT_NAME + " threw exception"));
+		assertTrue(page.asNormalizedText(), page.asNormalizedText().contains(OBJECT_NAME + " threw exception"));
 
 		textPage = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/s?t=true");
 		assertTrue(textPage.getContent().contains("java.lang:type=Runtime"));
@@ -254,6 +254,8 @@ public class JmxWebHandlerTest {
 
 		textPage = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/?t=true");
 		assertTrue(textPage.getContent().contains("java.lang"));
+
+		webClient.close();
 	}
 
 	@Test

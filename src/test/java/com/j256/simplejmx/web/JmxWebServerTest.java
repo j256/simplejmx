@@ -21,7 +21,6 @@ public class JmxWebServerTest {
 		int port = portCounter.getAndIncrement();
 		JmxWebServer webServer = new JmxWebServer(InetAddress.getByName("localhost"), port);
 		webServer.start();
-		Thread.sleep(1000);
 		try {
 			testServer(port);
 		} finally {
@@ -36,7 +35,6 @@ public class JmxWebServerTest {
 		webServer.setServerAddress(InetAddress.getByName("localhost"));
 		webServer.setServerPort(port);
 		webServer.start();
-		Thread.sleep(1000);
 		try {
 			testServer(port);
 		} finally {
@@ -49,7 +47,6 @@ public class JmxWebServerTest {
 		int port = portCounter.getAndIncrement();
 		JmxWebServer webServer = new JmxWebServer(port);
 		webServer.start();
-		Thread.sleep(1000);
 		try {
 			testServer(port);
 		} finally {
@@ -61,6 +58,7 @@ public class JmxWebServerTest {
 	private void testServer(int port) throws Exception {
 		WebClient webClient = new WebClient();
 		HtmlPage page = webClient.getPage("http://localhost:" + port);
-		assertTrue(page.asText().contains("JMX Domains"));
+		assertTrue(page.asNormalizedText().contains("JMX Domains"));
+		webClient.close();
 	}
 }
