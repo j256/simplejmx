@@ -39,6 +39,7 @@ public class CommandLineJmxClient {
 
 	private static final String HELP_COMMAND = "help";
 	private static final String DEFAULT_PROMPT = "Jmx: ";
+	private static final String CLASSPATH_PREFIX = "classpath:";
 
 	private JmxClient jmxClient;
 
@@ -606,25 +607,19 @@ public class CommandLineJmxClient {
 	}
 
 	private InputStream getInputStream(String filePath) throws IOException {
-		InputStream inputStream;
 		// first we try the classpath
-		if (filePath.startsWith("classpath:")) {
-			String[] paths = filePath.split(":", 2);
-			assert paths.length > 1;
-			inputStream = filePath.getClass().getResourceAsStream(paths[1]);
-			if (inputStream == null) {
-				return null;
-			}
+		if (filePath.startsWith(CLASSPATH_PREFIX)) {
+			String scriptPath = filePath.substring(CLASSPATH_PREFIX.length());
+			return getClass().getResourceAsStream(scriptPath);
 		} else {
 			// otherwise we fall back to the filesystem
 			File inputFile = new File(filePath);
 			if (inputFile.exists()) {
-				inputStream = new FileInputStream(inputFile);
+				return new FileInputStream(inputFile);
 			} else {
 				return null;
 			}
 		}
-		return inputStream;
 	}
 
 	private static interface LineReader {
