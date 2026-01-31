@@ -11,7 +11,7 @@ LOCAL_DIR="$HOME/svn/local/$LIBRARY"
 
 bad=0
 
-git status | head -1 | fgrep master > /dev/null 2>&1
+git status | head -1 | fgrep main > /dev/null 2>&1
 if [ $? -ne 0 ]; then
     /bin/echo "Should be on master branch."
     git status | head -1
