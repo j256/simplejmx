@@ -12,7 +12,7 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
 /**
- * Jetty 9 web handler that implements the {@link JmxWebPublisher} functions to allow the {@link JmxWebService} to
+ * Jetty 9 web handler that implements the {@link JmxWebPublisher} functions to allow the {@link JmxWebHandler} to
  * display web simple JMX web pages.
  * 
  * @author graywatson
