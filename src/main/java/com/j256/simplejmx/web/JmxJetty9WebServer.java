@@ -13,22 +13,23 @@ import org.eclipse.jetty.server.ServerConnector;
  * 
  * @author graywatson
  */
-public class JmxWebServer implements Closeable {
+public class JmxJetty9WebServer implements Closeable {
 
 	private InetAddress serverAddress;
 	private int serverPort;
 	private Server server;
+	private String pathPrefix;
 
-	public JmxWebServer() {
+	public JmxJetty9WebServer() {
 		// for spring
 	}
 
-	public JmxWebServer(InetAddress inetAddress, int serverPort) {
+	public JmxJetty9WebServer(InetAddress inetAddress, int serverPort) {
 		this.serverAddress = inetAddress;
 		this.serverPort = serverPort;
 	}
 
-	public JmxWebServer(int serverPort) {
+	public JmxJetty9WebServer(int serverPort) {
 		this.serverPort = serverPort;
 	}
 
@@ -43,7 +44,7 @@ public class JmxWebServer implements Closeable {
 		}
 		connector.setPort(serverPort);
 		server.addConnector(connector);
-		server.setHandler(new JmxWebHandler());
+		server.setHandler(new Jetty9JmxWebHandler(new JmxWebHandler(), pathPrefix));
 		server.start();
 	}
 
@@ -92,5 +93,12 @@ public class JmxWebServer implements Closeable {
 	 */
 	public void setMaxNumThreads(int maxNumThreads) {
 		// ignored
+	}
+
+	/**
+	 * Prefix to all of the jmx web requests.
+	 */
+	public void setPathPrefix(String pathPrefix) {
+		this.pathPrefix = pathPrefix;
 	}
 }

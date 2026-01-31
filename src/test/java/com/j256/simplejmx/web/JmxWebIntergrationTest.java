@@ -19,7 +19,7 @@ public class JmxWebIntergrationTest {
 	private static final String OBJECT_NAME = "TestBean";
 	private static final int OP_PARAM_THROWS = 1414124;
 
-	private static JmxWebServer webServer;
+	private static JmxJetty9WebServer webServer;
 	private static JmxServer jmxServer;
 	private static final TestBean testBean = new TestBean();
 
@@ -31,7 +31,7 @@ public class JmxWebIntergrationTest {
 		jmxServer = new JmxServer(9113);
 		jmxServer.start();
 		jmxServer.register(testBean);
-		webServer = new JmxWebServer(InetAddress.getByName(WEB_SERVER_NAME), WEB_SERVER_PORT);
+		webServer = new JmxJetty9WebServer(InetAddress.getByName(WEB_SERVER_NAME), WEB_SERVER_PORT);
 		webServer.start();
 		System.out.println("Web server running on port: " + WEB_SERVER_PORT);
 		Thread.sleep(3600000);

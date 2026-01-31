@@ -9,50 +9,50 @@ public class ClientUtilsTest {
 
 	@Test
 	public void testStringToParam() {
-		assertEquals(true, ClientUtils.stringToParam("true", "boolean"));
-		assertEquals(true, ClientUtils.stringToParam("true", "java.lang.Boolean"));
-		assertEquals('i', ClientUtils.stringToParam("i", "char"));
-		assertEquals('i', ClientUtils.stringToParam("i", "java.lang.Character"));
-		assertEquals('\0', ClientUtils.stringToParam("", "char"));
-		assertEquals((byte) 1, ClientUtils.stringToParam("1", "byte"));
-		assertEquals((byte) 2, ClientUtils.stringToParam("2", "java.lang.Byte"));
-		assertEquals((short) 1, ClientUtils.stringToParam("1", "short"));
-		assertEquals((short) 2, ClientUtils.stringToParam("2", "java.lang.Short"));
-		assertEquals((int) 1, ClientUtils.stringToParam("1", "int"));
-		assertEquals((int) 2, ClientUtils.stringToParam("2", "java.lang.Integer"));
-		assertEquals((long) 1, ClientUtils.stringToParam("1", "long"));
-		assertEquals((long) 2, ClientUtils.stringToParam("2", "java.lang.Long"));
-		assertEquals((float) 1, ClientUtils.stringToParam("1", "float"));
-		assertEquals((float) 2, ClientUtils.stringToParam("2", "java.lang.Float"));
-		assertEquals((double) 1, ClientUtils.stringToParam("1", "double"));
-		assertEquals((double) 2, ClientUtils.stringToParam("2", "java.lang.Double"));
-		assertEquals("2", ClientUtils.stringToParam("2", "java.lang.String"));
+		assertEquals(true, ClientUtils.valueToParam("true", "boolean"));
+		assertEquals(true, ClientUtils.valueToParam("true", "java.lang.Boolean"));
+		assertEquals('i', ClientUtils.valueToParam("i", "char"));
+		assertEquals('i', ClientUtils.valueToParam("i", "java.lang.Character"));
+		assertEquals('\0', ClientUtils.valueToParam("", "char"));
+		assertEquals((byte) 1, ClientUtils.valueToParam("1", "byte"));
+		assertEquals((byte) 2, ClientUtils.valueToParam("2", "java.lang.Byte"));
+		assertEquals((short) 1, ClientUtils.valueToParam("1", "short"));
+		assertEquals((short) 2, ClientUtils.valueToParam("2", "java.lang.Short"));
+		assertEquals((int) 1, ClientUtils.valueToParam("1", "int"));
+		assertEquals((int) 2, ClientUtils.valueToParam("2", "java.lang.Integer"));
+		assertEquals((long) 1, ClientUtils.valueToParam("1", "long"));
+		assertEquals((long) 2, ClientUtils.valueToParam("2", "java.lang.Long"));
+		assertEquals((float) 1, ClientUtils.valueToParam("1", "float"));
+		assertEquals((float) 2, ClientUtils.valueToParam("2", "java.lang.Float"));
+		assertEquals((double) 1, ClientUtils.valueToParam("1", "double"));
+		assertEquals((double) 2, ClientUtils.valueToParam("2", "java.lang.Double"));
+		assertEquals("2", ClientUtils.valueToParam("2", "java.lang.String"));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testPrivateConstructor() {
-		ClientUtils.stringToParam("2", PrivateConstructor.class.getName());
+		ClientUtils.valueToParam("2", PrivateConstructor.class.getName());
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testNoStringConstructor() {
-		ClientUtils.stringToParam("2", NoStringConstructor.class.getName());
+		ClientUtils.valueToParam("2", NoStringConstructor.class.getName());
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testConstructorThrows() {
-		ClientUtils.stringToParam("2", ConstructorThrows.class.getName());
+		ClientUtils.valueToParam("2", ConstructorThrows.class.getName());
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testUnknownClass() {
-		ClientUtils.stringToParam("2", "unknown-class");
+		ClientUtils.valueToParam("2", "unknown-class");
 	}
 
 	@Test
 	public void testStringConstructor() {
 		String str = "fpoewjfpewfjw";
-		StringConstructor obj = (StringConstructor) ClientUtils.stringToParam(str, StringConstructor.class.getName());
+		StringConstructor obj = (StringConstructor) ClientUtils.valueToParam(str, StringConstructor.class.getName());
 		assertEquals(str, obj.val);
 	}
 

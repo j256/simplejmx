@@ -11,36 +11,39 @@ import java.lang.reflect.Constructor;
 public class ClientUtils {
 
 	/**
-	 * Convert a string to an object based on the type string.
+	 * Convert a value string to an object based on the type string.
 	 */
-	public static Object stringToParam(String string, String typeString) throws IllegalArgumentException {
+	public static Object valueToParam(String value, String typeString) throws IllegalArgumentException {
+		if (value == null) {
+			return null;
+		}
 		if (typeString.equals("boolean") || typeString.equals("java.lang.Boolean")) {
-			return Boolean.parseBoolean(string);
+			return Boolean.parseBoolean(value);
 		} else if (typeString.equals("char") || typeString.equals("java.lang.Character")) {
-			if (string.length() == 0) {
+			if (value.length() == 0) {
 				// not sure what to do here
 				return '\0';
 			} else {
-				return string.toCharArray()[0];
+				return value.toCharArray()[0];
 			}
 		} else if (typeString.equals("byte") || typeString.equals("java.lang.Byte")) {
-			return Byte.parseByte(string);
+			return Byte.parseByte(value);
 		} else if (typeString.equals("short") || typeString.equals("java.lang.Short")) {
-			return Short.parseShort(string);
+			return Short.parseShort(value);
 		} else if (typeString.equals("int") || typeString.equals("java.lang.Integer")) {
-			return Integer.parseInt(string);
+			return Integer.parseInt(value);
 		} else if (typeString.equals("long") || typeString.equals("java.lang.Long")) {
-			return Long.parseLong(string);
+			return Long.parseLong(value);
 		} else if (typeString.equals("java.lang.String")) {
-			return string;
+			return value;
 		} else if (typeString.equals("float") || typeString.equals("java.lang.Float")) {
-			return Float.parseFloat(string);
+			return Float.parseFloat(value);
 		} else if (typeString.equals("double") || typeString.equals("java.lang.Double")) {
-			return Double.parseDouble(string);
+			return Double.parseDouble(value);
 		} else {
 			Constructor<?> constr = getConstructor(typeString);
 			try {
-				return constr.newInstance(new Object[] { string });
+				return constr.newInstance(new Object[] { value });
 			} catch (Exception e) {
 				throw new IllegalArgumentException(
 						"Could not get new instance using string constructor for type " + typeString);

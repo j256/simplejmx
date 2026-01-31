@@ -10,7 +10,7 @@ import org.junit.Test;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
-public class JmxWebServerTest {
+public class JmxJetty9WebServerTest {
 
 	private static final int WEB_SERVER_PORT = 8081;
 
@@ -19,7 +19,7 @@ public class JmxWebServerTest {
 	@Test(timeout = 10000)
 	public void testBasic() throws Exception {
 		int port = portCounter.getAndIncrement();
-		JmxWebServer webServer = new JmxWebServer(InetAddress.getByName("localhost"), port);
+		JmxJetty9WebServer webServer = new JmxJetty9WebServer(InetAddress.getByName("localhost"), port);
 		webServer.start();
 		try {
 			testServer(port);
@@ -31,7 +31,7 @@ public class JmxWebServerTest {
 	@Test(timeout = 10000)
 	public void testSpring() throws Exception {
 		int port = portCounter.getAndIncrement();
-		JmxWebServer webServer = new JmxWebServer();
+		JmxJetty9WebServer webServer = new JmxJetty9WebServer();
 		webServer.setServerAddress(InetAddress.getByName("localhost"));
 		webServer.setServerPort(port);
 		webServer.start();
@@ -45,7 +45,7 @@ public class JmxWebServerTest {
 	@Test(timeout = 10000)
 	public void testCoverage() throws Exception {
 		int port = portCounter.getAndIncrement();
-		JmxWebServer webServer = new JmxWebServer(port);
+		JmxJetty9WebServer webServer = new JmxJetty9WebServer(port);
 		webServer.start();
 		try {
 			testServer(port);

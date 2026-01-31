@@ -127,13 +127,11 @@
 							<goal>jar</goal>
 						</goals>
 						<configuration>
-							<showPackage>false</showPackage>
 							<additionalparam>-tag inheritDoc:X -Xdoclint:none</additionalparam>
 						</configuration>
 					</execution>
 				</executions>
 				<configuration>
-					<showPackage>false</showPackage>
 					<bottom>
 						This documentation content is licensed by Gray Watson under the
 						&lt;a
