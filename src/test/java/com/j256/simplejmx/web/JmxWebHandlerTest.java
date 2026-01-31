@@ -9,17 +9,10 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.InetAddress;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.easymock.EasyMock;
-import org.eclipse.jetty.server.HttpChannel;
-import org.eclipse.jetty.server.HttpInput;
-import org.eclipse.jetty.server.Request;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -46,7 +39,7 @@ public class JmxWebHandlerTest {
 	private static final String OBJECT_NAME = "TestBean";
 	private static final int OP_PARAM_THROWS = 1414124;
 
-	private static JmxWebServer webServer;
+	private static JmxJetty9WebServer webServer;
 	private static JmxServer jmxServer;
 	private static final TestBean testBean = new TestBean();
 
@@ -55,7 +48,7 @@ public class JmxWebHandlerTest {
 		jmxServer = new JmxServer(9113);
 		jmxServer.start();
 		jmxServer.register(testBean);
-		webServer = new JmxWebServer(InetAddress.getByName(WEB_SERVER_NAME), WEB_SERVER_PORT);
+		webServer = new JmxJetty9WebServer(InetAddress.getByName(WEB_SERVER_NAME), WEB_SERVER_PORT);
 		webServer.start();
 	}
 
@@ -261,36 +254,15 @@ public class JmxWebHandlerTest {
 	@Test
 	public void coverage() throws IOException {
 		JmxWebHandler handler = new JmxWebHandler();
-		HttpServletRequest servletRequest = EasyMock.createMock(HttpServletRequest.class);
-		HttpServletResponse servletResponse = EasyMock.createMock(HttpServletResponse.class);
-		HttpChannel httpChannel = EasyMock.createMock(HttpChannel.class);
-		HttpInput httpInput = EasyMock.createMock(HttpInput.class);
+		JmxWebPublisher webPublisher = EasyMock.createMock(JmxWebPublisher.class);
 
-		ServletOutputStream outputStream = new ServletOutputStream() {
-			@Override
-			public void write(int b) {
-				// no-op
-			}
+		expect(webPublisher.getRequestPathInfo()).andReturn(null);
+		expect(webPublisher.getRequestQueryParameter("t")).andReturn(null);
+		webPublisher.setResponseContentType("text/html");
 
-			@Override
-			public boolean isReady() {
-				return true;
-			}
-
-			@Override
-			public void setWriteListener(WriteListener writeListener) {
-				// no-op
-			}
-		};
-		expect(servletResponse.getOutputStream()).andReturn(outputStream);
-		servletResponse.setContentType("text/html");
-		expect(servletRequest.getPathInfo()).andReturn(null);
-		expect(servletRequest.getParameter("t")).andReturn(null);
-
-		replay(servletRequest, servletResponse);
-		Request request = new Request(httpChannel, httpInput);
-		handler.handle(null, request, servletRequest, servletResponse);
-		verify(servletRequest, servletResponse);
+		replay(webPublisher);
+		handler.handle(webPublisher, new StringWriter(), null);
+		verify(webPublisher);
 	}
 
 	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)

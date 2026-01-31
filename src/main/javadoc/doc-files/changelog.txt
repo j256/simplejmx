@@ -1,3 +1,6 @@
+2.3: 1/13/2026
+	* Refactored the web-server stuff to better support any version of Jetty or another web-server.
+
 2.2: 3/4/2023
 	* Upgraded to HtmlUnit 2.70.0 for security reasons.
 

@@ -364,7 +364,7 @@ public class JmxClient implements Closeable {
 		if (info == null) {
 			throw new IllegalArgumentException("Cannot find attribute named '" + attrName + "'");
 		} else {
-			setAttribute(name, attrName, ClientUtils.stringToParam(value, info.getType()));
+			setAttribute(name, attrName, ClientUtils.valueToParam(value, info.getType()));
 		}
 	}
 
@@ -426,7 +426,7 @@ public class JmxClient implements Closeable {
 		} else {
 			paramObjs = new Object[paramStrings.length];
 			for (int i = 0; i < paramStrings.length; i++) {
-				paramObjs[i] = ClientUtils.stringToParam(paramStrings[i], paramTypes[i]);
+				paramObjs[i] = ClientUtils.valueToParam(paramStrings[i], paramTypes[i]);
 			}
 		}
 		return invokeOperation(name, operName, paramTypes, paramObjs);

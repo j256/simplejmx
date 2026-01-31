@@ -5,10 +5,10 @@ import com.j256.simplejmx.common.JmxAttributeMethod;
 import com.j256.simplejmx.common.JmxOperation;
 import com.j256.simplejmx.common.JmxResource;
 import com.j256.simplejmx.server.JmxServer;
-import com.j256.simplejmx.web.JmxWebServer;
+import com.j256.simplejmx.web.JmxJetty9WebServer;
 
 /**
- * Example program which uses the {@link JmxWebServer} which publishes the beans over JMX _and_ over a simple web
+ * Example program which uses the {@link JmxJetty9WebServer} which publishes the beans over JMX _and_ over a simple web
  * interface.
  * 
  * <p>
@@ -36,7 +36,7 @@ public class WebServerExample {
 		jmxServer.register(counter);
 
 		// create a web server publisher listening on a specific port
-		JmxWebServer jmxWebServer = new JmxWebServer(WEB_PORT);
+		JmxJetty9WebServer jmxWebServer = new JmxJetty9WebServer(WEB_PORT);
 		jmxWebServer.start();
 
 		try {
