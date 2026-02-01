@@ -1,3 +1,6 @@
+3.2: ?/?/2026
+	* Fixed use of the pathPrefix in the web handler code.
+
 3.1: 2/1/2026
 	* Moved the major version because of the JDK change.  Sorry for the 2.3 release.
 

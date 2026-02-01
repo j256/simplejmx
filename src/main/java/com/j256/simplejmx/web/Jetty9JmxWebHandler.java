@@ -32,6 +32,7 @@ public class Jetty9JmxWebHandler extends AbstractHandler implements JmxWebPublis
 
 	public Jetty9JmxWebHandler(JmxWebHandler webHandler, String pathPrefix) {
 		this.webHandler = webHandler;
+		this.pathPrefix = pathPrefix;
 	}
 
 	@Override

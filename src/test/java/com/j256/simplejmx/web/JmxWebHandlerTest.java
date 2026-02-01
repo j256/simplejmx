@@ -37,7 +37,6 @@ public class JmxWebHandlerTest {
 	private static final String WEB_SERVER_NAME = "127.0.0.1";
 	private static final String DOMAIN_NAME = "j256.com";
 	private static final String OBJECT_NAME = "TestBean";
-	private static final int OP_PARAM_THROWS = 1414124;
 
 	private static JmxJetty9WebServer webServer;
 	private static JmxServer jmxServer;
@@ -49,7 +48,9 @@ public class JmxWebHandlerTest {
 		jmxServer.start();
 		jmxServer.register(testBean);
 		webServer = new JmxJetty9WebServer(InetAddress.getByName(WEB_SERVER_NAME), WEB_SERVER_PORT);
+		webServer.setPathPrefix("/jmx");
 		webServer.start();
+		// Thread.sleep(100000);
 	}
 
 	@AfterClass
@@ -228,15 +229,16 @@ public class JmxWebHandlerTest {
 		assertTrue(textPage.getContent().contains("noread=not readable"));
 
 		int val = 11232;
-		page = webClient
-				.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/o/" + beanName + "/op?p0=" + val);
-		assertTrue(page.asNormalizedText(), page.asNormalizedText().contains("op result is: " + val));
-
-		page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/o/" + beanName + "/op?p0=wow");
-		assertTrue(page.asNormalizedText(), page.asNormalizedText().contains("NumberFormatException"));
+		page = webClient.getPage(
+				"http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/o/" + beanName + "/assignValue?p0=" + val);
+		assertTrue(page.asNormalizedText(), page.asNormalizedText().contains("assignValue result is: " + val));
 
 		page = webClient.getPage(
-				"http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/o/" + beanName + "/op?p0=" + OP_PARAM_THROWS);
+				"http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/o/" + beanName + "/assignValue?p0=wow");
+		assertTrue(page.asNormalizedText(), page.asNormalizedText().contains("NumberFormatException"));
+
+		page = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/o/" + beanName
+				+ "/assignValue?p0=" + TestBean.OP_PARAM_THROWS);
 		assertTrue(page.asNormalizedText(), page.asNormalizedText().contains(OBJECT_NAME + " threw exception"));
 
 		textPage = webClient.getPage("http://" + WEB_SERVER_NAME + ":" + WEB_SERVER_PORT + "/s?t=true");
@@ -267,6 +269,12 @@ public class JmxWebHandlerTest {
 
 	@JmxResource(domainName = DOMAIN_NAME, beanName = OBJECT_NAME)
 	public static class TestBean {
+
+		public static final int OP_PARAM_THROWS = 1414124;
+
+		@JmxAttributeField
+		public int value = 10;
+
 		@JmxAttributeField(isReadible = false)
 		int noread;
 
@@ -275,12 +283,13 @@ public class JmxWebHandlerTest {
 			throw new RuntimeException();
 		}
 
-		@JmxOperation
-		public String op(int foo) {
-			if (foo == OP_PARAM_THROWS) {
-				throw new RuntimeException();
+		@JmxOperation(parameterNames = { "value" }, parameterDescriptions = { "integer value" })
+		public String assignValue(int value) {
+			if (value == OP_PARAM_THROWS) {
+				throw new RuntimeException("used special value " + OP_PARAM_THROWS);
 			} else {
-				return Integer.toString(foo);
+				this.value = value;
+				return Integer.toString(value);
 			}
 		}
 	}

@@ -83,10 +83,11 @@ public class JmxWebHandler {
 		String pathInfo = webPublisher.getRequestPathInfo();
 		if (pathInfo == null) {
 			pathInfo = "";
-		} else if (pathInfo.length() > 0 && pathInfo.charAt(0) == '/') {
-			pathInfo = pathInfo.substring(1);
 		} else if (pathInfo.startsWith(pathPrefix)) {
 			pathInfo = pathInfo.substring(pathPrefix.length());
+		}
+		if (pathInfo.length() > 0 && pathInfo.charAt(0) == '/') {
+			pathInfo = pathInfo.substring(1);
 		}
 
 		boolean textOnly = (webPublisher.getRequestQueryParameter(PARAM_TEXT_ONLY) != null);
@@ -105,12 +106,12 @@ public class JmxWebHandler {
 				listDomains(writer, pathPrefix, textOnly);
 				if (!textOnly) {
 					writer.append("<br />\n");
-					appendLink(writer, textOnly, '/' + COMMAND_SHOW_ALL_BEANS, "all", null, "Show all beans.",
-							pathPrefix);
+					appendLink(writer, textOnly, pathPrefix + '/' + COMMAND_SHOW_ALL_BEANS, "all", null,
+							"Show all beans.");
 					writer.append("  ");
 				}
 			}
-			appendFooter(writer, pathPrefix, textOnly);
+			appendFooter(writer, textOnly);
 			return;
 		}
 
@@ -120,18 +121,18 @@ public class JmxWebHandler {
 		if (command.equals(COMMAND_LIST_BEANS_IN_DOMAIN)) {
 			appendHeader(writer, textOnly);
 			listBeansInDomain(writer, pathPrefix, textOnly, pathInfo);
-			appendFooter(writer, pathPrefix, textOnly);
+			appendFooter(writer, textOnly);
 		} else if (command.equals(COMMAND_SHOW_BEAN)) {
 			appendHeader(writer, textOnly);
 			showBean(writer, pathPrefix, textOnly, pathInfo);
-			appendFooter(writer, pathPrefix, textOnly);
+			appendFooter(writer, textOnly);
 		} else if (command.equals(COMMAND_ASSIGN_ATTRIBUTE)) {
 			// this may redirect
 			assignAttribute(webPublisher, writer, pathPrefix, textOnly, pathInfo);
 		} else if (command.equals(COMMAND_INVOKE_OPERATION)) {
 			appendHeader(writer, textOnly);
 			invokeOperation(webPublisher, writer, pathPrefix, textOnly, pathInfo);
-			appendFooter(writer, pathPrefix, textOnly);
+			appendFooter(writer, textOnly);
 		} else {
 			webPublisher.setResponseStatusCode(404 /* not found */);
 		}
@@ -147,8 +148,9 @@ public class JmxWebHandler {
 		}
 		Collections.sort(domainNames);
 		for (String domainName : domainNames) {
-			appendLink(writer, textOnly, '/' + COMMAND_LIST_BEANS_IN_DOMAIN + '/' + makeHtmlSafe(domainName), "beans",
-					null, domainName, pathPrefix);
+			appendLink(writer, textOnly,
+					pathPrefix + '/' + COMMAND_LIST_BEANS_IN_DOMAIN + '/' + makeHtmlSafe(domainName), "beans", null,
+					domainName);
 			appendLine(writer, textOnly, null);
 		}
 	}
@@ -191,8 +193,8 @@ public class JmxWebHandler {
 					// if we are looking at a domain name, remove it from the displayed beans
 					display = nameString.substring(domainName.length() + 1, nameString.length());
 				}
-				appendLink(writer, textOnly, '/' + COMMAND_SHOW_BEAN + '/' + makeHtmlSafe(nameString), nameString,
-						description, display, pathPrefix);
+				appendLink(writer, textOnly, pathPrefix + '/' + COMMAND_SHOW_BEAN + '/' + makeHtmlSafe(nameString),
+						nameString, description, display);
 				appendLine(writer, textOnly, null);
 			}
 		}
@@ -221,13 +223,13 @@ public class JmxWebHandler {
 			writer.append("<h1> Information about object " + makeHtmlSafe(objectNameString) + " </h1>\n");
 			displayClassInfo(writer, mbeanInfo);
 		}
-		displayAttributes(writer, textOnly, objectName, mbeanInfo);
-		displayOperations(writer, textOnly, objectName, mbeanInfo);
+		displayAttributes(writer, pathPrefix, textOnly, objectName, mbeanInfo);
+		displayOperations(writer, pathPrefix, textOnly, objectName, mbeanInfo);
 		appendBackToDomains(writer, pathPrefix, textOnly, objectName);
 	}
 
-	private void displayAttributes(Writer writer, boolean textOnly, ObjectName objectName, MBeanInfo mbeanInfo)
-			throws IOException {
+	private void displayAttributes(Writer writer, String pathPrefix, boolean textOnly, ObjectName objectName,
+			MBeanInfo mbeanInfo) throws IOException {
 		if (!textOnly) {
 			writer.append("<table cellpadding='3' cellspacing='1' border='3'>\n");
 			writer.append("<tr><th colspan='3'> Attributes: </th></tr>\n");
@@ -253,8 +255,9 @@ public class JmxWebHandler {
 			writer.append("<tr><td title='" + makeHtmlSafe(attribute.getDescription()) + "'> " + name + " </td>");
 			writer.append("<td> " + ClientUtils.displayType(attribute.getType(), value) + " </td>");
 			if (attribute.isWritable()) {
-				writer.append("\n<form action='/" + COMMAND_ASSIGN_ATTRIBUTE + "/" + makeHtmlSafe(objectName.toString())
-						+ "/" + makeHtmlSafe(name) + "' name='" + makeHtmlSafe(name) + "'>\n");
+				writer.append("\n<form action='" + pathPrefix + '/' + COMMAND_ASSIGN_ATTRIBUTE + "/"
+						+ makeHtmlSafe(objectName.toString()) + "/" + makeHtmlSafe(name) + "' name='"
+						+ makeHtmlSafe(name) + "'>\n");
 				writer.append("<td>");
 				writer.append(
 						"<input name='" + PARAM_ATTRIBUTE_VALUE + "' value='" + makeHtmlSafe(valueString) + "' />");
@@ -271,8 +274,8 @@ public class JmxWebHandler {
 		}
 	}
 
-	private void displayOperations(Writer writer, boolean textOnly, ObjectName objectName, MBeanInfo mbeanInfo)
-			throws IOException {
+	private void displayOperations(Writer writer, String pathPrefix, boolean textOnly, ObjectName objectName,
+			MBeanInfo mbeanInfo) throws IOException {
 		int maxParams = 1;
 		boolean noOperations = true;
 		for (MBeanOperationInfo operation : mbeanInfo.getOperations()) {
@@ -307,8 +310,9 @@ public class JmxWebHandler {
 				writer.append(name);
 			} else {
 				writer.append("<tr>\n");
-				writer.append("<form action='/" + COMMAND_INVOKE_OPERATION + "/" + makeHtmlSafe(objectName.toString())
-						+ "/" + makeHtmlSafe(name) + "' name='" + makeHtmlSafe(name) + "'>\n");
+				writer.append("<form action='" + pathPrefix + '/' + COMMAND_INVOKE_OPERATION + "/"
+						+ makeHtmlSafe(objectName.toString()) + "/" + makeHtmlSafe(name) + "' name='"
+						+ makeHtmlSafe(name) + "'>\n");
 				writer.append("<td title='" + makeHtmlSafe(operation.getDescription()) + "'> " + makeHtmlSafe(name)
 						+ " </td>");
 				writer.append("<td> " + ClientUtils.displayType(operation.getReturnType(), null) + " </td>");
@@ -408,7 +412,7 @@ public class JmxWebHandler {
 		}
 		appendLine(writer, textOnly, message);
 		appendBackToRoot(writer, pathPrefix, textOnly);
-		appendFooter(writer, pathPrefix, textOnly);
+		appendFooter(writer, textOnly);
 	}
 
 	private void invokeOperation(JmxWebPublisher webPublisher, Writer writer, String pathPrefix, boolean textOnly,
@@ -514,12 +518,11 @@ public class JmxWebHandler {
 		}
 	}
 
-	private void appendFooter(Writer writer, String pathPrefix, boolean textOnly) throws IOException {
+	private void appendFooter(Writer writer, boolean textOnly) throws IOException {
 		if (!textOnly) {
-			appendLink(writer, false, "?t=1", "text", null, "Text version", pathPrefix);
+			appendLink(writer, false, "?t=1", "text", null, "Text version");
 			writer.append(".  Produced by ");
-			appendLink(writer, false, "https://256stuff.com/sources/simplejmx/", "simplejmx", null, "SimpleJMX",
-					pathPrefix);
+			appendLink(writer, false, "https://256stuff.com/sources/simplejmx/", "simplejmx", null, "SimpleJMX");
 			appendLine(writer, false, null);
 			writer.append("</body></html>\n");
 		}
@@ -529,8 +532,8 @@ public class JmxWebHandler {
 			ObjectName objectName) throws IOException {
 		if (!textOnly) {
 			writer.append("<br />\n");
-			appendLink(writer, false, '/' + COMMAND_SHOW_BEAN + '/' + objectName.toString(), "bean", null,
-					"Back to bean information", pathPrefix);
+			appendLink(writer, false, pathPrefix + '/' + COMMAND_SHOW_BEAN + '/' + objectName.toString(), "bean", null,
+					"Back to bean information");
 			writer.append("<br />\n");
 		}
 	}
@@ -538,7 +541,7 @@ public class JmxWebHandler {
 	private void appendBackToRoot(Writer writer, String pathPrefix, boolean textOnly) throws IOException {
 		if (!textOnly) {
 			writer.append("<br />\n");
-			appendLink(writer, false, "/", "root", null, "Back to root", pathPrefix);
+			appendLink(writer, false, pathPrefix + "/", "root", null, "Back to root");
 			writer.append("<br />\n");
 		}
 	}
@@ -547,20 +550,16 @@ public class JmxWebHandler {
 			throws IOException {
 		if (!textOnly) {
 			writer.append("<br />\n");
-			appendLink(writer, false, '/' + COMMAND_LIST_BEANS_IN_DOMAIN + '/' + objectName.getDomain(), "beans", null,
-					"Back to beans in domain", pathPrefix);
+			appendLink(writer, false, pathPrefix + '/' + COMMAND_LIST_BEANS_IN_DOMAIN + '/' + objectName.getDomain(),
+					"beans", null, "Back to beans in domain");
 			writer.append("<br />\n");
 		}
 	}
 
-	private void appendLink(Writer writer, boolean textOnly, String url, String name, String title, String text,
-			String pathPrefix) throws IOException {
+	private void appendLink(Writer writer, boolean textOnly, String url, String name, String title, String text)
+			throws IOException {
 		if (!textOnly) {
-			writer.append("<a href='");
-			if (!url.startsWith("https:")) {
-				writer.append(pathPrefix);
-			}
-			writer.append(url).append("' ");
+			writer.append("<a href='").append(url).append("' ");
 			if (name != null) {
 				writer.append("name='").append(makeHtmlSafe(name)).append("' ");
 			}
