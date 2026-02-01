@@ -5,10 +5,9 @@ import static org.junit.Assert.assertTrue;
 import java.net.InetAddress;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.htmlunit.WebClient;
+import org.htmlunit.html.HtmlPage;
 import org.junit.Test;
-
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 public class JmxJetty9WebServerTest {
 

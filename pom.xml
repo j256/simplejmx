@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
 	<!-- simplejmx pom configuration file for maven -->
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.j256.simplejmx</groupId>
@@ -8,7 +10,8 @@
 	<packaging>jar</packaging>
 	<name>Simple JMX</name>
 	<url>https://256stuff.com/sources/simplejmx/</url>
-	<description>Simple JMX package for Java that helps publishing of objects using JMX.</description>
+	<description>Simple JMX package for Java that helps publishing of objects
+		using JMX.</description>
 	<licenses>
 		<license>
 			<name>ISC License</name>
@@ -28,7 +31,7 @@
 		<!-- test dependency versions -->
 		<easymock-version>3.4</easymock-version>
 		<junit-version>4.13.2</junit-version>
-		<htmlunit-version>2.70.0</htmlunit-version>
+		<htmlunit-version>4.21.0</htmlunit-version>
 	</properties>
 	<scm>
 		<url>https://github.com/j256/simplejmx</url>
@@ -56,12 +59,14 @@
 				<repository>
 					<id>sonatype-nexus-staging</id>
 					<name>Nexus Release Repository</name>
-					<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+					<url>
+						https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 				</repository>
 				<snapshotRepository>
 					<id>sonatype-nexus-snapshots</id>
 					<name>Sonatype Nexus Snapshots</name>
-					<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+					<url>
+						https://oss.sonatype.org/content/repositories/snapshots/</url>
 				</snapshotRepository>
 			</distributionManagement>
 		</profile>
@@ -133,9 +138,12 @@
 				</executions>
 				<configuration>
 					<bottom>
-						This documentation content is licensed by Gray Watson under the
+						This documentation content is licensed by Gray Watson
+						under the
 						&lt;a
-						href="https://creativecommons.org/licenses/by-sa/3.0/" &gt;Creative Commons Attribution-Share Alike 3.0 License.
+						href="https://creativecommons.org/licenses/by-sa/3.0/"
+						&gt;Creative Commons Attribution-Share Alike 3.0
+						License.
 						&lt;/a&gt; </bottom>
 					<additionalparam>-tag inheritDoc:X -Xdoclint:none</additionalparam>
 					<excludePackageNames>
@@ -189,7 +197,8 @@
 					</execution>
 				</executions>
 				<configuration>
-					<!-- j256 Releases (Code releases for j256.com) <j256@256stuff.com> -->
+					<!-- j256 Releases (Code releases for j256.com)
+					<j256@256stuff.com> -->
 					<keyname>D3412AC1</keyname>
 				</configuration>
 			</plugin>
@@ -289,7 +298,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>net.sourceforge.htmlunit</groupId>
+			<groupId>org.htmlunit</groupId>
 			<artifactId>htmlunit</artifactId>
 			<version>${htmlunit-version}</version>
 			<scope>test</scope>
