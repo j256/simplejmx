@@ -13,7 +13,7 @@ bad=0
 
 git status | head -1 | fgrep main > /dev/null 2>&1
 if [ $? -ne 0 ]; then
-    /bin/echo "Should be on master branch."
+    /bin/echo "Should be on main branch."
     git status | head -1
     bad=1
 fi
@@ -30,15 +30,6 @@ git status | grep 'nothing to commit'
 if [ $? -ne 0 ]; then
     /bin/echo "Files not checked-in"
     git status
-    bad=1
-fi
-
-#############################################################
-# check maven settings
-
-grep sonatype-nexus-snapshots $HOME/.m2/settings.xml > /dev/null 2>&1
-if [ $? -ne 0 ]; then
-    /bin/echo "Can't find sonatype info in the maven settings.xml file"
     bad=1
 fi
 
@@ -121,10 +112,10 @@ git push --delete origin $tag 2> /dev/null
 read cont
 if [ "$cont" = "" -o "$cont" = "y" ]; then
     cd $LOCAL_DIR
-    mvn -P st release:clean || exit 1
-    mvn -P st release:prepare || ( /bin/echo "Maybe use mvn release:rollback to rollback"; exit 1 )
-    mvn -P st release:perform || ( /bin/echo "Maybe use mvn release:rollback to rollback"; exit 1 )
-
+    mvn release:clean || exit 1
+    mvn release:prepare || ( /bin/echo "Maybe use mvn release:rollback to rollback"; exit 1 )
+    mvn release:perform || ( /bin/echo "Maybe use mvn release:rollback to rollback"; exit 1 )
+    # mvn deplot || ( /bin/echo "Maybe use mvn release:rollback to rollback"; exit 1 )
     /bin/echo ""
     /bin/echo ""
 fi

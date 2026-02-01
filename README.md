@@ -83,7 +83,7 @@ Maven packages are published via [![Maven Central](https://maven-badges.herokuap
 <dependency>
 	<groupId>com.j256.simplejmx</groupId>
 	<artifactId>simplejmx</artifactId>
-	<version>2.3</version>
+	<version>3.1</version>
 </dependency>
 ```
 
