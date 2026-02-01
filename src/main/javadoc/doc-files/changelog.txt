@@ -4,7 +4,7 @@
 2.3: 1/31/2026
 	* Refactored the web-server stuff to better support any version of Jetty or another web-server.
 	* Forced to move to Java 8 JDK because my local JDK can't produce 7 targets.  Grumble.
-	* This should have bveen version 3.0.
+	* This should have been version 3.0.
 
 2.2: 3/4/2023
 	* Upgraded to HtmlUnit 2.70.0 for security reasons.
