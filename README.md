@@ -77,7 +77,7 @@ Other methods can be annotated with `@JmxOperation` to expose them as operations
 
 # Maven Configuration
 
-Maven packages are published via [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.j256.simplejmx/simplejmx/badge.svg?style=flat-square)](https://mvnrepository.com/artifact/com.j256.simplejmx/simplejmx/latest)
+Maven packages are published via [![Maven Central](https://img.shields.io/maven-central/v/com.j256.simplejmx/simplejmx.svg?style=flat-square)](https://mvnrepository.com/artifact/com.j256.simplejmx/simplejmx/latest)
 
 ``` xml
 <dependency>
