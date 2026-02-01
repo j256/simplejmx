@@ -6,7 +6,7 @@ This package provides some Java classes to help with the publishing of objects u
 * For more information, visit the [SimpleJMX home page](http://256stuff.com/sources/simplejmx/).
 * Online documentation can be found on the home page.  Here are the [SimpleJMX Javadocs](http://256stuff.com/sources/simplejmx/javadoc/simplejmx/).
 * Code available from the [git repository](https://github.com/j256/simplejmx).  [![CircleCI](https://circleci.com/gh/j256/simplejmx.svg?style=svg)](https://circleci.com/gh/j256/simplejmx) [![CodeCov](https://img.shields.io/codecov/c/github/j256/simplejmx.svg)](https://codecov.io/github/j256/simplejmx/)
-* Maven packages are published via [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.j256.simplejmx/simplejmx/badge.svg?style=flat-square)](https://mvnrepository.com/artifact/com.j256.simplejmx/simplejmx/latest) [![javadoc](https://javadoc.io/badge2/com.j256.simplejmx/simplejmx/javadoc.svg)](https://javadoc.io/doc/com.j256.simplejmx/simplejmx)
+* Maven packages are published via [![Maven Central](https://img.shields.io/maven-central/v/com.j256.simplejmx/simplejmx.svg?style=flat-square)](https://mvnrepository.com/artifact/com.j256.simplejmx/simplejmx/latest) [![javadoc](https://javadoc.io/badge2/com.j256.simplejmx/simplejmx/javadoc.svg)](https://javadoc.io/doc/com.j256.simplejmx/simplejmx)
 
 Enjoy.  Gray Watson
 
