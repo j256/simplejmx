@@ -1,8 +1,7 @@
 Simple Java JMX
 ===============
 
-[![Maven Central](https://img.shields.io/maven-central/v/simplejmx/simplejmx?style=flat-square
-)](https://mvnrepository.com/artifact/com.j256.simplejmx/simplejmx/latest)
+[![Maven Central](https://img.shields.io/maven-central/v/com.j256.simplejmx/simplejmx?style=flat-square)](https://mvnrepository.com/artifact/com.j256.simplejmx/simplejmx/latest)
 [![javadoc](https://javadoc.io/badge2/com.j256.simplejmx/simplejmx/javadoc.svg)](https://javadoc.io/doc/com.j256.simplejmx/simplejmx)
 [![ChangeLog](https://img.shields.io/github/v/release/j256/simplejmx?label=changelog&display_name=release)](https://github.com/j256/simplejmx/blob/master/src/main/javadoc/doc-files/changelog.txt)
 [![Documentation](https://img.shields.io/github/v/release/j256/simplejmx?label=documentation&display_name=release)](https://htmlpreview.github.io/?https://github.com/j256/simplejmx/blob/master/src/main/javadoc/doc-files/simplejmx.html)
@@ -16,6 +15,7 @@ This package provides some Java classes to help with the publishing of objects u
 * Code available from the [git repository](https://github.com/j256/simplejmx).
 * [Documentation for the library](https://htmlpreview.github.io/?https://github.com/j256/simplejmx/blob/master/src/main/javadoc/doc-files/simplejmx.html).  More on the [home page](https://256stuff.com/sources/simplejmx/).
 * Maven packages are published via [Maven Central](https://mvnrepository.com/artifact/com.j256.simplejmx/simplejmx/latest)
+* You can also view the [online javadocs](https://javadoc.io/doc/com.j256.simplejmx/simplejmx)
 
 Enjoy.  Gray Watson
 
