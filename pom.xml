@@ -18,6 +18,10 @@
 		</license>
 	</licenses>
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<maven.compiler.source>18</maven.compiler.source>
+		<maven.compiler.target>18</maven.compiler.target>
 		<!-- optional dependency versions -->
 		<spring-version>5.3.39</spring-version>
 		<jetty-version>9.4.58.v20250814</jetty-version>
@@ -109,18 +113,16 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.9.1</version>
+				<version>3.12.0</version>
 				<executions>
 					<execution>
 						<goals>
 							<goal>jar</goal>
 						</goals>
-						<configuration>
-							<additionalparam>-tag inheritDoc:X -Xdoclint:none</additionalparam>
-						</configuration>
 					</execution>
 				</executions>
 				<configuration>
+					<source>${maven.compiler.source}</source>
 					<bottom>
 						This documentation content is licensed by Gray Watson
 						under the
@@ -129,9 +131,12 @@
 						&gt;Creative Commons Attribution-Share Alike 3.0
 						License.
 						&lt;/a&gt; </bottom>
-					<additionalparam>-tag inheritDoc:X -Xdoclint:none</additionalparam>
-					<excludePackageNames>
-					</excludePackageNames>
+					<doclint>none</doclint>
+					<docfilessubdirs>true</docfilessubdirs>
+					<links>
+						<link>
+							https://docs.oracle.com/en/java/javase/${maven.compiler.source}/docs/api/</link>
+					</links>
 				</configuration>
 			</plugin>
 			<plugin>

@@ -92,10 +92,10 @@ Maven packages are published via [Maven Central](https://mvnrepository.com/artif
 <dependency>
 	<groupId>com.j256.simplejmx</groupId>
 	<artifactId>simplejmx</artifactId>
-	<version>3.1</version>
+	<version>3.2</version>
 </dependency>
 ```
 
 # ChangeLog Release Notes
 
-See the [ChangeLog](https://github.com/j256/simplejmx/blob/master/src/main/javadoc/doc-files/changelog.txt)
+See the [ChangeLog file](https://github.com/j256/simplejmx/blob/master/src/main/javadoc/doc-files/changelog.txt)
