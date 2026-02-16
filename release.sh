@@ -3,7 +3,7 @@
 # Release script
 #
 
-LIBRARY="simplejmx"
+LIBRARY=`basename $(pwd)`
 LOCAL_DIR="$HOME/svn/local/$LIBRARY"
 
 #############################################################
@@ -39,7 +39,7 @@ release=$(grep version pom.xml | grep SNAPSHOT | head -1 | cut -f2 -d\> | cut -f
 
 /bin/echo ""
 /bin/echo "------------------------------------------------------- "
-/bin/echo -n "Enter release number [$release]: "
+/bin/echo -n "Enter ${LIBRARY} release number [$release]: "
 read rel
 if [ "$rel" != "" ]; then
     release=$rel
