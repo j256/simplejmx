@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.j256.simplejmx</groupId>
 	<artifactId>simplejmx</artifactId>
-	<version>3.2</version>
+	<version>3.3-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Simple JMX</name>
 	<url>https://256stuff.com/sources/simplejmx/</url>
@@ -34,7 +34,7 @@
 		<url>https://github.com/j256/simplejmx</url>
 		<connection>scm:git:ssh://git@github.com/j256/simplejmx.git</connection>
 		<developerConnection>scm:git:ssh://git@github.com/j256/simplejmx.git</developerConnection>
-	  <tag>simplejmx-3.2</tag>
+	  <tag>HEAD</tag>
   </scm>
 	<developers>
 		<developer>
