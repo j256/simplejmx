@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.PrintStream;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 
 import javax.management.JMException;
 
@@ -87,7 +88,11 @@ public class MainTest {
 
 	@Test
 	public void testConnectToServer() throws Exception {
-		int port = 8000;
+		int port;
+		try (ServerSocket socket = new ServerSocket(0)) {
+		    socket.setReuseAddress(true);
+		    port = socket.getLocalPort();
+		}
 		InetAddress address = InetAddress.getByName("127.0.0.1");
 		JmxServer server = new JmxServer(address, port);
 		try {

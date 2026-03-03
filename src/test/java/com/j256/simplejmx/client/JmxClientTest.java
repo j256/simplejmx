@@ -6,7 +6,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -35,7 +37,6 @@ import com.j256.simplejmx.server.JmxServer;
 
 public class JmxClientTest {
 
-	private static final int JMX_PORT = 8000;
 	private static final String JMX_DOMAIN = "foo.com";
 
 	private static JmxServer server;
@@ -49,8 +50,9 @@ public class JmxClientTest {
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
+		int port = getServerPort();
 		InetAddress address = InetAddress.getByName("localhost");
-		server = new JmxServer(address, JMX_PORT);
+		server = new JmxServer(address, port);
 		server.start();
 		testObject = new JmxClientTestObject();
 		server.register(testObject);
@@ -62,8 +64,8 @@ public class JmxClientTest {
 		anotherBeanName = JmxClientTestAnotherObject.class.getSimpleName();
 		anotherObjectName = ObjectNameUtil.makeObjectName(JMX_DOMAIN, anotherBeanName);
 
-		client = new JmxClient(address, JMX_PORT);
-		closedClient = new JmxClient(address, JMX_PORT);
+		client = new JmxClient(address, port);
+		closedClient = new JmxClient(address, port);
 		closedClient.closeThrow();
 		closedClient.closeThrow();
 	}
@@ -89,7 +91,7 @@ public class JmxClientTest {
 	@Test
 	public void testHostPort() throws Exception {
 		@SuppressWarnings("resource")
-		JmxClient client = new JmxClient("localhost", JMX_PORT);
+		JmxClient client = new JmxClient("localhost", server.getServerPort());
 		try {
 			client.getAttribute(objectName, "x");
 		} finally {
@@ -100,7 +102,7 @@ public class JmxClientTest {
 	@Test
 	public void testHostPortEnvironment() throws Exception {
 		@SuppressWarnings("resource")
-		JmxClient client = new JmxClient("localhost", JMX_PORT,
+		JmxClient client = new JmxClient("localhost", server.getServerPort(),
 				Collections.<String, Object> singletonMap("jmx.remote.x.client.connection.check.period", 5000L));
 		try {
 			client.getAttribute(objectName, "x");
@@ -529,7 +531,7 @@ public class JmxClientTest {
 	@Test
 	public void testCoverage() {
 		try {
-			new JmxClient(JMX_PORT).close();
+			new JmxClient(server.getServerPort()).close();
 		} catch (JMException jme) {
 			// ignored
 		}
@@ -537,31 +539,39 @@ public class JmxClientTest {
 
 	@Test
 	public void testUserNamePass() throws Exception {
-		new JmxClient("localhost", JMX_PORT, "user", "pass").close();
+		new JmxClient("localhost", server.getServerPort(), "user", "pass").close();
 	}
 
 	@Test
 	public void testUserNamePassNull() throws Exception {
-		new JmxClient("localhost", JMX_PORT, null, null).close();
+		new JmxClient("localhost", server.getServerPort(), null, null).close();
 	}
 
 	@Test
 	public void testServiceUrl() throws Exception {
-		new JmxClient("service:jmx:rmi:///jndi/rmi://localhost:" + JMX_PORT + "/jmxrmi").close();
+		new JmxClient("service:jmx:rmi:///jndi/rmi://localhost:" + server.getServerPort() + "/jmxrmi").close();
 	}
 
 	@Test
 	public void testUserNamePassServiceUrl() throws Exception {
-		new JmxClient("service:jmx:rmi:///jndi/rmi://localhost:" + JMX_PORT + "/jmxrmi", null, null).close();
+		new JmxClient("service:jmx:rmi:///jndi/rmi://localhost:" + server.getServerPort() + "/jmxrmi", null, null)
+				.close();
 	}
 
 	@Test
 	public void testUserNamePassNull2() throws Exception {
-		new JmxClient("service:jmx:rmi:///jndi/rmi://localhost:" + JMX_PORT + "/jmxrmi", null, null,
+		new JmxClient("service:jmx:rmi:///jndi/rmi://localhost:" + server.getServerPort() + "/jmxrmi", null, null,
 				Collections.<String, Object> emptyMap()).close();
 	}
 
 	/* ======================================================================= */
+
+	private static int getServerPort() throws IOException {
+		try (ServerSocket socket = new ServerSocket(0)) {
+			socket.setReuseAddress(true);
+			return socket.getLocalPort();
+		}
+	}
 
 	private void testThingtoString(String methodName, Object arg) throws Exception {
 		String argString = arg.toString();

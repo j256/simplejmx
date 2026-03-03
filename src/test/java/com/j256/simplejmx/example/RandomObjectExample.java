@@ -1,5 +1,7 @@
 package com.j256.simplejmx.example;
 
+import java.net.ServerSocket;
+
 import com.j256.simplejmx.common.JmxAttributeFieldInfo;
 import com.j256.simplejmx.common.JmxAttributeMethodInfo;
 import com.j256.simplejmx.common.JmxOperationInfo;
@@ -21,41 +23,41 @@ import com.j256.simplejmx.server.PublishAllBeanWrapper;
  */
 public class RandomObjectExample {
 
-	private static final int JMX_PORT = 8000;
-
 	public static void main(String[] args) throws Exception {
 		new RandomObjectExample().doMain(args);
 	}
 
 	private void doMain(String[] args) throws Exception {
 
+		int port;
+		try (ServerSocket socket = new ServerSocket(0)) {
+			socket.setReuseAddress(true);
+			port = socket.getLocalPort();
+		}
+
 		// create the object we will be exposing with JMX
 		RuntimeCounter lookupCache = new RuntimeCounter();
 
 		// create a new JMX server listening on a port
-		JmxServer jmxServer = new JmxServer(JMX_PORT);
+		JmxServer jmxServer = new JmxServer(port);
 		try {
 			// start our server
 			jmxServer.start();
 
 			// attribute fields exposed through reflection
-			JmxAttributeFieldInfo[] attributeFieldInfos =
-					new JmxAttributeFieldInfo[] {
-							new JmxAttributeFieldInfo("startMillis", true, false /* not writable */,
-									"When our timer started"),
-							new JmxAttributeFieldInfo("showSeconds", true, true, "Show runtime in seconds") };
+			JmxAttributeFieldInfo[] attributeFieldInfos = new JmxAttributeFieldInfo[] {
+					new JmxAttributeFieldInfo("startMillis", true, false /* not writable */, "When our timer started"),
+					new JmxAttributeFieldInfo("showSeconds", true, true, "Show runtime in seconds") };
 			// attribute get/set/is methods
-			JmxAttributeMethodInfo[] attributeMethodInfos =
-					new JmxAttributeMethodInfo[] { new JmxAttributeMethodInfo("getRunTime",
-							"Run time in seconds or milliseconds") };
+			JmxAttributeMethodInfo[] attributeMethodInfos = new JmxAttributeMethodInfo[] {
+					new JmxAttributeMethodInfo("getRunTime", "Run time in seconds or milliseconds") };
 			// method operations
-			JmxOperationInfo[] operationInfos =
-					new JmxOperationInfo[] {
-							new JmxOperationInfo("restartTimer", null, null, OperationAction.UNKNOWN,
-									"Restart the timer to the current time"),
-							new JmxOperationInfo("restartTimerToValue", new String[] { "startMillis" },
-									new String[] { "Milliseconds to set our start-time to" }, OperationAction.UNKNOWN,
-									"Set the timer as starting from a particular milliseconds value") };
+			JmxOperationInfo[] operationInfos = new JmxOperationInfo[] {
+					new JmxOperationInfo("restartTimer", null, null, OperationAction.UNKNOWN,
+							"Restart the timer to the current time"),
+					new JmxOperationInfo("restartTimerToValue", new String[] { "startMillis" },
+							new String[] { "Milliseconds to set our start-time to" }, OperationAction.UNKNOWN,
+							"Set the timer as starting from a particular milliseconds value") };
 			/*
 			 * Register our lookupCache object defined below but with specific field-attributes, method-attributes, and
 			 * method-operations defined.
@@ -68,7 +70,7 @@ public class RandomObjectExample {
 			// do your other code here...
 			// we just sleep forever to let the server do its stuff
 			System.out.println("Sleeping for a while to let the server do its stuff");
-			System.out.println("JMX server on port " + JMX_PORT);
+			System.out.println("JMX server on port " + port);
 			Thread.sleep(1000000000);
 
 		} finally {

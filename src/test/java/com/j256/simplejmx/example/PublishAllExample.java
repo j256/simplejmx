@@ -1,5 +1,7 @@
 package com.j256.simplejmx.example;
 
+import java.net.ServerSocket;
+
 import com.j256.simplejmx.common.JmxResourceInfo;
 import com.j256.simplejmx.server.JmxServer;
 import com.j256.simplejmx.server.PublishAllBeanWrapper;
@@ -17,19 +19,23 @@ import com.j256.simplejmx.server.PublishAllBeanWrapper;
  */
 public class PublishAllExample {
 
-	private static final int JMX_PORT = 8000;
-
 	public static void main(String[] args) throws Exception {
 		new PublishAllExample().doMain(args);
 	}
 
 	private void doMain(String[] args) throws Exception {
 
+		int port;
+		try (ServerSocket socket = new ServerSocket(0)) {
+		    socket.setReuseAddress(true);
+		    port = socket.getLocalPort();
+		}
+
 		// create the object we will be exposing with JMX
 		RuntimeCounter counter = new RuntimeCounter();
 
 		// create a new JMX server listening on a specific port
-		JmxServer jmxServer = new JmxServer(JMX_PORT);
+		JmxServer jmxServer = new JmxServer(port);
 
 		try {
 			// start our server
@@ -41,7 +47,7 @@ public class PublishAllExample {
 
 			// we just sleep forever to let the jmx server do its stuff
 			System.out.println("Sleeping for a while to let the server do its stuff");
-			System.out.println("JMX server on port " + JMX_PORT);
+			System.out.println("JMX server on port " + port);
 			Thread.sleep(1000000000);
 
 		} finally {

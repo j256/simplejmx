@@ -7,8 +7,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -21,7 +23,6 @@ import com.j256.simplejmx.server.JmxServer;
 
 public class CommandLineJmxClientTest {
 
-	private static final int JMX_PORT = 8000;
 	private static final String JMX_DOMAIN = "foo.com";
 
 	private static JmxServer server;
@@ -31,12 +32,13 @@ public class CommandLineJmxClientTest {
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
+		int port = getServerPort();
 		InetAddress address = InetAddress.getByName("localhost");
-		server = new JmxServer(InetAddress.getByName("localhost"), JMX_PORT);
+		server = new JmxServer(InetAddress.getByName("localhost"), port);
 		server.start();
 		testObj = new CommandLineJmxClientTestObject();
 		server.register(testObj);
-		client = new CommandLineJmxClient(address, JMX_PORT);
+		client = new CommandLineJmxClient(address, port);
 		objectNameString = JMX_DOMAIN + ":name=" + CommandLineJmxClientTestObject.class.getSimpleName();
 	}
 
@@ -54,7 +56,7 @@ public class CommandLineJmxClientTest {
 
 	@Test
 	public void testCommandLine() throws Exception {
-		CommandLineJmxClient client = new CommandLineJmxClient("localhost", JMX_PORT);
+		CommandLineJmxClient client = new CommandLineJmxClient("localhost", server.getServerPort());
 		ByteArrayOutputStream array = new ByteArrayOutputStream();
 		System.setOut(new PrintStream(array));
 		System.setIn(new ByteArrayInputStream("help".getBytes()));
@@ -65,15 +67,15 @@ public class CommandLineJmxClientTest {
 
 	@Test
 	public void testDifferentConstructor() throws Exception {
-		CommandLineJmxClient client =
-				new CommandLineJmxClient("service:jmx:rmi:///jndi/rmi://localhost:" + JMX_PORT + "/jmxrmi");
+		CommandLineJmxClient client = new CommandLineJmxClient(
+				"service:jmx:rmi:///jndi/rmi://localhost:" + server.getServerPort() + "/jmxrmi");
 		String output = getClientOutput(client, "help");
 		assertTrue(output, output.matches("(?s).*execute a script.*"));
 	}
 
 	@Test
 	public void testRunBatch() throws Exception {
-		CommandLineJmxClient client = new CommandLineJmxClient("localhost", JMX_PORT);
+		CommandLineJmxClient client = new CommandLineJmxClient("localhost", server.getServerPort());
 		File scriptFile = new File("target/scriptFileTest.t");
 		try {
 			scriptFile.delete();
@@ -95,7 +97,7 @@ public class CommandLineJmxClientTest {
 
 	@Test
 	public void testScriptFileLoop() throws Exception {
-		CommandLineJmxClient client = new CommandLineJmxClient("localhost", JMX_PORT);
+		CommandLineJmxClient client = new CommandLineJmxClient("localhost", server.getServerPort());
 		File scriptFile = new File("target/scriptFileTest.t");
 		try {
 			scriptFile.delete();
@@ -471,6 +473,13 @@ public class CommandLineJmxClientTest {
 		System.setOut(new PrintStream(array));
 		client.runCommands(commands);
 		return new String(array.toByteArray());
+	}
+
+	private static int getServerPort() throws IOException {
+		try (ServerSocket socket = new ServerSocket(0)) {
+			socket.setReuseAddress(true);
+			return socket.getLocalPort();
+		}
 	}
 
 	@JmxResource(domainName = JMX_DOMAIN)

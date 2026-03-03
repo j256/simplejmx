@@ -1,5 +1,7 @@
 package com.j256.simplejmx.example;
 
+import java.net.ServerSocket;
+
 import com.j256.simplejmx.common.JmxAttributeField;
 import com.j256.simplejmx.common.JmxAttributeMethod;
 import com.j256.simplejmx.common.JmxOperation;
@@ -19,32 +21,40 @@ import com.j256.simplejmx.web.JmxJetty9WebServer;
  */
 public class WebServerExample {
 
-	private static final int JMX_PORT = 8000;
-	private static final int WEB_PORT = 8080;
-
 	public static void main(String[] args) throws Exception {
 		new WebServerExample().doMain(args);
 	}
 
 	private void doMain(String[] args) throws Exception {
 
+		int jmxPort;
+		try (ServerSocket socket = new ServerSocket(0)) {
+			socket.setReuseAddress(true);
+			jmxPort = socket.getLocalPort();
+		}
+		int webPort;
+		try (ServerSocket socket = new ServerSocket(0)) {
+			socket.setReuseAddress(true);
+			webPort = socket.getLocalPort();
+		}
+
 		// create a new JMX server listening on a specific port
-		JmxServer jmxServer = new JmxServer(JMX_PORT);
+		JmxServer jmxServer = new JmxServer(jmxPort);
 		jmxServer.start();
 
 		RuntimeCounter counter = new RuntimeCounter();
 		jmxServer.register(counter);
 
 		// create a web server publisher listening on a specific port
-		JmxJetty9WebServer jmxWebServer = new JmxJetty9WebServer(WEB_PORT);
+		JmxJetty9WebServer jmxWebServer = new JmxJetty9WebServer(webPort);
 		jmxWebServer.start();
 
 		try {
 			// do your other code here...
 			// we just sleep forever to let the jmx server do its stuff
 			System.out.println("Sleeping for a while to let the server do its stuff");
-			System.out.println("JMX server on port " + JMX_PORT);
-			System.out.println("Web server on port " + WEB_PORT);
+			System.out.println("JMX server on port " + jmxPort);
+			System.out.println("Web server on port " + webPort);
 			Thread.sleep(1000000000);
 
 		} finally {
