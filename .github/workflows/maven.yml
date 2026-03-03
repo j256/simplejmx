@@ -23,11 +23,11 @@ jobs:
         cache: maven
     - name: Cache Maven packages
       uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository # The path to cache the local repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }} # Cache key based on OS and pom.xml hash
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
-          ${{ runner.os }}-maven- # Fallback key if an exact match isn't found
+          ${{ runner.os }}-maven-
     - name: Build with Maven
       run: mvn -B package --file pom.xml
     - name: Generate coverage report using jacoco
