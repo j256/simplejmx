@@ -28,5 +28,5 @@ jobs:
       run: mvn -B jacoco:report
     - name: Upload coverage report to CodeCov
       run: bash <(curl -s https://codecov.io/bash)
-    -name: Test checks publishing to github
+    - name: Test checks publishing to github
       run: mvn -X com.j256.testcheckpublisher:test-check-publisher-maven-plugin:publish
