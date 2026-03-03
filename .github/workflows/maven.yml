@@ -37,3 +37,5 @@ jobs:
       run: bash <(curl -s https://codecov.io/bash)
     - name: Test checks publishing to github
       run: mvn -X com.j256.testcheckpublisher:test-check-publisher-maven-plugin:publish
+      env:
+        TEST_CHECK_PUBLISHER_SECRET: ${{ secrets.TEST_CHECK_PUBLISHER_SECRET }}
