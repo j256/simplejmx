@@ -222,6 +222,8 @@
 					<failOnError>false</failOnError>
 				</configuration>
 			</plugin>
+		</plugins>
+		<pluginManagement>
 			<plugins>
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
