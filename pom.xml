@@ -133,11 +133,6 @@
 						&lt;/a&gt; </bottom>
 					<doclint>none</doclint>
 					<docfilessubdirs>true</docfilessubdirs>
-					<detectOfflineLinks>false</detectOfflineLinks>
-					<links>
-						<link>
-							https://docs.oracle.com/en/java/javase/${maven.compiler.source}/docs/api/</link>
-					</links>
 				</configuration>
 			</plugin>
 			<plugin>
