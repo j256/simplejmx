@@ -95,11 +95,6 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.6</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
 				<version>2.2.1</version>
 				<executions>
@@ -217,7 +212,7 @@
 			<plugin>
 				<groupId>com.j256.testcheckpublisher</groupId>
 				<artifactId>test-check-publisher-maven-plugin</artifactId>
-				<version>1.5</version>
+				<version>1.6</version>
 				<configuration>
 					<failOnError>false</failOnError>
 				</configuration>
