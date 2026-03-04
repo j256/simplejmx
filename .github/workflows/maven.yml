@@ -35,6 +35,8 @@ jobs:
       run: mvn -B jacoco:report
     - name: Upload coverage report to CodeCov
       run: bash <(curl -s https://codecov.io/bash)
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     - name: Test checks publishing to github
       run: mvn -X com.j256.testcheckpublisher:test-check-publisher-maven-plugin:publish
       env:
