@@ -33,6 +33,14 @@ jobs:
       run: mvn -B package --file pom.xml
     - name: Generate coverage report using jacoco
       run: mvn -B jacoco:report
+    - name: echo 1
+      run: echo secrets.CODECOV_TOKEN
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    - name: echo 2
+      run: echo ${ secrets.CODECOV_TOKEN }
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     - name: Upload coverage report to CodeCov
       run: bash <(curl -s https://codecov.io/bash)
       env:
