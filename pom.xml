@@ -34,8 +34,8 @@
 		<url>https://github.com/j256/simplejmx</url>
 		<connection>scm:git:ssh://git@github.com/j256/simplejmx.git</connection>
 		<developerConnection>scm:git:ssh://git@github.com/j256/simplejmx.git</developerConnection>
-	  <tag>HEAD</tag>
-  </scm>
+		<tag>HEAD</tag>
+	</scm>
 	<developers>
 		<developer>
 			<id>gray</id>
